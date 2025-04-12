@@ -196,8 +196,8 @@ def predict_fight(fighter_a, fighter_b, model_info=None, odds_a=0, odds_b=0):
     )
     
     # Ajouter un peu de bruit pour simuler un modèle
-    a_score += np.random.normal(0, 0.2)
-    b_score += np.random.normal(0, 0.2)
+    #a_score += np.random.normal(0, 0.2)
+    #b_score += np.random.normal(0, 0.2)
     
     # Normaliser pour obtenir des probabilités
     total = a_score + b_score
