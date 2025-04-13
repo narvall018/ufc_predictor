@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
 import os
+import pickle
+import joblib
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -83,10 +85,302 @@ st.markdown("""
         border-radius: 10px;
         padding: 15px;
     }
+    
+    /* Badge pour le modèle ML */
+    .ml-badge {
+        background-color: #4CAF50;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    
+    /* Badge pour le modèle classique */
+    .classic-badge {
+        background-color: #2196F3;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    
+    /* Style pour le sélecteur de méthode de prédiction */
+    .prediction-method {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Fonction pour charger le fichier de statistiques des combattants
+# FONCTIONS POUR LE MODÈLE ML
+
+@st.cache_resource
+def load_ml_model():
+    """
+    Charge le modèle ML entraîné, le scaler et les feature names
+    """
+    try:
+        # Essayer de charger avec joblib (plus rapide pour les gros modèles)
+        if os.path.exists("ufc_prediction_model.joblib"):
+            model_data = joblib.load("ufc_prediction_model.joblib")
+            print("Modèle chargé depuis joblib")
+        # Sinon, essayer avec pickle
+        elif os.path.exists("ufc_prediction_model.pkl"):
+            with open("ufc_prediction_model.pkl", 'rb') as file:
+                model_data = pickle.load(file)
+            print("Modèle chargé depuis pickle")
+        else:
+            print("Aucun modèle trouvé")
+            return None, None, None
+        
+        model = model_data.get('model')
+        scaler = model_data.get('scaler')
+        feature_names = model_data.get('feature_names')
+        
+        return model, scaler, feature_names
+    except Exception as e:
+        print(f"Erreur lors du chargement du modèle: {e}")
+        return None, None, None
+
+def get_float_value(stats_dict, key, default=0.0):
+    """
+    Récupère une valeur du dictionnaire et la convertit en float.
+    """
+    if key not in stats_dict:
+        return default
+        
+    value = stats_dict[key]
+    
+    if isinstance(value, (int, float)):
+        return float(value)
+    
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
+def create_ml_features(r_stats, b_stats):
+    """
+    Crée les features nécessaires pour le modèle ML
+    """
+    features = {}
+    
+    # Liste des statistiques numériques que nous utiliserons
+    numeric_stats = ['wins', 'losses', 'height', 'weight', 'reach', 'age', 
+                     'SLpM', 'sig_str_acc', 'SApM', 'str_def', 
+                     'td_avg', 'td_acc', 'td_def', 'sub_avg']
+    
+    # Extraire et convertir les statistiques numériques
+    for stat in numeric_stats:
+        r_value = get_float_value(r_stats, stat, 0.0)
+        b_value = get_float_value(b_stats, stat, 0.0)
+        
+        features[f'r_{stat}'] = r_value
+        features[f'b_{stat}'] = b_value
+        features[f'diff_{stat}'] = r_value - b_value
+        
+        if b_value != 0:
+            features[f'ratio_{stat}'] = r_value / b_value
+        else:
+            features[f'ratio_{stat}'] = 0.0
+    
+    # Features avancées
+    
+    # 1. Win ratio et expérience
+    r_wins = get_float_value(r_stats, 'wins', 0)
+    r_losses = get_float_value(r_stats, 'losses', 0)
+    b_wins = get_float_value(b_stats, 'wins', 0)
+    b_losses = get_float_value(b_stats, 'losses', 0)
+    
+    # Nombre total de combats (expérience)
+    features['r_total_fights'] = r_wins + r_losses
+    features['b_total_fights'] = b_wins + b_losses
+    features['diff_total_fights'] = features['r_total_fights'] - features['b_total_fights']
+    
+    # Win ratio
+    if r_wins + r_losses > 0:
+        features['r_win_ratio'] = r_wins / (r_wins + r_losses)
+    else:
+        features['r_win_ratio'] = 0
+    
+    if b_wins + b_losses > 0:
+        features['b_win_ratio'] = b_wins / (b_wins + b_losses)
+    else:
+        features['b_win_ratio'] = 0
+        
+    features['diff_win_ratio'] = features['r_win_ratio'] - features['b_win_ratio']
+    
+    # 2. Striking efficiency
+    r_slpm = get_float_value(r_stats, 'SLpM', 0)
+    r_sapm = get_float_value(r_stats, 'SApM', 0)
+    b_slpm = get_float_value(b_stats, 'SLpM', 0)
+    b_sapm = get_float_value(b_stats, 'SApM', 0)
+    
+    # Efficacité de frappe
+    features['r_striking_efficiency'] = r_slpm - r_sapm
+    features['b_striking_efficiency'] = b_slpm - b_sapm
+    features['diff_striking_efficiency'] = features['r_striking_efficiency'] - features['b_striking_efficiency']
+    
+    # Ratio frappe/défense
+    if r_sapm > 0:
+        features['r_strike_defense_ratio'] = r_slpm / r_sapm
+    else:
+        features['r_strike_defense_ratio'] = r_slpm if r_slpm > 0 else 1.0
+        
+    if b_sapm > 0:
+        features['b_strike_defense_ratio'] = b_slpm / b_sapm
+    else:
+        features['b_strike_defense_ratio'] = b_slpm if b_slpm > 0 else 1.0
+        
+    features['diff_strike_defense_ratio'] = features['r_strike_defense_ratio'] - features['b_strike_defense_ratio']
+    
+    # 3. Différences physiques 
+    r_height = get_float_value(r_stats, 'height', 0)
+    r_weight = get_float_value(r_stats, 'weight', 0)
+    r_reach = get_float_value(r_stats, 'reach', 0)
+    b_height = get_float_value(b_stats, 'height', 0)
+    b_weight = get_float_value(b_stats, 'weight', 0)
+    b_reach = get_float_value(b_stats, 'reach', 0)
+    
+    # Rapport taille/poids
+    if r_weight > 0:
+        features['r_height_weight_ratio'] = r_height / r_weight
+    else:
+        features['r_height_weight_ratio'] = 0
+        
+    if b_weight > 0:
+        features['b_height_weight_ratio'] = b_height / b_weight
+    else:
+        features['b_height_weight_ratio'] = 0
+        
+    features['diff_height_weight_ratio'] = features['r_height_weight_ratio'] - features['b_height_weight_ratio']
+    
+    # Avantage d'allonge normalisé par la taille
+    if r_height > 0:
+        features['r_reach_height_ratio'] = r_reach / r_height
+    else:
+        features['r_reach_height_ratio'] = 0
+        
+    if b_height > 0:
+        features['b_reach_height_ratio'] = b_reach / b_height
+    else:
+        features['b_reach_height_ratio'] = 0
+        
+    features['diff_reach_height_ratio'] = features['r_reach_height_ratio'] - features['b_reach_height_ratio']
+    
+    # 4. Indicateurs de style de combat
+    r_td_avg = get_float_value(r_stats, 'td_avg', 0)
+    r_sub_avg = get_float_value(r_stats, 'sub_avg', 0)
+    r_str_def = get_float_value(r_stats, 'str_def', 0)
+    r_td_def = get_float_value(r_stats, 'td_def', 0)
+    b_td_avg = get_float_value(b_stats, 'td_avg', 0)
+    b_sub_avg = get_float_value(b_stats, 'sub_avg', 0)
+    b_str_def = get_float_value(b_stats, 'str_def', 0)
+    b_td_def = get_float_value(b_stats, 'td_def', 0)
+    
+    # Spécialiste de striking vs grappling
+    if r_td_avg > 0:
+        features['r_striking_grappling_ratio'] = r_slpm / r_td_avg
+    else:
+        features['r_striking_grappling_ratio'] = r_slpm if r_slpm > 0 else 0
+        
+    if b_td_avg > 0:
+        features['b_striking_grappling_ratio'] = b_slpm / b_td_avg
+    else:
+        features['b_striking_grappling_ratio'] = b_slpm if b_slpm > 0 else 0
+        
+    # Offensive vs défensive (plus le ratio est élevé, plus le combattant est offensif)
+    features['r_offensive_rating'] = r_slpm * r_td_avg * (1 + r_sub_avg)
+    features['b_offensive_rating'] = b_slpm * b_td_avg * (1 + b_sub_avg)
+    features['diff_offensive_rating'] = features['r_offensive_rating'] - features['b_offensive_rating']
+    
+    features['r_defensive_rating'] = r_str_def * r_td_def
+    features['b_defensive_rating'] = b_str_def * b_td_def
+    features['diff_defensive_rating'] = features['r_defensive_rating'] - features['b_defensive_rating']
+    
+    # 5. Variables composites
+    # Performance globale = win_ratio * offensive_rating * defensive_rating
+    features['r_overall_performance'] = features['r_win_ratio'] * features['r_offensive_rating'] * features['r_defensive_rating']
+    features['b_overall_performance'] = features['b_win_ratio'] * features['b_offensive_rating'] * features['b_defensive_rating']
+    features['diff_overall_performance'] = features['r_overall_performance'] - features['b_overall_performance']
+    
+    # Avantage physique combiné (taille, poids, allonge)
+    features['r_physical_advantage'] = features['r_reach_height_ratio'] * features['r_height_weight_ratio']
+    features['b_physical_advantage'] = features['b_reach_height_ratio'] * features['b_height_weight_ratio']
+    features['diff_physical_advantage'] = features['r_physical_advantage'] - features['b_physical_advantage']
+    
+    # 6. Style matching
+    if 'stance' in r_stats and 'stance' in b_stats:
+        features['same_stance'] = 1 if r_stats['stance'] == b_stats['stance'] else 0
+        
+        # One-hot encoding des stances
+        r_stance = r_stats.get('stance', '').lower()
+        b_stance = b_stats.get('stance', '').lower()
+        
+        stances = ['orthodox', 'southpaw', 'switch', 'open stance']
+        for stance in stances:
+            features[f'r_stance_{stance}'] = 1 if r_stance == stance else 0
+            features[f'b_stance_{stance}'] = 1 if b_stance == stance else 0
+    
+    return features
+
+def predict_with_ml(r_stats, b_stats, model, scaler, feature_names):
+    """
+    Prédit l'issue d'un combat avec le modèle ML
+    """
+    # Si le modèle n'est pas chargé, retourner None
+    if model is None or scaler is None or feature_names is None:
+        return None
+    
+    try:
+        # Créer les features
+        features = create_ml_features(r_stats, b_stats)
+        
+        # Convertir en DataFrame
+        features_df = pd.DataFrame([features])
+        
+        # S'assurer que toutes les colonnes nécessaires sont présentes
+        for col in feature_names:
+            if col not in features_df.columns:
+                features_df[col] = 0
+        
+        # Ne garder que les colonnes utilisées par le modèle
+        features_df = features_df[feature_names]
+        
+        # Remplacer les valeurs infinies et NaN
+        features_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+        features_df.fillna(0, inplace=True)
+        
+        # Normaliser
+        X_scaled = scaler.transform(features_df)
+        
+        # Prédire
+        if hasattr(model, "predict_proba"):
+            red_prob = model.predict_proba(X_scaled)[0][1]
+        else:
+            red_prob = float(model.predict(X_scaled)[0])
+        
+        blue_prob = 1 - red_prob
+        
+        # Créer le résultat
+        result = {
+            'prediction': 'Red' if red_prob > blue_prob else 'Blue',
+            'red_probability': red_prob,
+            'blue_probability': blue_prob,
+            'confidence': 'Élevé' if abs(red_prob - blue_prob) > 0.2 else 'Modéré'
+        }
+        
+        return result
+    except Exception as e:
+        st.error(f"Erreur lors de la prédiction ML: {e}")
+        return None
+
+# FONCTIONS ORIGINALES DE L'APP
+
 def load_fighters_stats(file_path):
     """
     Charge les statistiques des combattants depuis un fichier texte
@@ -173,10 +467,10 @@ def deduplicate_fighters(fighters_list):
     
     return unique_fighters
 
-# Fonction pour prédire l'issue d'un combat
-def predict_fight(fighter_a, fighter_b, model_info=None, odds_a=0, odds_b=0):
+# Fonction pour prédire l'issue d'un combat (méthode originale basée sur les statistiques)
+def predict_fight_classic(fighter_a, fighter_b, odds_a=0, odds_b=0):
     """
-    Prédit l'issue d'un combat avec analyse de paris
+    Prédit l'issue d'un combat avec analyse de paris (méthode classique)
     """
     # Calcul des scores de base
     a_score = (
@@ -194,10 +488,6 @@ def predict_fight(fighter_a, fighter_b, model_info=None, odds_a=0, odds_b=0):
         fighter_b['td_avg'] * fighter_b['td_acc'] + 
         fighter_b['sub_avg']
     )
-    
-    # Ajouter un peu de bruit pour simuler un modèle
-    #a_score += np.random.normal(0, 0.2)
-    #b_score += np.random.normal(0, 0.2)
     
     # Normaliser pour obtenir des probabilités
     total = a_score + b_score
@@ -247,6 +537,82 @@ def predict_fight(fighter_a, fighter_b, model_info=None, odds_a=0, odds_b=0):
         }
     
     return result
+
+# Fonction unifiée pour prédire avec l'un ou l'autre modèle
+def predict_fight(fighter_a, fighter_b, method='classic', odds_a=0, odds_b=0):
+    """
+    Prédit l'issue d'un combat en utilisant la méthode spécifiée
+    """
+    if method == 'ml':
+        # Charger le modèle ML si nécessaire
+        model, scaler, feature_names = load_ml_model()
+        
+        # Vérifier si le modèle a été chargé correctement
+        if model is None:
+            st.warning("⚠️ Le modèle ML n'a pas pu être chargé. Utilisation de la méthode classique à la place.")
+            # Fallback à la méthode classique
+            prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
+            prediction['method'] = 'classic'  # Indiquer la méthode utilisée
+            return prediction
+        
+        # Prédire avec le modèle ML
+        prediction = predict_with_ml(fighter_a, fighter_b, model, scaler, feature_names)
+        
+        if prediction is None:
+            st.warning("⚠️ Erreur lors de la prédiction ML. Utilisation de la méthode classique à la place.")
+            # Fallback à la méthode classique
+            prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
+            prediction['method'] = 'classic'  # Indiquer la méthode utilisée
+            return prediction
+        
+        # Compléter avec les noms pour maintenir la compatibilité
+        prediction['winner_name'] = fighter_a['name'] if prediction['prediction'] == 'Red' else fighter_b['name']
+        prediction['loser_name'] = fighter_b['name'] if prediction['prediction'] == 'Red' else fighter_a['name']
+        prediction['method'] = 'ml'  # Indiquer la méthode utilisée
+        
+        # Ajouter l'analyse des paris si des cotes sont fournies
+        if odds_a > 0 and odds_b > 0:
+            red_prob = prediction['red_probability']
+            blue_prob = prediction['blue_probability']
+            
+            # Probabilité implicite selon les bookmakers
+            implied_prob_a = 1 / odds_a
+            implied_prob_b = 1 / odds_b
+            
+            # Normaliser pour éliminer la marge du bookmaker
+            total_implied = implied_prob_a + implied_prob_b
+            implied_prob_a_norm = implied_prob_a / total_implied
+            implied_prob_b_norm = implied_prob_b / total_implied
+            
+            # Valeur espérée (Expected Value)
+            ev_a = (red_prob * odds_a) - 1
+            ev_b = (blue_prob * odds_b) - 1
+            
+            # Recommandation de pari
+            bet_recommendation_a = "Favorable" if ev_a > 0.1 else "Neutre" if ev_a > -0.1 else "Défavorable"
+            bet_recommendation_b = "Favorable" if ev_b > 0.1 else "Neutre" if ev_b > -0.1 else "Défavorable"
+            
+            prediction['betting'] = {
+                'odds_red': odds_a,
+                'odds_blue': odds_b,
+                'implied_prob_red': implied_prob_a_norm,
+                'implied_prob_blue': implied_prob_b_norm,
+                'ev_red': ev_a,
+                'ev_blue': ev_b,
+                'recommendation_red': bet_recommendation_a,
+                'recommendation_blue': bet_recommendation_b,
+                'edge_red': red_prob - implied_prob_a_norm,
+                'edge_blue': blue_prob - implied_prob_b_norm
+            }
+        
+        return prediction
+    else:
+        # Prédire avec la méthode classique
+        prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
+        prediction['method'] = 'classic'  # Indiquer la méthode utilisée
+        return prediction
+
+# FONCTIONS DE VISUALISATION
 
 def create_radar_chart(fighter_a, fighter_b):
     """Crée un graphique radar comparant les attributs des combattants"""
@@ -505,10 +871,16 @@ def create_stats_comparison_df(fighter_a, fighter_b):
     
     return pd.DataFrame(data)
 
+# FONCTION PRINCIPALE
+
 def main():
     # Titre principal
     st.markdown('<div class="main-title">🥊 Prédicteur de Combats UFC 🥊</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Analysez et prédisez l\'issue des affrontements</div>', unsafe_allow_html=True)
+    
+    # Vérifier si le modèle ML est disponible
+    model, _, _ = load_ml_model()
+    ml_available = model is not None
     
     # Chargement des données
     fighter_stats_path = 'fighters_stats.txt'
@@ -594,6 +966,17 @@ def main():
     default_index_b = min(1, len(fighter_b_options) - 1) if len(fighter_b_options) > 1 and fighter_b_options[0] == fighter_a_name else 0
     fighter_b_name = st.sidebar.selectbox("Sélectionner Bleu", fighter_b_options, index=default_index_b)
     
+    # Méthode de prédiction
+    st.sidebar.markdown("## 🧠 Méthode de prédiction")
+    prediction_method = st.sidebar.radio(
+        "Sélectionner une méthode:",
+        ['Machine Learning' if ml_available else 'Machine Learning (non disponible)', 'Calcul statistique classique'],
+        horizontal=True
+    )
+    
+    # Convertir le choix en code pour la fonction de prédiction
+    method = 'ml' if prediction_method.startswith('Machine Learning') and ml_available else 'classic'
+    
     # Options de paris
     st.sidebar.markdown("## 💰 Options de paris")
     odds_a = st.sidebar.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.05, format="%.2f")
@@ -615,7 +998,7 @@ def main():
             prediction = predict_fight(
                 fighter_a, 
                 fighter_b, 
-                None,
+                method=method,
                 odds_a=odds_a,
                 odds_b=odds_b
             )
@@ -624,6 +1007,9 @@ def main():
             winner_color = "red" if prediction['prediction'] == 'Red' else "blue"
             winner_name = prediction['winner_name']
             loser_name = prediction['loser_name']
+            
+            # Badge pour la méthode de prédiction
+            method_badge = f'<span class="ml-badge">Prédiction ML</span>' if prediction['method'] == 'ml' else f'<span class="classic-badge">Prédiction statistique</span>'
             
             # Container pour l'affichage du résultat
             result_container = st.container()
@@ -634,7 +1020,7 @@ def main():
                 with col1:
                     st.markdown(f"""
                     <div class="prediction-box">
-                        <h2 style="text-align:center;">Prédiction du combat</h2>
+                        <h2 style="text-align:center;">Prédiction du combat {method_badge}</h2>
                         <h3 style="text-align:center; color:{winner_color};" class="winner">
                             🏆 Vainqueur prédit: {winner_name} 🏆
                         </h3>
@@ -800,12 +1186,21 @@ def main():
             st.plotly_chart(style_fig, use_container_width=True)
     
     else:
-        # Message d'accueil
+        # Message d'accueil - CORRIGÉ
         st.markdown("""
         <div style="background-color:rgba(240, 242, 246, 0.7); padding:20px; border-radius:10px; text-align:center;">
             <h2>Bienvenue sur le Prédicteur de Combats UFC!</h2>
             <p style="font-size:1.2em;">Sélectionnez deux combattants dans le menu latéral et cliquez sur "Prédire le combat" pour obtenir une analyse complète.</p>
             <p>Vous pouvez également entrer les cotes proposées par les bookmakers pour recevoir des recommandations de paris.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Section de méthodes de prédiction - SÉPARÉE DU MESSAGE D'ACCUEIL
+        st.markdown("""
+        <div style="margin-top:15px; padding:10px; background-color:rgba(76, 175, 80, 0.1); border-radius:5px; text-align:left;">
+            <h3>Deux méthodes de prédiction disponibles:</h3>
+            <p><b>🤖 Machine Learning:</b> Utilise un modèle entraîné sur des milliers de combats pour des prédictions plus précises.</p>
+            <p><b>📊 Calcul statistique:</b> Utilise une formule basée sur les statistiques des combattants pour déterminer le vainqueur probable.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -815,12 +1210,34 @@ def main():
         
         1. **Sélectionnez les combattants**: Utilisez les menus déroulants dans la barre latérale pour choisir les deux combattants que vous souhaitez comparer.
         
-        2. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
+        2. **Choisissez une méthode de prédiction**: Sélectionnez entre la prédiction par Machine Learning (plus précise mais nécessite un modèle pré-entraîné) ou la méthode classique basée sur les statistiques.
         
-        3. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir une analyse détaillée.
+        3. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
         
-        4. **Explorez les résultats**: Consultez les différentes visualisations et tableaux pour comprendre les forces et faiblesses de chaque combattant.
+        4. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir une analyse détaillée.
+        
+        5. **Explorez les résultats**: Consultez les différentes visualisations et tableaux pour comprendre les forces et faiblesses de chaque combattant.
         """)
+
+        # Afficher les informations sur le modèle ML
+        if ml_available:
+            st.markdown("""
+            <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
+                <h3>✅ Modèle ML détecté!</h3>
+                <p>Le modèle de machine learning a été correctement chargé et est prêt à être utilisé pour des prédictions.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color:rgba(244, 67, 54, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
+                <h3>⚠️ Modèle ML non détecté</h3>
+                <p>Le modèle de machine learning n'a pas été trouvé. Assurez-vous que les fichiers suivants sont présents dans le même répertoire que cette application:</p>
+                <ul>
+                    <li><code>ufc_prediction_model.joblib</code> ou <code>ufc_prediction_model.pkl</code></li>
+                </ul>
+                <p>Seule la méthode de prédiction classique basée sur les statistiques est disponible pour le moment.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
