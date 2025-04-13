@@ -123,6 +123,42 @@ st.markdown("""
         margin-bottom: 15px;
         border-left: 3px solid #FFC107;
     }
+    
+    /* Divider pour les sections */
+    .divider {
+        border-top: 1px solid rgba(200, 200, 200, 0.3);
+        margin: 20px 0;
+    }
+    
+    /* Style pour les tableaux de paris */
+    .betting-card {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .betting-card-red {
+        background-color: rgba(255, 235, 238, 0.7);
+    }
+    
+    .betting-card-blue {
+        background-color: rgba(227, 242, 253, 0.7);
+    }
+    
+    .favorable {
+        color: green;
+        font-weight: bold;
+    }
+    
+    .neutral {
+        color: orange;
+        font-weight: bold;
+    }
+    
+    .unfavorable {
+        color: red;
+        font-weight: bold;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -548,79 +584,65 @@ def predict_fight_classic(fighter_a, fighter_b, odds_a=0, odds_b=0):
     
     return result
 
-# Fonction unifiée pour prédire avec l'un ou l'autre modèle
-def predict_fight(fighter_a, fighter_b, method='classic', odds_a=0, odds_b=0):
+# Fonction de prédiction améliorée qui retourne les résultats des deux méthodes
+def predict_both_methods(fighter_a, fighter_b, odds_a=0, odds_b=0):
     """
-    Prédit l'issue d'un combat en utilisant la méthode spécifiée
+    Prédit l'issue d'un combat en utilisant les deux méthodes (ML et classique)
+    et retourne les deux prédictions
     """
-    if method == 'ml':
-        # Charger le modèle ML si nécessaire
-        model, scaler, feature_names = load_ml_model()
+    # Prédiction avec la méthode classique
+    classic_prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
+    classic_prediction['method'] = 'classic'
+    
+    # Prédiction avec ML si disponible
+    model, scaler, feature_names = load_ml_model()
+    ml_prediction = None
+    
+    if model is not None:
+        ml_result = predict_with_ml(fighter_a, fighter_b, model, scaler, feature_names)
         
-        # Vérifier si le modèle a été chargé correctement
-        if model is None:
-            st.warning("⚠️ Le modèle ML n'a pas pu être chargé. Utilisation de la méthode classique à la place.")
-            # Fallback à la méthode classique
-            prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
-            prediction['method'] = 'classic'  # Indiquer la méthode utilisée
-            return prediction
-        
-        # Prédire avec le modèle ML
-        prediction = predict_with_ml(fighter_a, fighter_b, model, scaler, feature_names)
-        
-        if prediction is None:
-            st.warning("⚠️ Erreur lors de la prédiction ML. Utilisation de la méthode classique à la place.")
-            # Fallback à la méthode classique
-            prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
-            prediction['method'] = 'classic'  # Indiquer la méthode utilisée
-            return prediction
-        
-        # Compléter avec les noms pour maintenir la compatibilité
-        prediction['winner_name'] = fighter_a['name'] if prediction['prediction'] == 'Red' else fighter_b['name']
-        prediction['loser_name'] = fighter_b['name'] if prediction['prediction'] == 'Red' else fighter_a['name']
-        prediction['method'] = 'ml'  # Indiquer la méthode utilisée
-        
-        # Ajouter l'analyse des paris si des cotes sont fournies
-        if odds_a > 0 and odds_b > 0:
-            red_prob = prediction['red_probability']
-            blue_prob = prediction['blue_probability']
+        if ml_result is not None:
+            ml_prediction = ml_result
+            ml_prediction['winner_name'] = fighter_a['name'] if ml_prediction['prediction'] == 'Red' else fighter_b['name']
+            ml_prediction['loser_name'] = fighter_b['name'] if ml_prediction['prediction'] == 'Red' else fighter_a['name']
+            ml_prediction['method'] = 'ml'
             
-            # Probabilité implicite selon les bookmakers
-            implied_prob_a = 1 / odds_a
-            implied_prob_b = 1 / odds_b
-            
-            # Normaliser pour éliminer la marge du bookmaker
-            total_implied = implied_prob_a + implied_prob_b
-            implied_prob_a_norm = implied_prob_a / total_implied
-            implied_prob_b_norm = implied_prob_b / total_implied
-            
-            # Valeur espérée (Expected Value)
-            ev_a = (red_prob * odds_a) - 1
-            ev_b = (blue_prob * odds_b) - 1
-            
-            # Recommandation de pari
-            bet_recommendation_a = "Favorable" if ev_a > 0.1 else "Neutre" if ev_a > -0.1 else "Défavorable"
-            bet_recommendation_b = "Favorable" if ev_b > 0.1 else "Neutre" if ev_b > -0.1 else "Défavorable"
-            
-            prediction['betting'] = {
-                'odds_red': odds_a,
-                'odds_blue': odds_b,
-                'implied_prob_red': implied_prob_a_norm,
-                'implied_prob_blue': implied_prob_b_norm,
-                'ev_red': ev_a,
-                'ev_blue': ev_b,
-                'recommendation_red': bet_recommendation_a,
-                'recommendation_blue': bet_recommendation_b,
-                'edge_red': red_prob - implied_prob_a_norm,
-                'edge_blue': blue_prob - implied_prob_b_norm
-            }
-        
-        return prediction
-    else:
-        # Prédire avec la méthode classique
-        prediction = predict_fight_classic(fighter_a, fighter_b, odds_a, odds_b)
-        prediction['method'] = 'classic'  # Indiquer la méthode utilisée
-        return prediction
+            # Ajouter l'analyse des paris si des cotes sont fournies
+            if odds_a > 0 and odds_b > 0:
+                red_prob = ml_prediction['red_probability']
+                blue_prob = ml_prediction['blue_probability']
+                
+                # Probabilité implicite selon les bookmakers
+                implied_prob_a = 1 / odds_a
+                implied_prob_b = 1 / odds_b
+                
+                # Normaliser pour éliminer la marge du bookmaker
+                total_implied = implied_prob_a + implied_prob_b
+                implied_prob_a_norm = implied_prob_a / total_implied
+                implied_prob_b_norm = implied_prob_b / total_implied
+                
+                # Valeur espérée (Expected Value)
+                ev_a = (red_prob * odds_a) - 1
+                ev_b = (blue_prob * odds_b) - 1
+                
+                # Recommandation de pari
+                bet_recommendation_a = "Favorable" if ev_a > 0.1 else "Neutre" if ev_a > -0.1 else "Défavorable"
+                bet_recommendation_b = "Favorable" if ev_b > 0.1 else "Neutre" if ev_b > -0.1 else "Défavorable"
+                
+                ml_prediction['betting'] = {
+                    'odds_red': odds_a,
+                    'odds_blue': odds_b,
+                    'implied_prob_red': implied_prob_a_norm,
+                    'implied_prob_blue': implied_prob_b_norm,
+                    'ev_red': ev_a,
+                    'ev_blue': ev_b,
+                    'recommendation_red': bet_recommendation_a,
+                    'recommendation_blue': bet_recommendation_b,
+                    'edge_red': red_prob - implied_prob_a_norm,
+                    'edge_blue': blue_prob - implied_prob_b_norm
+                }
+    
+    return classic_prediction, ml_prediction
 
 # FONCTIONS DE VISUALISATION
 
@@ -888,10 +910,6 @@ def main():
     st.markdown('<div class="main-title">🥊 Prédicteur de Combats UFC 🥊</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Analysez et prédisez l\'issue des affrontements</div>', unsafe_allow_html=True)
     
-    # Vérifier si le modèle ML est disponible
-    model, _, _ = load_ml_model()
-    ml_available = model is not None
-    
     # Chargement des données
     fighter_stats_path = 'fighters_stats.txt'
     
@@ -947,10 +965,7 @@ def main():
     # Créer un dictionnaire pour accéder rapidement aux statistiques des combattants
     fighters_dict = {fighter['name']: fighter for fighter in fighters}
     
-    # Liste des noms de combattants
-    fighter_names = sorted([fighter['name'] for fighter in fighters])
-    
-    # Interface améliorée de recherche des combattants
+    # Interface de sélection des combattants
     st.sidebar.markdown("## Sélection des combattants")
     
     # Message d'avertissement sur l'importance de l'ordre des combattants
@@ -961,53 +976,23 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Recherche unifiée des combattants
-    fighter_search = st.sidebar.text_input("🔍 Rechercher un combattant", key="fighter_search")
+    # Liste des noms de combattants
+    fighter_names = sorted([fighter['name'] for fighter in fighters])
     
-    if fighter_search:
-        filtered_names = [name for name in fighter_names if fighter_search.lower() in name.lower()]
-        search_results = filtered_names if filtered_names else fighter_names
-    else:
-        search_results = fighter_names
-    
-    # Sélection du combattant rouge
+    # Sélection des combattants avec barre de recherche intégrée
     st.sidebar.markdown("### 🔴 Combattant Rouge")
     fighter_a_name = st.sidebar.selectbox(
-        "Sélectionner",
-        search_results,
-        index=0 if search_results else 0
+        "Sélectionner combattant rouge",
+        options=fighter_names
     )
     
-    # Filtrer les options pour le combattant bleu (exclure le combattant rouge déjà sélectionné)
-    blue_options = [name for name in fighter_names if name != fighter_a_name]
-    
-    # Recherche spécifique pour le combattant bleu
+    # Sélection du combattant bleu (en excluant le combattant rouge)
     st.sidebar.markdown("### 🔵 Combattant Bleu")
-    fighter_b_search = st.sidebar.text_input("🔍 Rechercher un combattant bleu", key="blue_search")
-    
-    if fighter_b_search:
-        filtered_blue = [name for name in blue_options if fighter_b_search.lower() in name.lower()]
-        blue_results = filtered_blue if filtered_blue else blue_options
-    else:
-        blue_results = blue_options
-    
-    # Sélection du combattant bleu
+    fighter_b_options = [name for name in fighter_names if name != fighter_a_name]
     fighter_b_name = st.sidebar.selectbox(
-        "Sélectionner",
-        blue_results,
-        index=0 if blue_results else 0
+        "Sélectionner combattant bleu",
+        options=fighter_b_options
     )
-    
-    # Méthode de prédiction
-    st.sidebar.markdown("## 🧠 Méthode de prédiction")
-    prediction_method = st.sidebar.radio(
-        "Sélectionner une méthode:",
-        ['Machine Learning' if ml_available else 'Machine Learning (non disponible)', 'Calcul statistique classique'],
-        horizontal=True
-    )
-    
-    # Convertir le choix en code pour la fonction de prédiction
-    method = 'ml' if prediction_method.startswith('Machine Learning') and ml_available else 'classic'
     
     # Options de paris
     st.sidebar.markdown("## 💰 Options de paris")
@@ -1026,149 +1011,263 @@ def main():
         if fighter_a_name == fighter_b_name:
             st.error("Veuillez sélectionner deux combattants différents.")
         else:
-            # Faire la prédiction
-            prediction = predict_fight(
+            # Faire les prédictions avec les deux méthodes
+            classic_prediction, ml_prediction = predict_both_methods(
                 fighter_a, 
-                fighter_b, 
-                method=method,
+                fighter_b,
                 odds_a=odds_a,
                 odds_b=odds_b
             )
             
-            # Afficher la prédiction principale
-            winner_color = "red" if prediction['prediction'] == 'Red' else "blue"
-            winner_name = prediction['winner_name']
-            loser_name = prediction['loser_name']
+            # Afficher les résultats des deux prédictions
+            st.markdown("""
+            <div style="text-align:center;">
+                <h2>🔮 Prédictions du combat 🔮</h2>
+            </div>
+            """, unsafe_allow_html=True)
             
-            # Badge pour la méthode de prédiction
-            method_badge = f'<span class="ml-badge">Prédiction ML</span>' if prediction['method'] == 'ml' else f'<span class="classic-badge">Prédiction statistique</span>'
-            
-            # Container pour l'affichage du résultat
-            result_container = st.container()
-            
-            with result_container:
-                col1, col2 = st.columns([2, 1])
+            # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
+            if ml_prediction:
+                # Créer un DataFrame pour le graphique comparatif
+                proba_data = pd.DataFrame({
+                    'Combattant': [fighter_a_name, fighter_b_name],
+                    'Statistique': [classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
+                })
                 
-                with col1:
+                # Créer un graphique qui montre les deux probabilités côte à côte
+                fig = go.Figure()
+                
+                # Ajouter les barres pour chaque méthode
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Statistique'],
+                    name='Prédiction Statistique',
+                    marker_color='#2196F3',
+                    text=[f"{proba:.2f}" for proba in proba_data['Statistique']],
+                    textposition='auto'
+                ))
+                
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Machine Learning'],
+                    name='Prédiction ML',
+                    marker_color='#4CAF50',
+                    text=[f"{proba:.2f}" for proba in proba_data['Machine Learning']],
+                    textposition='auto'
+                ))
+                
+                # Configurer la mise en page
+                fig.update_layout(
+                    title="Probabilités de victoire selon les deux méthodes",
+                    xaxis_title="",
+                    yaxis_title="Probabilité",
+                    yaxis=dict(range=[0, 1]),
+                    legend_title="Méthode",
+                    height=400,
+                    barmode='group'
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                # Si seulement la méthode statistique est disponible
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    x=[fighter_a_name, fighter_b_name],
+                    y=[classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    marker_color=['red', 'blue'],
+                    text=[f"{classic_prediction['red_probability']:.2f}", f"{classic_prediction['blue_probability']:.2f}"],
+                    textposition='auto'
+                ))
+                
+                fig.update_layout(
+                    title="Probabilités de victoire (Méthode Statistique)",
+                    xaxis_title="",
+                    yaxis_title="Probabilité",
+                    yaxis=dict(range=[0, 1]),
+                    height=400
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Créer deux colonnes pour les deux prédictions
+            pred_cols = st.columns(2 if ml_prediction else 1)
+            
+            # Afficher la prédiction statistique
+            with pred_cols[0]:
+                winner_color = "red" if classic_prediction['prediction'] == 'Red' else "blue"
+                winner_name = classic_prediction['winner_name']
+                
+                st.markdown(f"""
+                <div class="prediction-box">
+                    <h3 style="text-align:center;"><span class="classic-badge">Prédiction statistique</span></h3>
+                    <h3 style="text-align:center; color:{winner_color};" class="winner">
+                        🏆 {winner_name} 🏆
+                    </h3>
+                    <p style="text-align:center; font-size:1.2em;">
+                        Probabilité: <span class="red-fighter">{classic_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
+                        <span class="blue-fighter">{classic_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
+                    </p>
+                    <p style="text-align:center;">Niveau de confiance: <b>{classic_prediction['confidence']}</b></p>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # Afficher la prédiction ML si disponible
+            if ml_prediction:
+                with pred_cols[1]:
+                    winner_color_ml = "red" if ml_prediction['prediction'] == 'Red' else "blue"
+                    winner_name_ml = ml_prediction['winner_name']
+                    
                     st.markdown(f"""
                     <div class="prediction-box">
-                        <h2 style="text-align:center;">Prédiction du combat {method_badge}</h2>
-                        <h3 style="text-align:center; color:{winner_color};" class="winner">
-                            🏆 Vainqueur prédit: {winner_name} 🏆
+                        <h3 style="text-align:center;"><span class="ml-badge">Prédiction Machine Learning</span></h3>
+                        <h3 style="text-align:center; color:{winner_color_ml};" class="winner">
+                            🏆 {winner_name_ml} 🏆
                         </h3>
                         <p style="text-align:center; font-size:1.2em;">
-                            Probabilité: <span class="red-fighter">{prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
-                            <span class="blue-fighter">{prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
+                            Probabilité: <span class="red-fighter">{ml_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
+                            <span class="blue-fighter">{ml_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
                         </p>
-                        <p style="text-align:center;">Niveau de confiance: <b>{prediction['confidence']}</b></p>
+                        <p style="text-align:center;">Niveau de confiance: <b>{ml_prediction['confidence']}</b></p>
                     </div>
                     """, unsafe_allow_html=True)
-                
-                with col2:
-                    # Graphique des probabilités
-                    proba_fig = go.Figure()
-                    proba_fig.add_trace(go.Bar(
-                        x=[fighter_a_name, fighter_b_name],
-                        y=[prediction['red_probability'], prediction['blue_probability']],
-                        text=[f"{prediction['red_probability']:.2f}", f"{prediction['blue_probability']:.2f}"],
-                        textposition='auto',
-                        marker_color=['red', 'blue']
-                    ))
-                    proba_fig.update_layout(
-                        title="Probabilités de victoire",
-                        yaxis=dict(range=[0, 1]),
-                        height=300
-                    )
-                    st.plotly_chart(proba_fig, use_container_width=True)
             
-            # Analyse des paris si disponible
-            if 'betting' in prediction:
-                betting = prediction['betting']
+            # Message de convergence/divergence si les deux méthodes sont disponibles
+            if ml_prediction:
+                same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
+                agreement_message = "✅ Les deux méthodes prédisent le même vainqueur!" if same_prediction else "⚠️ Les méthodes prédisent des vainqueurs différents!"
+                agreement_color = "green" if same_prediction else "orange"
+                
+                st.markdown(f"""
+                <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
+                    <h3 style="color:{agreement_color};">{agreement_message}</h3>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Analyse des paris (utiliser les deux méthodes si disponibles)
+            if 'betting' in classic_prediction:
+                betting_classic = classic_prediction['betting']
+                betting_ml = ml_prediction.get('betting') if ml_prediction else None
                 
                 st.markdown("""
+                <div class="divider"></div>
                 <div style="text-align:center;">
                     <h2>💰 Analyse des paris 💰</h2>
                 </div>
                 """, unsafe_allow_html=True)
                 
+                # Analyse des paris pour les deux combattants avec Streamlit natif (pas d'HTML)
                 col1, col2 = st.columns(2)
                 
+                # Combattant Rouge - Carte de paris
                 with col1:
-                    # Table d'analyse des paris pour le combattant rouge
-                    rec_color_red = "green" if betting['recommendation_red'] == 'Favorable' else "orange" if betting['recommendation_red'] == 'Neutre' else "red"
-                    st.markdown(f"""
-                    <div style="background-color:rgba(255, 235, 238, 0.7); padding:15px; border-radius:10px; margin-bottom:20px;">
-                        <h3 style="text-align:center; color:red;">{fighter_a_name}</h3>
-                        <table style="width:100%;">
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Cote</th>
-                                <td style="padding:8px; text-align:center;">{betting['odds_red']:.2f}</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Probabilité implicite</th>
-                                <td style="padding:8px; text-align:center;">{betting['implied_prob_red']:.2f}</td>
-                            </tr>
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Notre probabilité</th>
-                                <td style="padding:8px; text-align:center;">{prediction['red_probability']:.2f}</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Avantage</th>
-                                <td style="padding:8px; text-align:center;">{betting['edge_red']*100:.1f}%</td>
-                            </tr>
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Valeur espérée</th>
-                                <td style="padding:8px; text-align:center;">{betting['ev_red']*100:.1f}%</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Recommandation</th>
-                                <td style="padding:8px; text-align:center; color:{rec_color_red}; font-weight:bold;">
-                                    {betting['recommendation_red']}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.subheader(f"🔴 {fighter_a_name}")
+                    
+                    # Créer un DataFrame pour une présentation simple
+                    red_data = {
+                        "Métrique": [
+                            "Cote", 
+                            "Probabilité implicite", 
+                            "Probabilité statistique",
+                            "Probabilité ML" if betting_ml else None,
+                            "Avantage (stat.)",
+                            "Valeur espérée (stat.)",
+                            "Recommandation stat.",
+                            "Recommandation ML" if betting_ml else None
+                        ],
+                        "Valeur": [
+                            f"{betting_classic['odds_red']:.2f}",
+                            f"{betting_classic['implied_prob_red']:.2f}",
+                            f"{classic_prediction['red_probability']:.2f}",
+                            f"{ml_prediction['red_probability']:.2f}" if betting_ml else None,
+                            f"{betting_classic['edge_red']*100:.1f}%",
+                            f"{betting_classic['ev_red']*100:.1f}%",
+                            betting_classic['recommendation_red'],
+                            betting_ml['recommendation_red'] if betting_ml else None
+                        ]
+                    }
+                    
+                    # Filtrer les lignes None
+                    red_df = pd.DataFrame(red_data)
+                    red_df = red_df.dropna()
+                    
+                    # Afficher le DataFrame stylisé
+                    st.dataframe(
+                        red_df,
+                        column_config={
+                            "Métrique": st.column_config.TextColumn("Métrique"),
+                            "Valeur": st.column_config.TextColumn("Valeur")
+                        },
+                        hide_index=True,
+                        use_container_width=True
+                    )
+                    
+                    # Affichage manuel des recommandations
+                    st.markdown("**Recommandation statistique:**")
+                    rec_class = "favorable" if betting_classic['recommendation_red'] == "Favorable" else "neutral" if betting_classic['recommendation_red'] == "Neutre" else "unfavorable"
+                    st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_red']}</span>", unsafe_allow_html=True)
+                    
+                    if betting_ml:
+                        st.markdown("**Recommandation ML:**")
+                        rec_ml_class = "favorable" if betting_ml['recommendation_red'] == "Favorable" else "neutral" if betting_ml['recommendation_red'] == "Neutre" else "unfavorable"
+                        st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_red']}</span>", unsafe_allow_html=True)
                 
+                # Combattant Bleu - Carte de paris
                 with col2:
-                    # Table d'analyse des paris pour le combattant bleu
-                    rec_color_blue = "green" if betting['recommendation_blue'] == 'Favorable' else "orange" if betting['recommendation_blue'] == 'Neutre' else "red"
-                    st.markdown(f"""
-                    <div style="background-color:rgba(227, 242, 253, 0.7); padding:15px; border-radius:10px; margin-bottom:20px;">
-                        <h3 style="text-align:center; color:blue;">{fighter_b_name}</h3>
-                        <table style="width:100%;">
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Cote</th>
-                                <td style="padding:8px; text-align:center;">{betting['odds_blue']:.2f}</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Probabilité implicite</th>
-                                <td style="padding:8px; text-align:center;">{betting['implied_prob_blue']:.2f}</td>
-                            </tr>
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Notre probabilité</th>
-                                <td style="padding:8px; text-align:center;">{prediction['blue_probability']:.2f}</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Avantage</th>
-                                <td style="padding:8px; text-align:center;">{betting['edge_blue']*100:.1f}%</td>
-                            </tr>
-                            <tr style="background-color:rgba(255, 255, 255, 0.1);">
-                                <th style="padding:8px; text-align:left;">Valeur espérée</th>
-                                <td style="padding:8px; text-align:center;">{betting['ev_blue']*100:.1f}%</td>
-                            </tr>
-                            <tr>
-                                <th style="padding:8px; text-align:left;">Recommandation</th>
-                                <td style="padding:8px; text-align:center; color:{rec_color_blue}; font-weight:bold;">
-                                    {betting['recommendation_blue']}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.subheader(f"🔵 {fighter_b_name}")
+                    
+                    # Créer un DataFrame pour une présentation simple
+                    blue_data = {
+                        "Métrique": [
+                            "Cote", 
+                            "Probabilité implicite", 
+                            "Probabilité statistique",
+                            "Probabilité ML" if betting_ml else None,
+                            "Avantage (stat.)",
+                            "Valeur espérée (stat.)",
+                            "Recommandation stat.",
+                            "Recommandation ML" if betting_ml else None
+                        ],
+                        "Valeur": [
+                            f"{betting_classic['odds_blue']:.2f}",
+                            f"{betting_classic['implied_prob_blue']:.2f}",
+                            f"{classic_prediction['blue_probability']:.2f}",
+                            f"{ml_prediction['blue_probability']:.2f}" if betting_ml else None,
+                            f"{betting_classic['edge_blue']*100:.1f}%",
+                            f"{betting_classic['ev_blue']*100:.1f}%",
+                            betting_classic['recommendation_blue'],
+                            betting_ml['recommendation_blue'] if betting_ml else None
+                        ]
+                    }
+                    
+                    # Filtrer les lignes None
+                    blue_df = pd.DataFrame(blue_data)
+                    blue_df = blue_df.dropna()
+                    
+                    # Afficher le DataFrame stylisé
+                    st.dataframe(
+                        blue_df,
+                        column_config={
+                            "Métrique": st.column_config.TextColumn("Métrique"),
+                            "Valeur": st.column_config.TextColumn("Valeur")
+                        },
+                        hide_index=True,
+                        use_container_width=True
+                    )
+                    
+                    # Affichage manuel des recommandations
+                    st.markdown("**Recommandation statistique:**")
+                    rec_class = "favorable" if betting_classic['recommendation_blue'] == "Favorable" else "neutral" if betting_classic['recommendation_blue'] == "Neutre" else "unfavorable"
+                    st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_blue']}</span>", unsafe_allow_html=True)
+                    
+                    if betting_ml:
+                        st.markdown("**Recommandation ML:**")
+                        rec_ml_class = "favorable" if betting_ml['recommendation_blue'] == "Favorable" else "neutral" if betting_ml['recommendation_blue'] == "Neutre" else "unfavorable"
+                        st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_blue']}</span>", unsafe_allow_html=True)
             
             # Afficher les statistiques comparatives
             st.markdown("""
+            <div class="divider"></div>
             <div style="text-align:center;">
                 <h2>📊 Statistiques comparatives 📊</h2>
             </div>
@@ -1195,6 +1294,7 @@ def main():
             
             # Visualisations
             st.markdown("""
+            <div class="divider"></div>
             <div style="text-align:center; margin-top:30px;">
                 <h2>📈 Visualisations des performances 📈</h2>
             </div>
@@ -1237,12 +1337,16 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Section de méthodes de prédiction - SÉPARÉE DU MESSAGE D'ACCUEIL
+        # Nouvelle fonctionnalité
         st.markdown("""
-        <div style="margin-top:15px; padding:10px; background-color:rgba(76, 175, 80, 0.1); border-radius:5px; text-align:left;">
-            <h3>Deux méthodes de prédiction disponibles:</h3>
-            <p><b>🤖 Machine Learning:</b> Utilise un modèle entraîné sur des milliers de combats pour des prédictions plus précises.</p>
-            <p><b>📊 Calcul statistique:</b> Utilise une formule basée sur les statistiques des combattants pour déterminer le vainqueur probable.</p>
+        <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
+            <h3>🔄 Nouvelle fonctionnalité: Prédictions comparatives!</h3>
+            <p>L'application affiche maintenant simultanément les prédictions des deux méthodes:</p>
+            <ul>
+                <li><b>🤖 Machine Learning:</b> Prédiction basée sur un modèle entraîné sur des milliers de combats</li>
+                <li><b>📊 Calcul statistique:</b> Prédiction basée sur une formule utilisant les statistiques des combattants</li>
+            </ul>
+            <p>Cette double prédiction vous permet de comparer les résultats et d'avoir une vision plus complète des chances de victoire.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -1250,20 +1354,23 @@ def main():
         st.markdown("""
         ### Comment utiliser l'application:
         
-        1. **Recherchez et sélectionnez vos combattants**: Utilisez la barre de recherche et les menus déroulants pour choisir les deux combattants que vous souhaitez comparer.
+        1. **Sélectionnez vos combattants**: Utilisez les menus déroulants pour choisir les combattants rouge et bleu que vous souhaitez comparer.
         
         2. **Respectez les positions**: Pour des prédictions plus précises, placez le combattant favori ou mieux classé dans le coin rouge.
         
-        3. **Choisissez une méthode de prédiction**: Sélectionnez entre la prédiction par Machine Learning (plus précise) ou la méthode statistique classique.
+        3. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
         
-        4. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
+        4. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir l'analyse complète avec les deux méthodes de prédiction.
         
-        5. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir une analyse détaillée.
+        5. **Comparez les résultats**: Analysez les différences entre les prédictions ML et statistiques pour une meilleure compréhension.
         
-        6. **Explorez les résultats**: Consultez les différentes visualisations et tableaux pour comprendre les forces et faiblesses de chaque combattant.
+        6. **Explorez les visualisations**: Consultez les graphiques et tableaux pour comprendre les forces et faiblesses de chaque combattant.
         """)
 
         # Afficher les informations sur le modèle ML
+        model, _, _ = load_ml_model()
+        ml_available = model is not None
+        
         if ml_available:
             st.markdown("""
             <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
@@ -1279,7 +1386,7 @@ def main():
                 <ul>
                     <li><code>ufc_prediction_model.joblib</code> ou <code>ufc_prediction_model.pkl</code></li>
                 </ul>
-                <p>Seule la méthode de prédiction classique basée sur les statistiques est disponible pour le moment.</p>
+                <p>Seule la méthode de prédiction statistique classique sera disponible.</p>
             </div>
             """, unsafe_allow_html=True)
 
