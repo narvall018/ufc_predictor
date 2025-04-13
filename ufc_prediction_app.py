@@ -113,6 +113,16 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 15px;
     }
+    
+    /* Note d'information */
+    .info-box {
+        background-color: rgba(255, 193, 7, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        border-left: 3px solid #FFC107;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -937,34 +947,56 @@ def main():
     # Créer un dictionnaire pour accéder rapidement aux statistiques des combattants
     fighters_dict = {fighter['name']: fighter for fighter in fighters}
     
-    # Interface de sélection des combattants
-    st.sidebar.markdown("## Sélection des combattants")
-    
     # Liste des noms de combattants
     fighter_names = sorted([fighter['name'] for fighter in fighters])
     
-    # Recherche et sélection des combattants
+    # Interface améliorée de recherche des combattants
+    st.sidebar.markdown("## Sélection des combattants")
+    
+    # Message d'avertissement sur l'importance de l'ordre des combattants
+    st.sidebar.markdown("""
+    <div class="info-box">
+        <b>⚠️ Important :</b> L'ordre des combattants (Rouge/Bleu) influence les prédictions. 
+        Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Recherche unifiée des combattants
+    fighter_search = st.sidebar.text_input("🔍 Rechercher un combattant", key="fighter_search")
+    
+    if fighter_search:
+        filtered_names = [name for name in fighter_names if fighter_search.lower() in name.lower()]
+        search_results = filtered_names if filtered_names else fighter_names
+    else:
+        search_results = fighter_names
+    
+    # Sélection du combattant rouge
     st.sidebar.markdown("### 🔴 Combattant Rouge")
-    fighter_a_search = st.sidebar.text_input("Rechercher Rouge", key="search_red")
-    if fighter_a_search:
-        filtered_names_a = [name for name in fighter_names if fighter_a_search.lower() in name.lower()]
-        fighter_a_options = filtered_names_a if filtered_names_a else fighter_names
-    else:
-        fighter_a_options = fighter_names
+    fighter_a_name = st.sidebar.selectbox(
+        "Sélectionner",
+        search_results,
+        index=0 if search_results else 0
+    )
     
-    fighter_a_name = st.sidebar.selectbox("Sélectionner Rouge", fighter_a_options, index=0 if fighter_a_options else 0)
+    # Filtrer les options pour le combattant bleu (exclure le combattant rouge déjà sélectionné)
+    blue_options = [name for name in fighter_names if name != fighter_a_name]
     
+    # Recherche spécifique pour le combattant bleu
     st.sidebar.markdown("### 🔵 Combattant Bleu")
-    fighter_b_search = st.sidebar.text_input("Rechercher Bleu", key="search_blue")
-    if fighter_b_search:
-        filtered_names_b = [name for name in fighter_names if fighter_b_search.lower() in name.lower()]
-        fighter_b_options = filtered_names_b if filtered_names_b else fighter_names
-    else:
-        fighter_b_options = fighter_names
+    fighter_b_search = st.sidebar.text_input("🔍 Rechercher un combattant bleu", key="blue_search")
     
-    # S'assurer qu'on n'a pas le même combattant par défaut
-    default_index_b = min(1, len(fighter_b_options) - 1) if len(fighter_b_options) > 1 and fighter_b_options[0] == fighter_a_name else 0
-    fighter_b_name = st.sidebar.selectbox("Sélectionner Bleu", fighter_b_options, index=default_index_b)
+    if fighter_b_search:
+        filtered_blue = [name for name in blue_options if fighter_b_search.lower() in name.lower()]
+        blue_results = filtered_blue if filtered_blue else blue_options
+    else:
+        blue_results = blue_options
+    
+    # Sélection du combattant bleu
+    fighter_b_name = st.sidebar.selectbox(
+        "Sélectionner",
+        blue_results,
+        index=0 if blue_results else 0
+    )
     
     # Méthode de prédiction
     st.sidebar.markdown("## 🧠 Méthode de prédiction")
@@ -1195,6 +1227,16 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
+        # Note sur l'importance de l'ordre des combattants
+        st.markdown("""
+        <div class="info-box">
+            <h3>⚠️ L'ordre des combattants est important!</h3>
+            <p>La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions, particulièrement avec le modèle ML.</p>
+            <p>Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge. Pour obtenir les résultats les plus précis, suivez cette convention.</p>
+            <p>Si vous inversez les positions, les probabilités de victoire peuvent changer considérablement.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
         # Section de méthodes de prédiction - SÉPARÉE DU MESSAGE D'ACCUEIL
         st.markdown("""
         <div style="margin-top:15px; padding:10px; background-color:rgba(76, 175, 80, 0.1); border-radius:5px; text-align:left;">
@@ -1208,15 +1250,17 @@ def main():
         st.markdown("""
         ### Comment utiliser l'application:
         
-        1. **Sélectionnez les combattants**: Utilisez les menus déroulants dans la barre latérale pour choisir les deux combattants que vous souhaitez comparer.
+        1. **Recherchez et sélectionnez vos combattants**: Utilisez la barre de recherche et les menus déroulants pour choisir les deux combattants que vous souhaitez comparer.
         
-        2. **Choisissez une méthode de prédiction**: Sélectionnez entre la prédiction par Machine Learning (plus précise mais nécessite un modèle pré-entraîné) ou la méthode classique basée sur les statistiques.
+        2. **Respectez les positions**: Pour des prédictions plus précises, placez le combattant favori ou mieux classé dans le coin rouge.
         
-        3. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
+        3. **Choisissez une méthode de prédiction**: Sélectionnez entre la prédiction par Machine Learning (plus précise) ou la méthode statistique classique.
         
-        4. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir une analyse détaillée.
+        4. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
         
-        5. **Explorez les résultats**: Consultez les différentes visualisations et tableaux pour comprendre les forces et faiblesses de chaque combattant.
+        5. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir une analyse détaillée.
+        
+        6. **Explorez les résultats**: Consultez les différentes visualisations et tableaux pour comprendre les forces et faiblesses de chaque combattant.
         """)
 
         # Afficher les informations sur le modèle ML
