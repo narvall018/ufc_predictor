@@ -1,0 +1,2 @@
+bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stake,kelly_fraction,model_probability,status,result,profit,roi
+1,2025-04-14,UFC 314,2025-04-12,Michael Chandler,Paddy Pimblett,Paddy Pimblett,1.62,130.0,,,closed,win,80.60000000000001,62.000000000000014

@@ -7,6 +7,7 @@ import plotly.express as px
 import os
 import pickle
 import joblib
+import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -158,6 +159,58 @@ st.markdown("""
     .unfavorable {
         color: red;
         font-weight: bold;
+    }
+    
+    /* Style pour les boutons d'action */
+    .delete-button {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .update-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    /* Style pour le conteneur de gestion des paris */
+    .bet-management-container {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    /* Style pour les options de mise */
+    .stake-options {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    /* Tableau de Kelly */
+    .kelly-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .kelly-table th, .kelly-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .kelly-table tr:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .kelly-highlight {
+        background-color: rgba(76, 175, 80, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -903,12 +956,363 @@ def create_stats_comparison_df(fighter_a, fighter_b):
     
     return pd.DataFrame(data)
 
+# NOUVELLES FONCTIONS POUR LA GESTION DE BANKROLL ET PARIS
+
+def init_bankroll():
+    """
+    Initialise ou charge la bankroll depuis le fichier
+    """
+    bets_dir = "bets"
+    bankroll_file = os.path.join(bets_dir, "bankroll.csv")
+    
+    # Créer le dossier s'il n'existe pas
+    if not os.path.exists(bets_dir):
+        os.makedirs(bets_dir)
+    
+    # Charger la bankroll si le fichier existe
+    if os.path.exists(bankroll_file):
+        bankroll_df = pd.read_csv(bankroll_file)
+        if not bankroll_df.empty:
+            return bankroll_df.iloc[-1]["amount"]
+    
+    # Sinon, initialiser le fichier avec une valeur par défaut
+    bankroll_df = pd.DataFrame({
+        "date": [datetime.datetime.now().strftime("%Y-%m-%d")],
+        "amount": [1000],  # Valeur par défaut
+        "action": ["initial"],
+        "note": ["Bankroll initiale"]
+    })
+    
+    # Sauvegarder le fichier
+    bankroll_df.to_csv(bankroll_file, index=False)
+    return 1000
+
+def init_bets_file():
+    """
+    Initialise le fichier de paris s'il n'existe pas
+    """
+    bets_dir = "bets"
+    bets_file = os.path.join(bets_dir, "bets.csv")
+    
+    # Créer le dossier s'il n'existe pas
+    if not os.path.exists(bets_dir):
+        os.makedirs(bets_dir)
+    
+    # Créer le fichier s'il n'existe pas
+    if not os.path.exists(bets_file):
+        columns = ["bet_id", "date_placed", "event_name", "event_date", 
+                  "fighter_red", "fighter_blue", "pick", "odds", 
+                  "stake", "kelly_fraction", "model_probability", 
+                  "status", "result", "profit", "roi"]
+        
+        empty_df = pd.DataFrame(columns=columns)
+        empty_df.to_csv(bets_file, index=False)
+
+def calculate_kelly(prob, odds, bankroll, fraction=1):
+    """
+    Calcule la mise optimale selon le critère de Kelly fractionné
+    
+    Args:
+        prob: probabilité de gain selon le modèle ML
+        odds: cote décimale (européenne)
+        bankroll: montant total disponible
+        fraction: diviseur Kelly (ex: 4 pour Kelly/4)
+    
+    Returns:
+        Montant recommandé à parier
+    """
+    b = odds - 1  # gain net par unité misée
+    q = 1 - prob  # probabilité de perte
+    
+    # Formule de Kelly: (p*b - q) / b
+    kelly_percentage = (prob * b - q) / b
+    
+    # Si Kelly est négatif, ne pas parier
+    if kelly_percentage <= 0:
+        return 0
+    
+    # Appliquer la fraction Kelly
+    fractional_kelly = kelly_percentage / fraction
+    
+    # Calculer la mise recommandée
+    recommended_stake = bankroll * fractional_kelly
+    
+    return round(recommended_stake, 2)
+
+def update_bet_result(bet_id, result, current_bankroll):
+    """
+    Met à jour le résultat d'un pari existant et ajuste la bankroll
+    
+    Args:
+        bet_id: Identifiant du pari à mettre à jour
+        result: Résultat du pari ('win', 'loss', 'void')
+        current_bankroll: Bankroll actuelle
+        
+    Returns:
+        Nouveau solde de la bankroll après la mise à jour
+    """
+    bets_dir = "bets"
+    bets_file = os.path.join(bets_dir, "bets.csv")
+    bankroll_file = os.path.join(bets_dir, "bankroll.csv")
+    
+    if not os.path.exists(bets_file):
+        st.error("Fichier de paris introuvable.")
+        return current_bankroll
+    
+    # Charger les fichiers
+    bets_df = pd.read_csv(bets_file)
+    bankroll_df = pd.read_csv(bankroll_file)
+    
+    # Vérifier si le pari existe
+    if bet_id not in bets_df["bet_id"].values:
+        st.error(f"Pari #{bet_id} introuvable.")
+        return current_bankroll
+    
+    # Récupérer les informations du pari
+    bet_row = bets_df[bets_df["bet_id"] == bet_id].iloc[0]
+    stake = float(bet_row["stake"])
+    odds = float(bet_row["odds"])
+    
+    # Calculer le profit
+    if result == "win":
+        profit = stake * (odds - 1)
+        roi = (profit / stake) * 100
+    elif result == "loss":
+        profit = -stake
+        roi = -100
+    else:  # void
+        profit = 0
+        roi = 0
+    
+    # Mettre à jour le pari
+    bets_df.loc[bets_df["bet_id"] == bet_id, "status"] = "closed"
+    bets_df.loc[bets_df["bet_id"] == bet_id, "result"] = result
+    bets_df.loc[bets_df["bet_id"] == bet_id, "profit"] = profit
+    bets_df.loc[bets_df["bet_id"] == bet_id, "roi"] = roi
+    bets_df.to_csv(bets_file, index=False)
+    
+    # Mettre à jour la bankroll
+    new_bankroll = current_bankroll + profit
+    new_entry = pd.DataFrame({
+        "date": [datetime.datetime.now().strftime("%Y-%m-%d")],
+        "amount": [new_bankroll],
+        "action": ["update"],
+        "note": [f"Résultat pari #{bet_id}: {result}"]
+    })
+    bankroll_df = pd.concat([bankroll_df, new_entry], ignore_index=True)
+    bankroll_df.to_csv(bankroll_file, index=False)
+    
+    return new_bankroll
+
+def delete_bet(bet_id):
+    """
+    Supprime un pari du fichier historique
+    
+    Args:
+        bet_id: Identifiant du pari à supprimer
+    
+    Returns:
+        True si la suppression a réussi, False sinon
+    """
+    bets_dir = "bets"
+    bets_file = os.path.join(bets_dir, "bets.csv")
+    
+    if not os.path.exists(bets_file):
+        st.error("Fichier de paris introuvable.")
+        return False
+    
+    # Charger le fichier
+    bets_df = pd.read_csv(bets_file)
+    
+    # Vérifier si le pari existe
+    if bet_id not in bets_df["bet_id"].values:
+        st.error(f"Pari #{bet_id} introuvable.")
+        return False
+    
+    # Vérifier si c'est un pari "fermé" (on ne peut pas supprimer des paris déjà réglés)
+    bet_row = bets_df[bets_df["bet_id"] == bet_id].iloc[0]
+    if bet_row["status"] == "closed":
+        st.error("Impossible de supprimer un pari déjà réglé.")
+        return False
+    
+    # Supprimer le pari
+    bets_df = bets_df[bets_df["bet_id"] != bet_id]
+    bets_df.to_csv(bets_file, index=False)
+    
+    return True
+
+def add_manual_bet(event_name, event_date, fighter_red, fighter_blue, pick, odds, stake, model_probability=None, kelly_fraction=None):
+    """
+    Ajoute un pari manuellement à l'historique
+    
+    Args:
+        event_name: Nom de l'événement
+        event_date: Date de l'événement
+        fighter_red: Nom du combattant rouge
+        fighter_blue: Nom du combattant bleu
+        pick: Combattant sur lequel le pari est placé
+        odds: Cote du pari
+        stake: Montant misé
+        model_probability: Probabilité prédite par le modèle (optionnel)
+        kelly_fraction: Fraction Kelly utilisée (optionnel)
+        
+    Returns:
+        True si l'ajout a réussi, False sinon
+    """
+    bets_dir = "bets"
+    bets_file = os.path.join(bets_dir, "bets.csv")
+    
+    # Créer le dossier et le fichier s'ils n'existent pas
+    if not os.path.exists(bets_dir):
+        os.makedirs(bets_dir)
+    
+    # Charger le fichier des paris ou en créer un nouveau
+    if os.path.exists(bets_file):
+        bets_df = pd.read_csv(bets_file)
+        # Générer un nouveau bet_id
+        new_id = 1 if bets_df.empty else bets_df["bet_id"].max() + 1
+    else:
+        columns = ["bet_id", "date_placed", "event_name", "event_date", 
+                  "fighter_red", "fighter_blue", "pick", "odds", 
+                  "stake", "kelly_fraction", "model_probability", 
+                  "status", "result", "profit", "roi"]
+        bets_df = pd.DataFrame(columns=columns)
+        new_id = 1
+    
+    # Formater la date
+    if isinstance(event_date, str):
+        event_date_str = event_date
+    else:
+        event_date_str = event_date.strftime("%Y-%m-%d")
+    
+    # Créer le nouveau pari
+    new_bet = pd.DataFrame({
+        "bet_id": [new_id],
+        "date_placed": [datetime.datetime.now().strftime("%Y-%m-%d")],
+        "event_name": [event_name],
+        "event_date": [event_date_str],
+        "fighter_red": [fighter_red],
+        "fighter_blue": [fighter_blue],
+        "pick": [pick],
+        "odds": [odds],
+        "stake": [stake],
+        "kelly_fraction": [kelly_fraction if kelly_fraction is not None else "N/A"],
+        "model_probability": [model_probability if model_probability is not None else "N/A"],
+        "status": ["open"],
+        "result": [""],
+        "profit": [0],
+        "roi": [0]
+    })
+    
+    # Ajouter le pari
+    bets_df = pd.concat([bets_df, new_bet], ignore_index=True)
+    bets_df.to_csv(bets_file, index=False)
+    
+    return True
+
+def get_betting_summary(bets_df):
+    """
+    Génère un résumé des statistiques de paris
+    
+    Args:
+        bets_df: DataFrame contenant l'historique des paris
+        
+    Returns:
+        Un dictionnaire avec les statistiques résumées
+    """
+    if bets_df.empty:
+        return {
+            "total_bets": 0,
+            "open_bets": 0,
+            "closed_bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "voids": 0,
+            "win_rate": 0,
+            "total_staked": 0,
+            "total_profit": 0,
+            "roi": 0
+        }
+    
+    # Filtrer les paris fermés
+    closed_bets = bets_df[bets_df["status"] == "closed"]
+    open_bets = bets_df[bets_df["status"] == "open"]
+    
+    # Nombre de paris
+    total_bets = len(bets_df)
+    open_bets_count = len(open_bets)
+    closed_bets_count = len(closed_bets)
+    
+    # Résultats des paris fermés
+    wins = len(closed_bets[closed_bets["result"] == "win"])
+    losses = len(closed_bets[closed_bets["result"] == "loss"])
+    voids = len(closed_bets[closed_bets["result"] == "void"])
+    
+    # Taux de réussite
+    win_rate = wins / max(wins + losses, 1) * 100
+    
+    # Montants financiers
+    total_staked = closed_bets["stake"].sum() + open_bets["stake"].sum()
+    total_profit = closed_bets["profit"].sum()
+    
+    # ROI global
+    roi = total_profit / max(closed_bets["stake"].sum(), 1) * 100
+    
+    return {
+        "total_bets": total_bets,
+        "open_bets": open_bets_count,
+        "closed_bets": closed_bets_count,
+        "wins": wins,
+        "losses": losses,
+        "voids": voids,
+        "win_rate": win_rate,
+        "total_staked": total_staked,
+        "total_profit": total_profit,
+        "roi": roi
+    }
+
+# Initialiser l'état de session pour éviter le rechargement de page
+if 'kelly_strategy' not in st.session_state:
+    st.session_state.kelly_strategy = "Kelly/4"
+    
+if 'use_manual_stake' not in st.session_state:
+    st.session_state.use_manual_stake = False
+    
+if 'event_name' not in st.session_state:
+    st.session_state.event_name = "UFC Fight Night"
+    
+if 'event_date' not in st.session_state:
+    st.session_state.event_date = datetime.datetime.now()
+    
+if 'manual_stake' not in st.session_state:
+    st.session_state.manual_stake = 0.0
+
+# Fonctions de callback pour mettre à jour l'état de session
+def update_kelly_strategy(value):
+    st.session_state.kelly_strategy = value
+    
+def update_use_manual_stake(value):
+    st.session_state.use_manual_stake = value
+    
+def update_event_name(value):
+    st.session_state.event_name = value
+    
+def update_event_date(value):
+    st.session_state.event_date = value
+    
+def update_manual_stake(value):
+    st.session_state.manual_stake = value
+
 # FONCTION PRINCIPALE
 
 def main():
     # Titre principal
     st.markdown('<div class="main-title">🥊 Prédicteur de Combats UFC 🥊</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Analysez et prédisez l\'issue des affrontements</div>', unsafe_allow_html=True)
+    
+    # Initialiser/Charger la bankroll et les paris
+    current_bankroll = init_bankroll()  
+    init_bets_file()
     
     # Chargement des données
     fighter_stats_path = 'fighters_stats.txt'
@@ -965,430 +1369,974 @@ def main():
     # Créer un dictionnaire pour accéder rapidement aux statistiques des combattants
     fighters_dict = {fighter['name']: fighter for fighter in fighters}
     
-    # Interface de sélection des combattants
-    st.sidebar.markdown("## Sélection des combattants")
+    # Créer les onglets principaux
+    tabs = st.tabs(["🎯 Prédictions", "💰 Gestion de Bankroll", "📊 Historique & Performance"])
     
-    # Message d'avertissement sur l'importance de l'ordre des combattants
-    st.sidebar.markdown("""
-    <div class="info-box">
-        <b>⚠️ Important :</b> L'ordre des combattants (Rouge/Bleu) influence les prédictions. 
-        Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Liste des noms de combattants
-    fighter_names = sorted([fighter['name'] for fighter in fighters])
-    
-    # Sélection des combattants avec barre de recherche intégrée
-    st.sidebar.markdown("### 🔴 Combattant Rouge")
-    fighter_a_name = st.sidebar.selectbox(
-        "Sélectionner combattant rouge",
-        options=fighter_names
-    )
-    
-    # Sélection du combattant bleu (en excluant le combattant rouge)
-    st.sidebar.markdown("### 🔵 Combattant Bleu")
-    fighter_b_options = [name for name in fighter_names if name != fighter_a_name]
-    fighter_b_name = st.sidebar.selectbox(
-        "Sélectionner combattant bleu",
-        options=fighter_b_options
-    )
-    
-    # Options de paris
-    st.sidebar.markdown("## 💰 Options de paris")
-    odds_a = st.sidebar.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.05, format="%.2f")
-    odds_b = st.sidebar.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.05, format="%.2f")
-    
-    # Bouton de prédiction
-    predict_btn = st.sidebar.button("🥊 Prédire le combat", type="primary")
-    
-    # Récupérer les statistiques des combattants sélectionnés
-    fighter_a = fighters_dict.get(fighter_a_name)
-    fighter_b = fighters_dict.get(fighter_b_name)
-    
-    # Vérifier si on peut faire une prédiction
-    if predict_btn and fighter_a and fighter_b:
-        if fighter_a_name == fighter_b_name:
-            st.error("Veuillez sélectionner deux combattants différents.")
-        else:
-            # Faire les prédictions avec les deux méthodes
-            classic_prediction, ml_prediction = predict_both_methods(
-                fighter_a, 
-                fighter_b,
-                odds_a=odds_a,
-                odds_b=odds_b
-            )
-            
-            # Afficher les résultats des deux prédictions
-            st.markdown("""
-            <div style="text-align:center;">
-                <h2>🔮 Prédictions du combat 🔮</h2>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
-            if ml_prediction:
-                # Créer un DataFrame pour le graphique comparatif
-                proba_data = pd.DataFrame({
-                    'Combattant': [fighter_a_name, fighter_b_name],
-                    'Statistique': [classic_prediction['red_probability'], classic_prediction['blue_probability']],
-                    'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
+    # Onglet de prédiction
+    with tabs[0]:
+        # Interface de sélection des combattants
+        st.sidebar.markdown("## Sélection des combattants")
+        
+        # Message d'avertissement sur l'importance de l'ordre des combattants
+        st.sidebar.markdown("""
+        <div class="info-box">
+            <b>⚠️ Important :</b> L'ordre des combattants (Rouge/Bleu) influence les prédictions. 
+            Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Liste des noms de combattants
+        fighter_names = sorted([fighter['name'] for fighter in fighters])
+        
+        # Sélection des combattants avec barre de recherche intégrée
+        st.sidebar.markdown("### 🔴 Combattant Rouge")
+        fighter_a_name = st.sidebar.selectbox(
+            "Sélectionner combattant rouge",
+            options=fighter_names,
+            key="fighter_a_selectbox"
+        )
+        
+        # Sélection du combattant bleu (en excluant le combattant rouge)
+        st.sidebar.markdown("### 🔵 Combattant Bleu")
+        fighter_b_options = [name for name in fighter_names if name != fighter_a_name]
+        fighter_b_name = st.sidebar.selectbox(
+            "Sélectionner combattant bleu",
+            options=fighter_b_options,
+            key="fighter_b_selectbox"
+        )
+        
+        # Options de paris
+        st.sidebar.markdown("## 💰 Options de paris")
+        odds_a = st.sidebar.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.05, format="%.2f", key="odds_a_input")
+        odds_b = st.sidebar.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.05, format="%.2f", key="odds_b_input")
+        
+        # Section de gestion de bankroll
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("## 💼 Ma Bankroll")
+        displayed_bankroll = st.sidebar.number_input(
+            "Bankroll actuelle (€)",
+            min_value=0.0,
+            value=float(current_bankroll),
+            step=10.0,
+            format="%.2f",
+            key="bankroll_input"
+        )
+
+        # Option pour modifier la bankroll
+        if st.sidebar.button("Mettre à jour la bankroll", key="update_bankroll_btn"):
+            if displayed_bankroll != current_bankroll:
+                bets_dir = "bets"
+                bankroll_file = os.path.join(bets_dir, "bankroll.csv")
+                
+                # Charger le fichier existant
+                if os.path.exists(bankroll_file):
+                    bankroll_df = pd.read_csv(bankroll_file)
+                else:
+                    bankroll_df = pd.DataFrame(columns=["date", "amount", "action", "note"])
+                
+                # Ajouter la nouvelle entrée
+                new_entry = pd.DataFrame({
+                    "date": [datetime.datetime.now().strftime("%Y-%m-%d")],
+                    "amount": [displayed_bankroll],
+                    "action": ["update"],
+                    "note": ["Mise à jour manuelle"]
                 })
                 
-                # Créer un graphique qui montre les deux probabilités côte à côte
-                fig = go.Figure()
+                bankroll_df = pd.concat([bankroll_df, new_entry], ignore_index=True)
+                bankroll_df.to_csv(bankroll_file, index=False)
                 
-                # Ajouter les barres pour chaque méthode
-                fig.add_trace(go.Bar(
-                    x=proba_data['Combattant'],
-                    y=proba_data['Statistique'],
-                    name='Prédiction Statistique',
-                    marker_color='#2196F3',
-                    text=[f"{proba:.2f}" for proba in proba_data['Statistique']],
-                    textposition='auto'
-                ))
-                
-                fig.add_trace(go.Bar(
-                    x=proba_data['Combattant'],
-                    y=proba_data['Machine Learning'],
-                    name='Prédiction ML',
-                    marker_color='#4CAF50',
-                    text=[f"{proba:.2f}" for proba in proba_data['Machine Learning']],
-                    textposition='auto'
-                ))
-                
-                # Configurer la mise en page
-                fig.update_layout(
-                    title="Probabilités de victoire selon les deux méthodes",
-                    xaxis_title="",
-                    yaxis_title="Probabilité",
-                    yaxis=dict(range=[0, 1]),
-                    legend_title="Méthode",
-                    height=400,
-                    barmode='group'
-                )
-                
-                st.plotly_chart(fig, use_container_width=True)
+                st.sidebar.success(f"Bankroll mise à jour : {displayed_bankroll:.2f} €")
+                current_bankroll = displayed_bankroll
+        
+        # Bouton de prédiction
+        predict_btn = st.sidebar.button("🥊 Prédire le combat", type="primary", key="predict_btn")
+        
+        # Récupérer les statistiques des combattants sélectionnés
+        fighter_a = fighters_dict.get(fighter_a_name)
+        fighter_b = fighters_dict.get(fighter_b_name)
+        
+        # Vérifier si on peut faire une prédiction
+        if predict_btn and fighter_a and fighter_b:
+            if fighter_a_name == fighter_b_name:
+                st.error("Veuillez sélectionner deux combattants différents.")
             else:
-                # Si seulement la méthode statistique est disponible
-                fig = go.Figure()
-                fig.add_trace(go.Bar(
-                    x=[fighter_a_name, fighter_b_name],
-                    y=[classic_prediction['red_probability'], classic_prediction['blue_probability']],
-                    marker_color=['red', 'blue'],
-                    text=[f"{classic_prediction['red_probability']:.2f}", f"{classic_prediction['blue_probability']:.2f}"],
-                    textposition='auto'
-                ))
-                
-                fig.update_layout(
-                    title="Probabilités de victoire (Méthode Statistique)",
-                    xaxis_title="",
-                    yaxis_title="Probabilité",
-                    yaxis=dict(range=[0, 1]),
-                    height=400
+                # Faire les prédictions avec les deux méthodes
+                classic_prediction, ml_prediction = predict_both_methods(
+                    fighter_a, 
+                    fighter_b,
+                    odds_a=odds_a,
+                    odds_b=odds_b
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
-            
-            # Créer deux colonnes pour les deux prédictions
-            pred_cols = st.columns(2 if ml_prediction else 1)
-            
-            # Afficher la prédiction statistique
-            with pred_cols[0]:
-                winner_color = "red" if classic_prediction['prediction'] == 'Red' else "blue"
-                winner_name = classic_prediction['winner_name']
-                
-                st.markdown(f"""
-                <div class="prediction-box">
-                    <h3 style="text-align:center;"><span class="classic-badge">Prédiction statistique</span></h3>
-                    <h3 style="text-align:center; color:{winner_color};" class="winner">
-                        🏆 {winner_name} 🏆
-                    </h3>
-                    <p style="text-align:center; font-size:1.2em;">
-                        Probabilité: <span class="red-fighter">{classic_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
-                        <span class="blue-fighter">{classic_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
-                    </p>
-                    <p style="text-align:center;">Niveau de confiance: <b>{classic_prediction['confidence']}</b></p>
+                # Afficher les résultats des deux prédictions
+                st.markdown("""
+                <div style="text-align:center;">
+                    <h2>🔮 Prédictions du combat 🔮</h2>
                 </div>
                 """, unsafe_allow_html=True)
-
-            # Afficher la prédiction ML si disponible
-            if ml_prediction:
-                with pred_cols[1]:
-                    winner_color_ml = "red" if ml_prediction['prediction'] == 'Red' else "blue"
-                    winner_name_ml = ml_prediction['winner_name']
+                
+                # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
+                if ml_prediction:
+                    # Créer un DataFrame pour le graphique comparatif
+                    proba_data = pd.DataFrame({
+                        'Combattant': [fighter_a_name, fighter_b_name],
+                        'Statistique': [classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                        'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
+                    })
+                    
+                    # Créer un graphique qui montre les deux probabilités côte à côte
+                    fig = go.Figure()
+                    
+                    # Ajouter les barres pour chaque méthode
+                    fig.add_trace(go.Bar(
+                        x=proba_data['Combattant'],
+                        y=proba_data['Statistique'],
+                        name='Prédiction Statistique',
+                        marker_color='#2196F3',
+                        text=[f"{proba:.2f}" for proba in proba_data['Statistique']],
+                        textposition='auto'
+                    ))
+                    
+                    fig.add_trace(go.Bar(
+                        x=proba_data['Combattant'],
+                        y=proba_data['Machine Learning'],
+                        name='Prédiction ML',
+                        marker_color='#4CAF50',
+                        text=[f"{proba:.2f}" for proba in proba_data['Machine Learning']],
+                        textposition='auto'
+                    ))
+                    
+                    # Configurer la mise en page
+                    fig.update_layout(
+                        title="Probabilités de victoire selon les deux méthodes",
+                        xaxis_title="",
+                        yaxis_title="Probabilité",
+                        yaxis=dict(range=[0, 1]),
+                        legend_title="Méthode",
+                        height=400,
+                        barmode='group'
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    # Si seulement la méthode statistique est disponible
+                    fig = go.Figure()
+                    fig.add_trace(go.Bar(
+                        x=[fighter_a_name, fighter_b_name],
+                        y=[classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                        marker_color=['red', 'blue'],
+                        text=[f"{classic_prediction['red_probability']:.2f}", f"{classic_prediction['blue_probability']:.2f}"],
+                        textposition='auto'
+                    ))
+                    
+                    fig.update_layout(
+                        title="Probabilités de victoire (Méthode Statistique)",
+                        xaxis_title="",
+                        yaxis_title="Probabilité",
+                        yaxis=dict(range=[0, 1]),
+                        height=400
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                # Créer deux colonnes pour les deux prédictions
+                pred_cols = st.columns(2 if ml_prediction else 1)
+                
+                # Afficher la prédiction statistique
+                with pred_cols[0]:
+                    winner_color = "red" if classic_prediction['prediction'] == 'Red' else "blue"
+                    winner_name = classic_prediction['winner_name']
                     
                     st.markdown(f"""
                     <div class="prediction-box">
-                        <h3 style="text-align:center;"><span class="ml-badge">Prédiction Machine Learning</span></h3>
-                        <h3 style="text-align:center; color:{winner_color_ml};" class="winner">
-                            🏆 {winner_name_ml} 🏆
+                        <h3 style="text-align:center;"><span class="classic-badge">Prédiction statistique</span></h3>
+                        <h3 style="text-align:center; color:{winner_color};" class="winner">
+                            🏆 {winner_name} 🏆
                         </h3>
                         <p style="text-align:center; font-size:1.2em;">
-                            Probabilité: <span class="red-fighter">{ml_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
-                            <span class="blue-fighter">{ml_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
+                            Probabilité: <span class="red-fighter">{classic_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
+                            <span class="blue-fighter">{classic_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
                         </p>
-                        <p style="text-align:center;">Niveau de confiance: <b>{ml_prediction['confidence']}</b></p>
+                        <p style="text-align:center;">Niveau de confiance: <b>{classic_prediction['confidence']}</b></p>
                     </div>
                     """, unsafe_allow_html=True)
-            
-            # Message de convergence/divergence si les deux méthodes sont disponibles
-            if ml_prediction:
-                same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
-                agreement_message = "✅ Les deux méthodes prédisent le même vainqueur!" if same_prediction else "⚠️ Les méthodes prédisent des vainqueurs différents!"
-                agreement_color = "green" if same_prediction else "orange"
+
+                # Afficher la prédiction ML si disponible
+                if ml_prediction:
+                    with pred_cols[1]:
+                        winner_color_ml = "red" if ml_prediction['prediction'] == 'Red' else "blue"
+                        winner_name_ml = ml_prediction['winner_name']
+                        
+                        st.markdown(f"""
+                        <div class="prediction-box">
+                            <h3 style="text-align:center;"><span class="ml-badge">Prédiction Machine Learning</span></h3>
+                            <h3 style="text-align:center; color:{winner_color_ml};" class="winner">
+                                🏆 {winner_name_ml} 🏆
+                            </h3>
+                            <p style="text-align:center; font-size:1.2em;">
+                                Probabilité: <span class="red-fighter">{ml_prediction['red_probability']:.2f}</span> pour {fighter_a_name}, 
+                                <span class="blue-fighter">{ml_prediction['blue_probability']:.2f}</span> pour {fighter_b_name}
+                            </p>
+                            <p style="text-align:center;">Niveau de confiance: <b>{ml_prediction['confidence']}</b></p>
+                        </div>
+                        """, unsafe_allow_html=True)
                 
-                st.markdown(f"""
-                <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
-                    <h3 style="color:{agreement_color};">{agreement_message}</h3>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Analyse des paris (utiliser les deux méthodes si disponibles)
-            if 'betting' in classic_prediction:
-                betting_classic = classic_prediction['betting']
-                betting_ml = ml_prediction.get('betting') if ml_prediction else None
+                # Message de convergence/divergence si les deux méthodes sont disponibles
+                if ml_prediction:
+                    same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
+                    agreement_message = "✅ Les deux méthodes prédisent le même vainqueur!" if same_prediction else "⚠️ Les méthodes prédisent des vainqueurs différents!"
+                    agreement_color = "green" if same_prediction else "orange"
+                    
+                    st.markdown(f"""
+                    <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
+                        <h3 style="color:{agreement_color};">{agreement_message}</h3>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
+                # Analyse des paris (utiliser les deux méthodes si disponibles)
+                if 'betting' in classic_prediction:
+                    betting_classic = classic_prediction['betting']
+                    betting_ml = ml_prediction.get('betting') if ml_prediction else None
+                    
+                    st.markdown("""
+                    <div class="divider"></div>
+                    <div style="text-align:center;">
+                        <h2>💰 Analyse des paris 💰</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Analyse des paris pour les deux combattants avec Streamlit natif (pas d'HTML)
+                    col1, col2 = st.columns(2)
+                    
+                    # Combattant Rouge - Carte de paris
+                    with col1:
+                        st.subheader(f"🔴 {fighter_a_name}")
+                        
+                        # Créer un DataFrame pour une présentation simple
+                        red_data = {
+                            "Métrique": [
+                                "Cote", 
+                                "Probabilité implicite", 
+                                "Probabilité statistique",
+                                "Probabilité ML" if betting_ml else None,
+                                "Avantage (stat.)",
+                                "Valeur espérée (stat.)",
+                                "Recommandation stat.",
+                                "Recommandation ML" if betting_ml else None
+                            ],
+                            "Valeur": [
+                                f"{betting_classic['odds_red']:.2f}",
+                                f"{betting_classic['implied_prob_red']:.2f}",
+                                f"{classic_prediction['red_probability']:.2f}",
+                                f"{ml_prediction['red_probability']:.2f}" if betting_ml else None,
+                                f"{betting_classic['edge_red']*100:.1f}%",
+                                f"{betting_classic['ev_red']*100:.1f}%",
+                                betting_classic['recommendation_red'],
+                                betting_ml['recommendation_red'] if betting_ml else None
+                            ]
+                        }
+                        
+                        # Filtrer les lignes None
+                        red_df = pd.DataFrame(red_data)
+                        red_df = red_df.dropna()
+                        
+                        # Afficher le DataFrame stylisé
+                        st.dataframe(
+                            red_df,
+                            column_config={
+                                "Métrique": st.column_config.TextColumn("Métrique"),
+                                "Valeur": st.column_config.TextColumn("Valeur")
+                            },
+                            hide_index=True,
+                            use_container_width=True
+                        )
+                        
+                        # Affichage manuel des recommandations
+                        st.markdown("**Recommandation statistique:**")
+                        rec_class = "favorable" if betting_classic['recommendation_red'] == "Favorable" else "neutral" if betting_classic['recommendation_red'] == "Neutre" else "unfavorable"
+                        st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_red']}</span>", unsafe_allow_html=True)
+                        
+                        if betting_ml:
+                            st.markdown("**Recommandation ML:**")
+                            rec_ml_class = "favorable" if betting_ml['recommendation_red'] == "Favorable" else "neutral" if betting_ml['recommendation_red'] == "Neutre" else "unfavorable"
+                            st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_red']}</span>", unsafe_allow_html=True)
+                    
+                    # Combattant Bleu - Carte de paris
+                    with col2:
+                        st.subheader(f"🔵 {fighter_b_name}")
+                        
+                        # Créer un DataFrame pour une présentation simple
+                        blue_data = {
+                            "Métrique": [
+                                "Cote", 
+                                "Probabilité implicite", 
+                                "Probabilité statistique",
+                                "Probabilité ML" if betting_ml else None,
+                                "Avantage (stat.)",
+                                "Valeur espérée (stat.)",
+                                "Recommandation stat.",
+                                "Recommandation ML" if betting_ml else None
+                            ],
+                            "Valeur": [
+                                f"{betting_classic['odds_blue']:.2f}",
+                                f"{betting_classic['implied_prob_blue']:.2f}",
+                                f"{classic_prediction['blue_probability']:.2f}",
+                                f"{ml_prediction['blue_probability']:.2f}" if betting_ml else None,
+                                f"{betting_classic['edge_blue']*100:.1f}%",
+                                f"{betting_classic['ev_blue']*100:.1f}%",
+                                betting_classic['recommendation_blue'],
+                                betting_ml['recommendation_blue'] if betting_ml else None
+                            ]
+                        }
+                        
+                        # Filtrer les lignes None
+                        blue_df = pd.DataFrame(blue_data)
+                        blue_df = blue_df.dropna()
+                        
+                        # Afficher le DataFrame stylisé
+                        st.dataframe(
+                            blue_df,
+                            column_config={
+                                "Métrique": st.column_config.TextColumn("Métrique"),
+                                "Valeur": st.column_config.TextColumn("Valeur")
+                            },
+                            hide_index=True,
+                            use_container_width=True
+                        )
+                        
+                        # Affichage manuel des recommandations
+                        st.markdown("**Recommandation statistique:**")
+                        rec_class = "favorable" if betting_classic['recommendation_blue'] == "Favorable" else "neutral" if betting_classic['recommendation_blue'] == "Neutre" else "unfavorable"
+                        st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_blue']}</span>", unsafe_allow_html=True)
+                        
+                        if betting_ml:
+                            st.markdown("**Recommandation ML:**")
+                            rec_ml_class = "favorable" if betting_ml['recommendation_blue'] == "Favorable" else "neutral" if betting_ml['recommendation_blue'] == "Neutre" else "unfavorable"
+                            st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_blue']}</span>", unsafe_allow_html=True)
+                
+                # Afficher les statistiques comparatives
                 st.markdown("""
                 <div class="divider"></div>
                 <div style="text-align:center;">
-                    <h2>💰 Analyse des paris 💰</h2>
+                    <h2>📊 Statistiques comparatives 📊</h2>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Analyse des paris pour les deux combattants avec Streamlit natif (pas d'HTML)
+                # Création du DataFrame des statistiques comparatives
+                stats_df = create_stats_comparison_df(fighter_a, fighter_b)
+                
+                # Appliquer un style conditionnel pour mettre en évidence les avantages
+                def highlight_advantage(row):
+                    styles = [''] * len(row)
+                    advantage = row['Avantage']
+                    
+                    if advantage == fighter_a_name:
+                        styles[1] = 'background-color: rgba(255, 0, 0, 0.2); font-weight: bold;'
+                    elif advantage == fighter_b_name:
+                        styles[2] = 'background-color: rgba(0, 0, 255, 0.2); font-weight: bold;'
+                    
+                    return styles
+                
+                # Appliquer le style et afficher
+                styled_df = stats_df.style.apply(highlight_advantage, axis=1)
+                st.dataframe(styled_df, use_container_width=True, height=600)
+                
+                # Visualisations
+                st.markdown("""
+                <div class="divider"></div>
+                <div style="text-align:center; margin-top:30px;">
+                    <h2>📈 Visualisations des performances 📈</h2>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Disposer les graphiques en deux colonnes
                 col1, col2 = st.columns(2)
                 
-                # Combattant Rouge - Carte de paris
                 with col1:
-                    st.subheader(f"🔴 {fighter_a_name}")
-                    
-                    # Créer un DataFrame pour une présentation simple
-                    red_data = {
-                        "Métrique": [
-                            "Cote", 
-                            "Probabilité implicite", 
-                            "Probabilité statistique",
-                            "Probabilité ML" if betting_ml else None,
-                            "Avantage (stat.)",
-                            "Valeur espérée (stat.)",
-                            "Recommandation stat.",
-                            "Recommandation ML" if betting_ml else None
-                        ],
-                        "Valeur": [
-                            f"{betting_classic['odds_red']:.2f}",
-                            f"{betting_classic['implied_prob_red']:.2f}",
-                            f"{classic_prediction['red_probability']:.2f}",
-                            f"{ml_prediction['red_probability']:.2f}" if betting_ml else None,
-                            f"{betting_classic['edge_red']*100:.1f}%",
-                            f"{betting_classic['ev_red']*100:.1f}%",
-                            betting_classic['recommendation_red'],
-                            betting_ml['recommendation_red'] if betting_ml else None
-                        ]
-                    }
-                    
-                    # Filtrer les lignes None
-                    red_df = pd.DataFrame(red_data)
-                    red_df = red_df.dropna()
-                    
-                    # Afficher le DataFrame stylisé
-                    st.dataframe(
-                        red_df,
-                        column_config={
-                            "Métrique": st.column_config.TextColumn("Métrique"),
-                            "Valeur": st.column_config.TextColumn("Valeur")
-                        },
-                        hide_index=True,
-                        use_container_width=True
-                    )
-                    
-                    # Affichage manuel des recommandations
-                    st.markdown("**Recommandation statistique:**")
-                    rec_class = "favorable" if betting_classic['recommendation_red'] == "Favorable" else "neutral" if betting_classic['recommendation_red'] == "Neutre" else "unfavorable"
-                    st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_red']}</span>", unsafe_allow_html=True)
-                    
-                    if betting_ml:
-                        st.markdown("**Recommandation ML:**")
-                        rec_ml_class = "favorable" if betting_ml['recommendation_red'] == "Favorable" else "neutral" if betting_ml['recommendation_red'] == "Neutre" else "unfavorable"
-                        st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_red']}</span>", unsafe_allow_html=True)
+                    # Graphique radar
+                    radar_fig = create_radar_chart(fighter_a, fighter_b)
+                    st.plotly_chart(radar_fig, use_container_width=True)
                 
-                # Combattant Bleu - Carte de paris
                 with col2:
-                    st.subheader(f"🔵 {fighter_b_name}")
-                    
-                    # Créer un DataFrame pour une présentation simple
-                    blue_data = {
-                        "Métrique": [
-                            "Cote", 
-                            "Probabilité implicite", 
-                            "Probabilité statistique",
-                            "Probabilité ML" if betting_ml else None,
-                            "Avantage (stat.)",
-                            "Valeur espérée (stat.)",
-                            "Recommandation stat.",
-                            "Recommandation ML" if betting_ml else None
-                        ],
-                        "Valeur": [
-                            f"{betting_classic['odds_blue']:.2f}",
-                            f"{betting_classic['implied_prob_blue']:.2f}",
-                            f"{classic_prediction['blue_probability']:.2f}",
-                            f"{ml_prediction['blue_probability']:.2f}" if betting_ml else None,
-                            f"{betting_classic['edge_blue']*100:.1f}%",
-                            f"{betting_classic['ev_blue']*100:.1f}%",
-                            betting_classic['recommendation_blue'],
-                            betting_ml['recommendation_blue'] if betting_ml else None
-                        ]
-                    }
-                    
-                    # Filtrer les lignes None
-                    blue_df = pd.DataFrame(blue_data)
-                    blue_df = blue_df.dropna()
-                    
-                    # Afficher le DataFrame stylisé
-                    st.dataframe(
-                        blue_df,
-                        column_config={
-                            "Métrique": st.column_config.TextColumn("Métrique"),
-                            "Valeur": st.column_config.TextColumn("Valeur")
-                        },
-                        hide_index=True,
-                        use_container_width=True
-                    )
-                    
-                    # Affichage manuel des recommandations
-                    st.markdown("**Recommandation statistique:**")
-                    rec_class = "favorable" if betting_classic['recommendation_blue'] == "Favorable" else "neutral" if betting_classic['recommendation_blue'] == "Neutre" else "unfavorable"
-                    st.markdown(f"<span class='{rec_class}'>{betting_classic['recommendation_blue']}</span>", unsafe_allow_html=True)
-                    
-                    if betting_ml:
-                        st.markdown("**Recommandation ML:**")
-                        rec_ml_class = "favorable" if betting_ml['recommendation_blue'] == "Favorable" else "neutral" if betting_ml['recommendation_blue'] == "Neutre" else "unfavorable"
-                        st.markdown(f"<span class='{rec_ml_class}'>{betting_ml['recommendation_blue']}</span>", unsafe_allow_html=True)
-            
-            # Afficher les statistiques comparatives
-            st.markdown("""
-            <div class="divider"></div>
-            <div style="text-align:center;">
-                <h2>📊 Statistiques comparatives 📊</h2>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Création du DataFrame des statistiques comparatives
-            stats_df = create_stats_comparison_df(fighter_a, fighter_b)
-            
-            # Appliquer un style conditionnel pour mettre en évidence les avantages
-            def highlight_advantage(row):
-                styles = [''] * len(row)
-                advantage = row['Avantage']
+                    # Graphique des forces et faiblesses
+                    strengths_fig = create_strengths_weaknesses_chart(fighter_a, fighter_b)
+                    st.plotly_chart(strengths_fig, use_container_width=True)
                 
-                if advantage == fighter_a_name:
-                    styles[1] = 'background-color: rgba(255, 0, 0, 0.2); font-weight: bold;'
-                elif advantage == fighter_b_name:
-                    styles[2] = 'background-color: rgba(0, 0, 255, 0.2); font-weight: bold;'
+                # Style de combat
+                style_fig = create_style_analysis_chart(fighter_a, fighter_b)
+                st.plotly_chart(style_fig, use_container_width=True)
                 
-                return styles
-            
-            # Appliquer le style et afficher
-            styled_df = stats_df.style.apply(highlight_advantage, axis=1)
-            st.dataframe(styled_df, use_container_width=True, height=600)
-            
-            # Visualisations
-            st.markdown("""
-            <div class="divider"></div>
-            <div style="text-align:center; margin-top:30px;">
-                <h2>📈 Visualisations des performances 📈</h2>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Disposer les graphiques en deux colonnes
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # Graphique radar
-                radar_fig = create_radar_chart(fighter_a, fighter_b)
-                st.plotly_chart(radar_fig, use_container_width=True)
-            
-            with col2:
-                # Graphique des forces et faiblesses
-                strengths_fig = create_strengths_weaknesses_chart(fighter_a, fighter_b)
-                st.plotly_chart(strengths_fig, use_container_width=True)
-            
-            # Style de combat
-            style_fig = create_style_analysis_chart(fighter_a, fighter_b)
-            st.plotly_chart(style_fig, use_container_width=True)
-    
-    else:
-        # Message d'accueil - CORRIGÉ
-        st.markdown("""
-        <div style="background-color:rgba(240, 242, 246, 0.7); padding:20px; border-radius:10px; text-align:center;">
-            <h2>Bienvenue sur le Prédicteur de Combats UFC!</h2>
-            <p style="font-size:1.2em;">Sélectionnez deux combattants dans le menu latéral et cliquez sur "Prédire le combat" pour obtenir une analyse complète.</p>
-            <p>Vous pouvez également entrer les cotes proposées par les bookmakers pour recevoir des recommandations de paris.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Note sur l'importance de l'ordre des combattants
-        st.markdown("""
-        <div class="info-box">
-            <h3>⚠️ L'ordre des combattants est important!</h3>
-            <p>La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions, particulièrement avec le modèle ML.</p>
-            <p>Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge. Pour obtenir les résultats les plus précis, suivez cette convention.</p>
-            <p>Si vous inversez les positions, les probabilités de victoire peuvent changer considérablement.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Nouvelle fonctionnalité
-        st.markdown("""
-        <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
-            <h3>🔄 Nouvelle fonctionnalité: Prédictions comparatives!</h3>
-            <p>L'application affiche maintenant simultanément les prédictions des deux méthodes:</p>
-            <ul>
-                <li><b>🤖 Machine Learning:</b> Prédiction basée sur un modèle entraîné sur des milliers de combats</li>
-                <li><b>📊 Calcul statistique:</b> Prédiction basée sur une formule utilisant les statistiques des combattants</li>
-            </ul>
-            <p>Cette double prédiction vous permet de comparer les résultats et d'avoir une vision plus complète des chances de victoire.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Explication des fonctionnalités
-        st.markdown("""
-        ### Comment utiliser l'application:
-        
-        1. **Sélectionnez vos combattants**: Utilisez les menus déroulants pour choisir les combattants rouge et bleu que vous souhaitez comparer.
-        
-        2. **Respectez les positions**: Pour des prédictions plus précises, placez le combattant favori ou mieux classé dans le coin rouge.
-        
-        3. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
-        
-        4. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir l'analyse complète avec les deux méthodes de prédiction.
-        
-        5. **Comparez les résultats**: Analysez les différences entre les prédictions ML et statistiques pour une meilleure compréhension.
-        
-        6. **Explorez les visualisations**: Consultez les graphiques et tableaux pour comprendre les forces et faiblesses de chaque combattant.
-        """)
+                # Calcul Kelly et enregistrement des paris
+                st.markdown("""
+                <div class="divider"></div>
+                <div style="text-align:center;">
+                    <h2>💰 Optimisation des mises 💰</h2>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Si la bankroll n'est pas initialisée correctement, afficher un message d'erreur
+                if current_bankroll <= 0:
+                    st.error("⚠️ Vous devez initialiser votre bankroll avant de pouvoir utiliser les recommandations de mise. Utilisez le champ 'Bankroll actuelle (€)' dans la barre latérale.")
+                else:
+                    # Déterminer le favori selon le modèle ML
+                    if ml_prediction:
+                        if ml_prediction['prediction'] == 'Red':
+                            favorite_name = fighter_a_name
+                            favorite_odds = odds_a
+                            favorite_prob = ml_prediction['red_probability']
+                        else:
+                            favorite_name = fighter_b_name
+                            favorite_odds = odds_b
+                            favorite_prob = ml_prediction['blue_probability']
+                        
+                        # Afficher le favori ML et sa probabilité
+                        st.subheader(f"Recommandations pour le favori ML: {favorite_name}")
+                        st.info(f"Probabilité ML: {favorite_prob:.2f} | Cote: {favorite_odds:.2f}")
+                        
+                        # Calculer les mises Kelly pour différentes fractions
+                        kelly_options = {
+                            "Kelly pur": 1,
+                            "Kelly/2": 2,
+                            "Kelly/3": 3,
+                            "Kelly/4": 4,
+                            "Kelly/5": 5,
+                            "Kelly/10": 10
+                        }
+                        
+                        # Calculer les mises recommandées
+                        kelly_stakes = {
+                            name: calculate_kelly(favorite_prob, favorite_odds, current_bankroll, fraction) 
+                            for name, fraction in kelly_options.items()
+                        }
+                        
+                        # Afficher toutes les options Kelly dans un tableau
+                        st.markdown("""
+                        <p>Le tableau ci-dessous présente les montants à miser selon différentes stratégies Kelly, basés sur la probabilité ML et votre bankroll actuelle:</p>
+                        """, unsafe_allow_html=True)
+                        
+                        # Créer un tableau avec les mises Kelly
+                        kelly_data = {
+                            "Stratégie": list(kelly_options.keys()),
+                            "Mise (€)": [kelly_stakes[name] for name in kelly_options.keys()],
+                            "% de la bankroll": [f"{kelly_stakes[name]/current_bankroll*100:.1f}%" for name in kelly_options.keys()],
+                            "Gain potentiel (€)": [f"{kelly_stakes[name] * (favorite_odds-1):.2f}" for name in kelly_options.keys()]
+                        }
+                        
+                        df_kelly = pd.DataFrame(kelly_data)
+                        st.dataframe(df_kelly, use_container_width=True)
+                        
 
-        # Afficher les informations sur le modèle ML
-        model, _, _ = load_ml_model()
-        ml_available = model is not None
+                    else:
+                        st.warning("Le modèle ML n'est pas disponible. Les recommandations Kelly ne peuvent pas être calculées.")
         
-        if ml_available:
+        else:
+            # Message d'accueil - CORRIGÉ
+            st.markdown("""
+            <div style="background-color:rgba(240, 242, 246, 0.7); padding:20px; border-radius:10px; text-align:center;">
+                <h2>Bienvenue sur le Prédicteur de Combats UFC!</h2>            
+                <p style="font-size:1.2em;">Sélectionnez deux combattants dans le menu latéral et cliquez sur "Prédire le combat" pour obtenir une analyse complète.</p>
+                <p>Vous pouvez également entrer les cotes proposées par les bookmakers pour recevoir des recommandations de paris.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Note sur l'importance de l'ordre des combattants
+            st.markdown("""
+            <div class="info-box">
+                <h3>⚠️ L'ordre des combattants est important!</h3>
+                <p>La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions, particulièrement avec le modèle ML.</p>
+                <p>Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge. Pour obtenir les résultats les plus précis, suivez cette convention.</p>
+                <p>Si vous inversez les positions, les probabilités de victoire peuvent changer considérablement.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Nouvelle fonctionnalité
             st.markdown("""
             <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
-                <h3>✅ Modèle ML détecté!</h3>
-                <p>Le modèle de machine learning a été correctement chargé et est prêt à être utilisé pour des prédictions.</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div style="background-color:rgba(244, 67, 54, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
-                <h3>⚠️ Modèle ML non détecté</h3>
-                <p>Le modèle de machine learning n'a pas été trouvé. Assurez-vous que les fichiers suivants sont présents dans le même répertoire que cette application:</p>
+                <h3>🔄 Nouvelle fonctionnalité: Prédictions comparatives!</h3>
+                <p>L'application affiche maintenant simultanément les prédictions des deux méthodes:</p>
                 <ul>
-                    <li><code>ufc_prediction_model.joblib</code> ou <code>ufc_prediction_model.pkl</code></li>
+                    <li><b>🤖 Machine Learning:</b> Prédiction basée sur un modèle entraîné sur des milliers de combats</li>
+                    <li><b>📊 Calcul statistique:</b> Prédiction basée sur une formule utilisant les statistiques des combattants</li>
                 </ul>
-                <p>Seule la méthode de prédiction statistique classique sera disponible.</p>
+                <p>Cette double prédiction vous permet de comparer les résultats et d'avoir une vision plus complète des chances de victoire.</p>
             </div>
             """, unsafe_allow_html=True)
+            
+            # Explication des fonctionnalités
+            st.markdown("""
+            ### Comment utiliser l'application:
+            
+            1. **Sélectionnez vos combattants**: Utilisez les menus déroulants pour choisir les combattants rouge et bleu que vous souhaitez comparer.
+            
+            2. **Respectez les positions**: Pour des prédictions plus précises, placez le combattant favori ou mieux classé dans le coin rouge.
+            
+            3. **Entrez les cotes** (optionnel): Si vous souhaitez analyser les opportunités de paris, entrez les cotes proposées par les bookmakers.
+            
+            4. **Lancez la prédiction**: Cliquez sur le bouton "Prédire le combat" pour obtenir l'analyse complète avec les deux méthodes de prédiction.
+            
+            5. **Comparez les résultats**: Analysez les différences entre les prédictions ML et statistiques pour une meilleure compréhension.
+            
+            6. **Explorez les visualisations**: Consultez les graphiques et tableaux pour comprendre les forces et faiblesses de chaque combattant.
+            """)
+
+            # Afficher les informations sur le modèle ML
+            model, _, _ = load_ml_model()
+            ml_available = model is not None
+            
+            if ml_available:
+                st.markdown("""
+                <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
+                    <h3>✅ Modèle ML détecté!</h3>
+                    <p>Le modèle de machine learning a été correctement chargé et est prêt à être utilisé pour des prédictions.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div style="background-color:rgba(244, 67, 54, 0.1); padding:15px; border-radius:10px; margin-top:20px;">
+                    <h3>⚠️ Modèle ML non détecté</h3>
+                    <p>Le modèle de machine learning n'a pas été trouvé. Assurez-vous que les fichiers suivants sont présents dans le même répertoire que cette application:</p>
+                    <ul>
+                        <li><code>ufc_prediction_model.joblib</code> ou <code>ufc_prediction_model.pkl</code></li>
+                    </ul>
+                    <p>Seule la méthode de prédiction statistique classique sera disponible.</p>
+                </div>
+                """, unsafe_allow_html=True)
+    
+    # Onglet de gestion de bankroll
+    with tabs[1]:
+        st.markdown("""
+        <div style="text-align:center;">
+            <h2>💰 Gestion de bankroll et paris 💰</h2>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Afficher la bankroll actuelle
+        st.metric("Bankroll actuelle", f"{current_bankroll:.2f} €", delta=None)
+        st.markdown("---")
+        
+        # Interface pour ajuster la bankroll
+        st.subheader("Ajuster la bankroll")
+        adjust_cols = st.columns(3)
+        
+        with adjust_cols[0]:
+            adjustment_amount = st.number_input(
+                "Montant (€)",
+                min_value=0.0,
+                step=10.0,
+                format="%.2f",
+                key="bankroll_adjustment_amount"
+            )
+        
+        with adjust_cols[1]:
+            adjustment_type = st.selectbox(
+                "Type d'opération",
+                options=["Dépôt", "Retrait", "Définir montant exact"],
+                key="bankroll_adjustment_type"
+            )
+        
+        with adjust_cols[2]:
+            adjustment_note = st.text_input(
+                "Note (optionnel)",
+                value="",
+                key="bankroll_adjustment_note"
+            )
+        
+        if st.button("Valider l'ajustement", type="primary", key="validate_bankroll_adjust"):
+            # Calculer la nouvelle bankroll
+            if adjustment_type == "Dépôt":
+                new_bankroll = current_bankroll + adjustment_amount
+                action = "deposit"
+                if not adjustment_note:
+                    adjustment_note = "Dépôt"
+            elif adjustment_type == "Retrait":
+                if adjustment_amount > current_bankroll:
+                    st.error(f"Montant du retrait ({adjustment_amount:.2f} €) supérieur à la bankroll actuelle ({current_bankroll:.2f} €)")
+                    new_bankroll = current_bankroll
+                    action = None
+                else:
+                    new_bankroll = current_bankroll - adjustment_amount
+                    action = "withdraw"
+                    if not adjustment_note:
+                        adjustment_note = "Retrait"
+            else:  # "Définir montant exact"
+                new_bankroll = adjustment_amount
+                action = "update"
+                if not adjustment_note:
+                    adjustment_note = "Mise à jour manuelle"
+            
+            # Mettre à jour la bankroll si nécessaire
+            if action and new_bankroll != current_bankroll:
+                bets_dir = "bets"
+                bankroll_file = os.path.join(bets_dir, "bankroll.csv")
+                
+                # Charger le fichier existant
+                if os.path.exists(bankroll_file):
+                    bankroll_df = pd.read_csv(bankroll_file)
+                else:
+                    bankroll_df = pd.DataFrame(columns=["date", "amount", "action", "note"])
+                
+                # Ajouter la nouvelle entrée
+                new_entry = pd.DataFrame({
+                    "date": [datetime.datetime.now().strftime("%Y-%m-%d")],
+                    "amount": [new_bankroll],
+                    "action": [action],
+                    "note": [adjustment_note]
+                })
+                
+                bankroll_df = pd.concat([bankroll_df, new_entry], ignore_index=True)
+                bankroll_df.to_csv(bankroll_file, index=False)
+                
+                st.success(f"Bankroll mise à jour: {new_bankroll:.2f} €")
+                st.experimental_rerun()
+        
+        st.markdown("---")
+        
+        # Section pour ajouter un pari manuellement
+        st.subheader("Ajouter un pari manuellement")
+        
+        # Interface d'ajout de pari
+        # Ligne 1: Informations sur l'événement
+        event_cols = st.columns(2)
+        with event_cols[0]:
+            manual_event_name = st.text_input("Nom de l'événement", value="UFC Fight Night", key="manual_event_name")
+        with event_cols[1]:
+            manual_event_date = st.date_input("Date de l'événement", value=datetime.datetime.now(), key="manual_event_date")
+        
+        # Ligne 2: Informations sur les combattants
+        fighter_cols = st.columns(2)
+        with fighter_cols[0]:
+            manual_fighter_red = st.selectbox("Combattant rouge", options=fighter_names, key="manual_fighter_red")
+        with fighter_cols[1]:
+            # Exclure le combattant rouge des options
+            manual_blue_options = [name for name in fighter_names if name != manual_fighter_red]
+            manual_fighter_blue = st.selectbox("Combattant bleu", options=manual_blue_options, key="manual_fighter_blue")
+        
+        # Ligne 3: Informations sur le pari
+        bet_cols = st.columns(3)
+        with bet_cols[0]:
+            manual_pick = st.selectbox("Pari sur", options=[manual_fighter_red, manual_fighter_blue], key="manual_pick")
+        with bet_cols[1]:
+            manual_odds = st.number_input("Cote", min_value=1.01, value=2.0, step=0.05, format="%.2f", key="manual_odds")
+        with bet_cols[2]:
+            manual_stake = st.number_input(
+                "Mise (€)",
+                min_value=0.0, 
+                max_value=float(current_bankroll),
+                value=min(50.0, float(current_bankroll)),
+                step=5.0,
+                format="%.2f",
+                key="manual_stake"
+            )
+        
+        # Afficher le gain potentiel
+        potential_profit = manual_stake * (manual_odds - 1)
+        st.info(f"Mise: {manual_stake:.2f} € @ {manual_odds:.2f} | Gain potentiel: {potential_profit:.2f} € | % de bankroll: {manual_stake/current_bankroll*100:.1f}%")
+        
+        # Bouton pour enregistrer le pari
+        if st.button("Enregistrer le pari", type="primary", key="save_manual_bet_btn"):
+            if manual_stake > current_bankroll:
+                st.error(f"Mise ({manual_stake:.2f} €) supérieure à la bankroll actuelle ({current_bankroll:.2f} €)")
+            elif manual_stake <= 0:
+                st.error("La mise doit être supérieure à 0 €")
+            else:
+                # Enregistrer le pari
+                if add_manual_bet(
+                    event_name=manual_event_name,
+                    event_date=manual_event_date,
+                    fighter_red=manual_fighter_red,
+                    fighter_blue=manual_fighter_blue,
+                    pick=manual_pick,
+                    odds=manual_odds,
+                    stake=manual_stake,
+                    model_probability=None,  # Pas de probabilité ML pour les paris manuels
+                    kelly_fraction=None      # Pas de fraction Kelly pour les paris manuels
+                ):
+                    st.success(f"Pari enregistré avec succès! Mise de {manual_stake:.2f} € sur {manual_pick} @ {manual_odds:.2f}")
+                    # Recharger la page
+                    st.experimental_rerun()
+                else:
+                    st.error("Erreur lors de l'enregistrement du pari.")
+    
+    # Onglet historique et performance
+    with tabs[2]:
+        st.markdown("""
+        <div style="text-align:center;">
+            <h2>📊 Historique des paris et performances 📊</h2>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Vérifier si les fichiers existent
+        bets_file = os.path.join("bets", "bets.csv")
+        bankroll_file = os.path.join("bets", "bankroll.csv")
+        has_bets = os.path.exists(bets_file)
+        has_bankroll = os.path.exists(bankroll_file)
+        
+        if has_bets and has_bankroll:
+            bets_df = pd.read_csv(bets_file)
+            bankroll_df = pd.read_csv(bankroll_file)
+            
+            # Graphique d'évolution de la bankroll
+            if not bankroll_df.empty:
+                st.subheader("Évolution de la bankroll")
+                fig = px.line(bankroll_df, x="date", y="amount", 
+                            title="Évolution de la bankroll dans le temps",
+                            labels={"amount": "Bankroll (€)", "date": "Date"})
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Résumé des performances
+            if not bets_df.empty:
+                # Obtenir les statistiques
+                betting_stats = get_betting_summary(bets_df)
+                
+                # Afficher les métriques principales
+                st.subheader("Résumé des performances")
+                metrics_cols = st.columns(4)
+                
+                with metrics_cols[0]:
+                    st.metric("Total des paris", f"{betting_stats['total_bets']}")
+                with metrics_cols[1]:
+                    st.metric("Paris en cours", f"{betting_stats['open_bets']}")
+                with metrics_cols[2]:
+                    st.metric("Victoires/Défaites", f"{betting_stats['wins']}/{betting_stats['losses']}")
+                with metrics_cols[3]:
+                    st.metric("Taux de réussite", f"{betting_stats['win_rate']:.1f}%")
+                
+                # Deuxième ligne de métriques
+                metrics_row2 = st.columns(4)
+                with metrics_row2[0]:
+                    st.metric("Total misé", f"{betting_stats['total_staked']:.2f} €")
+                with metrics_row2[1]:
+                    st.metric("Profit total", f"{betting_stats['total_profit']:.2f} €")
+                with metrics_row2[2]:
+                    st.metric("ROI", f"{betting_stats['roi']:.1f}%")
+                with metrics_row2[3]:
+                    avg_stake = betting_stats['total_staked'] / max(betting_stats['total_bets'], 1)
+                    st.metric("Mise moyenne", f"{avg_stake:.2f} €")
+                
+                # Afficher les paris en cours dans un tableau interactif
+                st.markdown("---")
+                
+                # Utiliser des onglets pour organiser les paris
+                bet_subtabs = st.tabs(["Paris en cours", "Historique des paris", "Modifier/Supprimer"])
+                
+                # Section des paris en cours
+                with bet_subtabs[0]:
+                    st.subheader("Paris en cours")
+                    open_bets = bets_df[bets_df["status"] == "open"]
+                    if not open_bets.empty:
+                        # Formater le DataFrame pour l'affichage
+                        display_open_bets = open_bets.copy()
+                        display_open_bets['gain_potentiel'] = display_open_bets.apply(lambda row: row['stake'] * (row['odds'] - 1), axis=1)
+                        
+                        # Sélectionner et renommer les colonnes
+                        display_open_bets = display_open_bets[["bet_id", "event_name", "event_date", "fighter_red", "fighter_blue", "pick", "odds", "stake", "gain_potentiel"]]
+                        display_open_bets.columns = ["ID", "Événement", "Date", "Rouge", "Bleu", "Pari sur", "Cote", "Mise (€)", "Gain potentiel (€)"]
+                        
+                        # Afficher le tableau
+                        st.dataframe(
+                            display_open_bets,
+                            use_container_width=True,
+                            column_config={
+                                "ID": st.column_config.NumberColumn("ID", format="%d"),
+                                "Événement": st.column_config.TextColumn("Événement"),
+                                "Date": st.column_config.DateColumn("Date", format="DD/MM/YYYY"),
+                                "Rouge": st.column_config.TextColumn("Rouge"),
+                                "Bleu": st.column_config.TextColumn("Bleu"),
+                                "Pari sur": st.column_config.TextColumn("Pari sur"),
+                                "Cote": st.column_config.NumberColumn("Cote", format="%.2f"),
+                                "Mise (€)": st.column_config.NumberColumn("Mise (€)", format="%.2f"),
+                                "Gain potentiel (€)": st.column_config.NumberColumn("Gain potentiel (€)", format="%.2f")
+                            }
+                        )
+                    else:
+                        st.info("Aucun pari en cours.")
+                
+                # Section historique des paris
+                with bet_subtabs[1]:
+                    st.subheader("Historique des paris")
+                    closed_bets = bets_df[bets_df["status"] == "closed"]
+                    if not closed_bets.empty:
+                        # Formater le DataFrame pour l'affichage
+                        display_closed_bets = closed_bets.copy()
+                        
+                        # Sélectionner et renommer les colonnes
+                        display_closed_bets = display_closed_bets[["bet_id", "event_name", "event_date", "fighter_red", "fighter_blue", "pick", "odds", "stake", "result", "profit", "roi"]]
+                        display_closed_bets.columns = ["ID", "Événement", "Date", "Rouge", "Bleu", "Pari sur", "Cote", "Mise (€)", "Résultat", "Profit (€)", "ROI (%)"]
+                        
+                        # Afficher le tableau
+                        st.dataframe(
+                            display_closed_bets,
+                            use_container_width=True,
+                            column_config={
+                                "ID": st.column_config.NumberColumn("ID", format="%d"),
+                                "Événement": st.column_config.TextColumn("Événement"),
+                                "Date": st.column_config.DateColumn("Date", format="DD/MM/YYYY"),
+                                "Rouge": st.column_config.TextColumn("Rouge"),
+                                "Bleu": st.column_config.TextColumn("Bleu"),
+                                "Pari sur": st.column_config.TextColumn("Pari sur"),
+                                "Cote": st.column_config.NumberColumn("Cote", format="%.2f"),
+                                "Mise (€)": st.column_config.NumberColumn("Mise (€)", format="%.2f"),
+                                "Résultat": st.column_config.TextColumn("Résultat"),
+                                "Profit (€)": st.column_config.NumberColumn("Profit (€)", format="%.2f"),
+                                "ROI (%)": st.column_config.NumberColumn("ROI (%)", format="%.1f")
+                            }
+                        )
+                    else:
+                        st.info("Aucun pari dans l'historique.")
+                
+                # Section de gestion des paris
+                with bet_subtabs[2]:
+                    st.subheader("Gérer les paris")
+                    
+                    # Créer deux colonnes
+                    manage_columns = st.columns(2)
+                    
+                    # Colonne pour mettre à jour les paris
+                    with manage_columns[0]:
+                        st.markdown("#### Mettre à jour un pari")
+                        
+                        # Sélectionner un pari à mettre à jour
+                        open_bets = bets_df[bets_df["status"] == "open"]
+                        open_bet_ids = open_bets["bet_id"].tolist() if not open_bets.empty else []
+                        
+                        if open_bet_ids:
+                            update_bet_id = st.selectbox(
+                                "Choisir un pari à mettre à jour:",
+                                options=open_bet_ids,
+                                format_func=lambda x: f"#{x} - {open_bets[open_bets['bet_id'] == x]['event_name'].values[0]} ({open_bets[open_bets['bet_id'] == x]['pick'].values[0]})",
+                                key="update_bet_select"
+                            )
+                            
+                            # Récupérer les informations du pari
+                            selected_bet = open_bets[open_bets["bet_id"] == update_bet_id].iloc[0]
+                            
+                            st.info(f"Pari #{update_bet_id}: {selected_bet['pick']} @ {selected_bet['odds']} (Mise: {selected_bet['stake']}€)")
+                            
+                            # Sélectionner le résultat
+                            result = st.radio(
+                                "Résultat du pari:",
+                                options=["win", "loss", "void"],
+                                horizontal=True,
+                                key="update_result_radio"
+                            )
+                            
+                            # Expliquer les options
+                            st.caption("win = gagné, loss = perdu, void = annulé/remboursé")
+                            
+                            # Bouton pour mettre à jour
+                            if st.button("Mettre à jour le pari", key="update_bet_btn"):
+                                # Mettre à jour le pari
+                                new_bankroll = update_bet_result(update_bet_id, result, current_bankroll)
+                                
+                                st.success(f"Pari mis à jour avec succès! Nouvelle bankroll: {new_bankroll:.2f} €")
+                                # Recharger la page
+                                st.experimental_rerun()
+                        else:
+                            st.info("Aucun pari en cours à mettre à jour.")
+                    
+                    # Colonne pour supprimer les paris
+                    with manage_columns[1]:
+                        st.markdown("#### Supprimer un pari")
+                        
+                        # Sélectionner un pari à supprimer (seulement les paris ouverts)
+                        open_bets = bets_df[bets_df["status"] == "open"]
+                        open_bet_ids = open_bets["bet_id"].tolist() if not open_bets.empty else []
+                        
+                        if open_bet_ids:
+                            delete_bet_id = st.selectbox(
+                                "Choisir un pari à supprimer:",
+                                options=open_bet_ids,
+                                format_func=lambda x: f"#{x} - {open_bets[open_bets['bet_id'] == x]['event_name'].values[0]} ({open_bets[open_bets['bet_id'] == x]['pick'].values[0]})",
+                                key="delete_bet_select"
+                            )
+                            
+                            # Récupérer les informations du pari
+                            selected_bet = open_bets[open_bets["bet_id"] == delete_bet_id].iloc[0]
+                            
+                            st.info(f"Pari #{delete_bet_id}: {selected_bet['pick']} @ {selected_bet['odds']} (Mise: {selected_bet['stake']}€)")
+                            
+                            # Confirmation
+                            st.warning("⚠️ La suppression est définitive et ne peut pas être annulée.")
+                            
+                            # Bouton pour supprimer
+                            if st.button("Supprimer le pari", key="delete_bet_btn"):
+                                # Supprimer le pari
+                                if delete_bet(delete_bet_id):
+                                    st.success(f"Pari #{delete_bet_id} supprimé avec succès!")
+                                    # Recharger la page
+                                    st.experimental_rerun()
+                                else:
+                                    st.error("Erreur lors de la suppression du pari.")
+                        else:
+                            st.info("Aucun pari à supprimer.")
+                
+                # Graphique de distribution des résultats
+                if not closed_bets.empty:
+                    st.markdown("---")
+                    st.subheader("Analyse des performances")
+                    
+                    # Distribution des résultats
+                    results_count = closed_bets['result'].value_counts().reset_index()
+                    results_count.columns = ['Résultat', 'Nombre']
+                    
+                    # Créer le graphique avec Plotly
+                    if not results_count.empty:
+                        fig = px.pie(
+                            results_count, 
+                            values='Nombre', 
+                            names='Résultat',
+                            title="Distribution des résultats",
+                            color_discrete_map={'win': 'green', 'loss': 'red', 'void': 'gray'}
+                        )
+                        st.plotly_chart(fig)
+                    
+                    # Graphique évolution du profit
+                    if len(closed_bets) > 1:
+                        # Trier par date
+                        closed_bets_sorted = closed_bets.sort_values(by='event_date')
+                        
+                        # Calculer le profit cumulatif
+                        closed_bets_sorted['profit_cumul'] = closed_bets_sorted['profit'].cumsum()
+                        
+                        # Créer le graphique
+                        fig = px.line(
+                            closed_bets_sorted,
+                            x='event_date',
+                            y='profit_cumul',
+                            title="Évolution du profit dans le temps",
+                            labels={'event_date': 'Date', 'profit_cumul': 'Profit cumulé (€)'}
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("Aucun pari enregistré. Commencez à parier pour voir vos statistiques.")
+        else:
+            st.info("Aucune donnée d'historique disponible. Placez votre premier pari pour commencer à suivre vos performances.")
+        
+        # Téléchargement des données
+        if has_bets and has_bankroll and not bets_df.empty:
+            st.markdown("---")
+            st.subheader("Exporter les données")
+            
+            download_cols = st.columns(2)
+            
+            with download_cols[0]:
+                st.download_button(
+                    label="Télécharger les paris (CSV)",
+                    data=bets_df.to_csv(index=False).encode('utf-8'),
+                    file_name='ufc_bets_history.csv',
+                    mime='text/csv',
+                    key="download_bets_btn"
+                )
+            
+            with download_cols[1]:
+                st.download_button(
+                    label="Télécharger l'historique bankroll (CSV)",
+                    data=bankroll_df.to_csv(index=False).encode('utf-8'),
+                    file_name='ufc_bankroll_history.csv',
+                    mime='text/csv',
+                    key="download_bankroll_btn"
+                )
 
 if __name__ == "__main__":
     main()
+                
