@@ -9,6 +9,11 @@ import pickle
 import joblib
 import datetime
 import warnings
+import requests
+from bs4 import BeautifulSoup
+import re
+import time
+import random
 warnings.filterwarnings('ignore')
 
 # Configuration de la page
@@ -212,8 +217,379 @@ st.markdown("""
     .kelly-highlight {
         background-color: rgba(76, 175, 80, 0.2);
     }
+    
+    /* Style pour les événements à venir */
+    .upcoming-event {
+        background-color: rgba(240, 242, 246, 0.7);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .upcoming-fight {
+        background-color: rgba(248, 249, 250, 0.5);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border-left: 4px solid #FF9800;
+    }
+    
+    .loading-spinner {
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .fight-card {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .fight-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    /* Nouveaux styles pour les sections d'événements */
+    .event-section {
+        background-color: rgba(38, 39, 48, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .event-title {
+        background-color: rgba(255, 69, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    /* Style pour les cartes de combat améliorées */
+    .fight-card-improved {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .fighters-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .fighter-name-red {
+        color: #ff4d4d;
+        font-weight: bold;
+        font-size: 1.2rem;
+        flex: 1;
+        text-align: left;
+    }
+    
+    .fighter-name-blue {
+        color: #4d79ff;
+        font-weight: bold;
+        font-size: 1.2rem;
+        flex: 1;
+        text-align: right;
+    }
+    
+    .vs-badge {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 10px;
+    }
+    
+    /* Barres de probabilité */
+    .probability-container {
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .probability-bar {
+        height: 25px;
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .probability-bar-red {
+        height: 100%;
+        background-color: #ff4d4d;
+        float: left;
+        text-align: center;
+        line-height: 25px;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .probability-bar-blue {
+        height: 100%;
+        background-color: #4d79ff;
+        float: right;
+        text-align: center;
+        line-height: 25px;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .prediction-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    
+    .prediction-badge-red {
+        background-color: #ff4d4d;
+        color: white;
+    }
+    
+    .prediction-badge-blue {
+        background-color: #4d79ff;
+        color: white;
+    }
+    
+    .prediction-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+    }
+    
+    .prediction-method {
+        font-size: 0.9rem;
+        color: #aaa;
+    }
+    
+    .confidence-badge {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.85rem;
+    }
+    
+    .confidence-high {
+        background-color: rgba(76, 175, 80, 0.3);
+        color: #2e7d32;
+    }
+    
+    .confidence-moderate {
+        background-color: rgba(255, 193, 7, 0.3);
+        color: #ff8f00;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+# CONFIGURATION POUR LES REQUÊTES WEB
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8'
+}
+
+# FONCTIONS POUR LES ÉVÉNEMENTS À VENIR
+def make_request(url, max_retries=3, delay_range=(0.5, 1.5)):
+    """Effectue une requête HTTP avec gestion des erreurs et des délais"""
+    for attempt in range(max_retries):
+        try:
+            time.sleep(random.uniform(delay_range[0], delay_range[1]))
+            response = requests.get(url, headers=HEADERS, timeout=20)
+            
+            status = response.status_code
+            if status == 200:
+                return response
+            
+            if status in [403, 429]:
+                longer_delay = random.uniform(5, 15)
+                time.sleep(longer_delay)
+        except Exception as e:
+            time.sleep(random.uniform(2, 5))
+    
+    return None
+
+def split_fighter_names(text):
+    """Sépare automatiquement les noms concaténés des combattants"""
+    if not text or "vs" in text:
+        return None, None
+    
+    # Nettoyer le texte d'abord
+    text = text.strip()
+    
+    # Méthode 1: Rechercher une lettre minuscule suivie d'une majuscule
+    matches = list(re.finditer(r'([a-z])([A-Z])', text))
+    
+    if matches:
+        # Trouver la dernière occurrence
+        match = matches[-1]
+        split_pos = match.start() + 1
+        
+        # Séparer les noms
+        first_fighter = text[:split_pos].strip()
+        second_fighter = text[split_pos:].strip()
+        
+        return first_fighter, second_fighter
+    
+    # Méthode 2: Si un seul espace est présent, séparer à cet espace
+    if text.count(' ') == 1:
+        parts = text.split(' ')
+        return parts[0], parts[1]
+    
+    # Si aucune séparation claire n'est trouvée
+    return None, None
+
+def get_upcoming_events(max_events=3):
+    """Récupère les événements UFC à venir"""
+    # URL pour les événements à venir
+    urls = [
+        "http://ufcstats.com/statistics/events/upcoming",
+        "http://ufcstats.com/statistics/events/completed"  # Fallback pour les événements récents
+    ]
+    
+    events = []
+    
+    for url in urls:
+        response = make_request(url)
+        if not response:
+            continue
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Méthode 1: Rechercher dans la table des événements
+        events_table = soup.find('table', class_='b-statistics__table-events')
+        
+        if events_table:
+            rows = events_table.find_all('tr')[1:]  # Ignorer l'en-tête
+            
+            for row in rows[:max_events]:  # Prendre les N premiers événements
+                cells = row.find_all('td')
+                if len(cells) >= 1:
+                    event_link = cells[0].find('a')
+                    if event_link:
+                        event_url = event_link.get('href')
+                        event_name = event_link.text.strip()
+                        
+                        events.append({
+                            'name': event_name,
+                            'url': event_url
+                        })
+        
+        # Méthode 2: Chercher les liens directement
+        if len(events) < max_events:
+            event_links = soup.find_all('a', href=lambda href: href and 'event-details' in href)
+            
+            for link in event_links[:max_events]:
+                event_url = link.get('href')
+                event_name = link.text.strip()
+                
+                if event_url and event_name:
+                    # Vérifier si cet événement est déjà dans la liste
+                    if not any(e['url'] == event_url for e in events):
+                        events.append({
+                            'name': event_name,
+                            'url': event_url
+                        })
+                        
+                        # Si on a assez d'événements, on s'arrête
+                        if len(events) >= max_events:
+                            break
+        
+        # Si on a trouvé assez d'événements, on peut passer à l'URL suivante
+        if len(events) >= max_events:
+            break
+    
+    return events[:max_events]
+
+def extract_upcoming_fights(event_url):
+    resp = make_request(event_url)
+    if not resp:
+        return []
+
+    soup   = BeautifulSoup(resp.text, "html.parser")
+    table  = soup.find("table", class_="b-fight-details__table")
+    fights = []
+
+    if table:
+        rows = table.select("tbody > tr")[0:]   # on saute la ligne d’en-tête
+        for row in rows:
+            links = row.select("td:nth-child(2) a")  # les 2 balises <a> avec les noms
+            if len(links) >= 2:
+                fights.append({
+                    "red_fighter":  links[0].text.strip(),
+                    "blue_fighter": links[1].text.strip()
+                })
+
+    return fights
+
+
+def find_best_match(name, fighters_dict):
+    """Recherche le meilleur match pour un nom de combattant dans les stats"""
+    if not name:
+        return None
+    
+    # Nettoyage du nom
+    name = name.strip()
+    
+    # Recherche exacte
+    if name in fighters_dict:
+        return name
+    
+    # Recherche insensible à la casse
+    name_lower = name.lower()
+    for fighter_name in fighters_dict:
+        if fighter_name.lower() == name_lower:
+            return fighter_name
+    
+    # Recherche partielle
+    best_match = None
+    best_score = 0
+    
+    for fighter_name in fighters_dict:
+        # Calculer un score de correspondance simple
+        score = 0
+        fighter_lower = fighter_name.lower()
+        
+        # Si l'un contient l'autre complètement
+        if name_lower in fighter_lower or fighter_lower in name_lower:
+            score += 5
+        
+        # Correspondance partielle de mots
+        name_words = name_lower.split()
+        fighter_words = fighter_lower.split()
+        
+        for word in name_words:
+            if word in fighter_words:
+                score += 2
+            for fighter_word in fighter_words:
+                if word in fighter_word or fighter_word in word:
+                    score += 1
+        
+        if score > best_score:
+            best_score = score
+            best_match = fighter_name
+    
+    # Seulement retourner s'il y a une correspondance raisonnable
+    if best_score >= 3:
+        return best_match
+    
+    return None
 
 # FONCTIONS POUR LE MODÈLE ML
 
@@ -1286,6 +1662,15 @@ if 'event_date' not in st.session_state:
     
 if 'manual_stake' not in st.session_state:
     st.session_state.manual_stake = 0.0
+    
+if 'upcoming_events' not in st.session_state:
+    st.session_state.upcoming_events = None
+    
+if 'upcoming_events_timestamp' not in st.session_state:
+    st.session_state.upcoming_events_timestamp = None
+    
+if 'upcoming_fights' not in st.session_state:
+    st.session_state.upcoming_fights = {}
 
 # Fonctions de callback pour mettre à jour l'état de session
 def update_kelly_strategy(value):
@@ -1302,6 +1687,19 @@ def update_event_date(value):
     
 def update_manual_stake(value):
     st.session_state.manual_stake = value
+    
+def fetch_upcoming_events_data():
+    """Récupère les événements à venir et les stocke dans la session state"""
+    st.session_state.upcoming_events = get_upcoming_events(max_events=3)
+    st.session_state.upcoming_events_timestamp = datetime.datetime.now()
+    
+    # Initialiser le dictionnaire des combats
+    st.session_state.upcoming_fights = {}
+    
+    # Récupérer les combats pour chaque événement
+    for event in st.session_state.upcoming_events:
+        event_url = event['url']
+        st.session_state.upcoming_fights[event_url] = extract_upcoming_fights(event_url)
 
 # FONCTION PRINCIPALE
 
@@ -1314,63 +1712,8 @@ def main():
     current_bankroll = init_bankroll()  
     init_bets_file()
     
-    # Chargement des données
-    fighter_stats_path = 'fighters_stats.txt'
-    
-    if os.path.exists(fighter_stats_path):
-        fighters = load_fighters_stats(fighter_stats_path)
-        # Ne pas afficher le nombre de combattants chargés
-    else:
-        # Utiliser les deux combattants d'exemple
-        fighters = [
-            {
-                'name': 'Josh Emmett',
-                'wins': 19,
-                'losses': 5,
-                'height': 167.64,
-                'weight': 65.77,
-                'reach': 177.8,
-                'stance': 'Orthodox',
-                'age': 40,
-                'SLpM': 3.75,
-                'sig_str_acc': 0.35,
-                'SApM': 4.46,
-                'str_def': 0.6,
-                'td_avg': 1.09,
-                'td_acc': 0.37,
-                'td_def': 0.46,
-                'sub_avg': 0.1
-            },
-            {
-                'name': 'Lerone Murphy',
-                'wins': 16,
-                'losses': 0,
-                'height': 175.26,
-                'weight': 65.77,
-                'reach': 185.42,
-                'stance': 'Orthodox',
-                'age': 33,
-                'SLpM': 4.53,
-                'sig_str_acc': 0.54,
-                'SApM': 2.48,
-                'str_def': 0.61,
-                'td_avg': 1.45,
-                'td_acc': 0.54,
-                'td_def': 0.52,
-                'sub_avg': 0.5
-            }
-        ]
-        # Ne pas afficher d'info sur les exemples
-    
-    # Appliquer la déduplication
-    fighters = deduplicate_fighters(fighters)
-    # Ne pas afficher le nombre après déduplication
-    
-    # Créer un dictionnaire pour accéder rapidement aux statistiques des combattants
-    fighters_dict = {fighter['name']: fighter for fighter in fighters}
-    
     # Créer les onglets principaux
-    tabs = st.tabs(["🎯 Prédictions", "💰 Gestion de Bankroll", "📊 Historique & Performance"])
+    tabs = st.tabs(["🎯 Prédictions", "🗓️ Événements à venir", "💰 Gestion de Bankroll", "📊 Historique & Performance"])
     
     # Onglet de prédiction
     with tabs[0]:
@@ -1384,6 +1727,61 @@ def main():
             Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.
         </div>
         """, unsafe_allow_html=True)
+        
+        # Chargement des données
+        fighter_stats_path = 'fighters_stats.txt'
+        
+        if os.path.exists(fighter_stats_path):
+            fighters = load_fighters_stats(fighter_stats_path)
+            # Ne pas afficher le nombre de combattants chargés
+        else:
+            # Utiliser les deux combattants d'exemple
+            fighters = [
+                {
+                    'name': 'Josh Emmett',
+                    'wins': 19,
+                    'losses': 5,
+                    'height': 167.64,
+                    'weight': 65.77,
+                    'reach': 177.8,
+                    'stance': 'Orthodox',
+                    'age': 40,
+                    'SLpM': 3.75,
+                    'sig_str_acc': 0.35,
+                    'SApM': 4.46,
+                    'str_def': 0.6,
+                    'td_avg': 1.09,
+                    'td_acc': 0.37,
+                    'td_def': 0.46,
+                    'sub_avg': 0.1
+                },
+                {
+                    'name': 'Lerone Murphy',
+                    'wins': 16,
+                    'losses': 0,
+                    'height': 175.26,
+                    'weight': 65.77,
+                    'reach': 185.42,
+                    'stance': 'Orthodox',
+                    'age': 33,
+                    'SLpM': 4.53,
+                    'sig_str_acc': 0.54,
+                    'SApM': 2.48,
+                    'str_def': 0.61,
+                    'td_avg': 1.45,
+                    'td_acc': 0.54,
+                    'td_def': 0.52,
+                    'sub_avg': 0.5
+                }
+            ]
+            # Ne pas afficher d'info sur les exemples
+        
+        # Appliquer la déduplication
+        fighters = deduplicate_fighters(fighters)
+        # Ne pas afficher le nombre après déduplication
+        
+        # Créer un dictionnaire pour accéder rapidement aux statistiques des combattants
+        fighters_dict = {fighter['name']: fighter for fighter in fighters}
         
         # Liste des noms de combattants
         fighter_names = sorted([fighter['name'] for fighter in fighters])
@@ -1824,8 +2222,6 @@ def main():
                         
                         df_kelly = pd.DataFrame(kelly_data)
                         st.dataframe(df_kelly, use_container_width=True)
-                        
-
                     else:
                         st.warning("Le modèle ML n'est pas disponible. Les recommandations Kelly ne peuvent pas être calculées.")
         
@@ -1902,8 +2298,287 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
     
-    # Onglet de gestion de bankroll
+    # Onglet des événements à venir - SECTION AMÉLIORÉE ET CORRIGÉE
     with tabs[1]:
+        st.markdown("""
+        <div style="text-align:center;">
+            <h2>🗓️ Événements UFC à venir 🗓️</h2>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Chargement des données
+        fighter_stats_path = 'fighters_stats.txt'
+        
+        # Vérifier si on a déjà des événements ou si on doit les récupérer
+        if (st.session_state.upcoming_events is None or 
+            st.session_state.upcoming_events_timestamp is None or 
+            (datetime.datetime.now() - st.session_state.upcoming_events_timestamp).total_seconds() > 3600):
+            
+            with st.spinner("Récupération des événements à venir..."):
+                fetch_upcoming_events_data()
+        
+        if not st.session_state.upcoming_events:
+            st.error("Impossible de récupérer les événements à venir. Veuillez réessayer plus tard.")
+        else:
+            # Charger les statistiques des combattants
+            if os.path.exists(fighter_stats_path):
+                fighters = load_fighters_stats(fighter_stats_path)
+                fighters = deduplicate_fighters(fighters)
+                fighters_dict = {fighter['name']: fighter for fighter in fighters}
+            else:
+                st.error(f"Fichier de statistiques combattants non trouvé: {fighter_stats_path}")
+                fighters_dict = {}
+            
+            # Charger le modèle ML
+            model, scaler, feature_names = load_ml_model()
+            
+            # Bouton pour rafraîchir les données
+            refresh_col, _ = st.columns([1, 3])
+            with refresh_col:
+                if st.button("🔄 Rafraîchir les données", key="refresh_events_btn"):
+                    with st.spinner("Récupération des événements à venir..."):
+                        fetch_upcoming_events_data()
+                    st.success("Données mises à jour!")
+                    st.experimental_rerun()
+            
+            # Créer des onglets pour chaque événement
+            event_names = [event['name'] for event in st.session_state.upcoming_events]
+            event_tabs = st.tabs(event_names)
+            
+            # Forcer la récupération des combats pour tous les événements s'ils ne sont pas déjà chargés
+            for event in st.session_state.upcoming_events:
+                event_url = event['url']
+                if event_url not in st.session_state.upcoming_fights or not st.session_state.upcoming_fights[event_url]:
+                    st.session_state.upcoming_fights[event_url] = extract_upcoming_fights(event_url)
+            
+            # Afficher chaque événement dans son propre onglet
+            for i, (event, event_tab) in enumerate(zip(st.session_state.upcoming_events, event_tabs)):
+                event_name = event['name']
+                event_url = event['url']
+                
+                with event_tab:
+                    # Titre de l'événement
+                    st.header(f"🥊 {event_name}")
+                    st.markdown("---")
+                    
+                    # Récupérer les combats pour cet événement
+                    fights = st.session_state.upcoming_fights.get(event_url, [])
+                    
+                    if not fights or len(fights) == 0:
+                        st.info(f"Aucun combat trouvé pour {event_name}. L'événement n'est peut-être pas encore finalisé.")
+                        
+                        # Tenter de récupérer les combats à nouveau, peut-être un problème lors du chargement initial
+                        with st.spinner(f"Nouvelle tentative de récupération des combats pour {event_name}..."):
+                            new_fights = extract_upcoming_fights(event_url)
+                            if new_fights and len(new_fights) > 0:
+                                st.session_state.upcoming_fights[event_url] = new_fights
+                                fights = new_fights
+                                st.success(f"{len(fights)} combats trouvés!")
+                            else:
+                                st.error("Impossible de récupérer les combats. Veuillez rafraîchir la page ou réessayer plus tard.")
+                                continue
+                    
+                    # Afficher chaque combat avec prédictions directement visibles
+                    for j, fight in enumerate(fights):
+                        red_fighter_name = fight['red_fighter']
+                        blue_fighter_name = fight['blue_fighter']
+                        
+                        # Trouver la correspondance dans la base de données
+                        red_match = find_best_match(red_fighter_name, fighters_dict)
+                        blue_match = find_best_match(blue_fighter_name, fighters_dict)
+                        
+                        st.markdown(f"### Combat {j+1}")
+                        
+                        if not red_match or not blue_match:
+                            # Afficher un combat sans prédiction si un combattant n'est pas reconnu
+                            st.write(f"**🔴 {red_fighter_name}** vs **🔵 {blue_fighter_name}**")
+                            st.info("Données insuffisantes pour faire une prédiction")
+                            st.markdown("---")
+                            continue
+                        
+                        # Récupérer les statistiques des combattants
+                        red_stats = fighters_dict[red_match]
+                        blue_stats = fighters_dict[blue_match]
+                        
+                        # Faire les prédictions
+                        classic_result = predict_fight_classic(red_stats, blue_stats)
+                        ml_result = None
+                        
+                        if model is not None:
+                            ml_result = predict_with_ml(red_stats, blue_stats, model, scaler, feature_names)
+                            if ml_result is not None:
+                                ml_result['winner_name'] = red_match if ml_result['prediction'] == 'Red' else blue_match
+                        
+                        # Calculer les valeurs pour l'affichage
+                        # Résultat classique
+                        red_prob_classic = classic_result['red_probability']
+                        blue_prob_classic = classic_result['blue_probability']
+                        winner_classic = "Red" if red_prob_classic > blue_prob_classic else "Blue"
+                        
+                        # Résultat ML (si disponible)
+                        if ml_result:
+                            red_prob_ml = ml_result['red_probability']
+                            blue_prob_ml = ml_result['blue_probability']
+                            winner_ml = "Red" if red_prob_ml > blue_prob_ml else "Blue"
+                            
+                            # Consensus?
+                            consensus = winner_classic == winner_ml
+                            
+                            # Utiliser le ML pour l'affichage principal
+                            winner_color = "red" if winner_ml == "Red" else "blue"
+                            winner_name = red_match if winner_ml == "Red" else blue_match
+                            red_prob = red_prob_ml
+                            blue_prob = blue_prob_ml
+                            confidence = ml_result['confidence']
+                            method = "Machine Learning"
+                        else:
+                            # Utiliser la méthode classique si ML n'est pas disponible
+                            winner_color = "red" if winner_classic == "Red" else "blue"
+                            winner_name = red_match if winner_classic == "Red" else blue_match
+                            red_prob = red_prob_classic
+                            blue_prob = blue_prob_classic
+                            confidence = classic_result['confidence']
+                            method = "Statistique"
+                            consensus = True  # Pas de comparaison possible
+                        
+                        # Afficher les noms des combattants avec couleurs
+                        fighters_col1, fighters_col2, fighters_col3 = st.columns([2, 1, 2])
+                        
+                        with fighters_col1:
+                            st.markdown(f"<h4 style='color: #ff4d4d; text-align: right;'>{red_match}</h4>", unsafe_allow_html=True)
+                        
+                        with fighters_col2:
+                            st.markdown("<h4 style='text-align: center;'>VS</h4>", unsafe_allow_html=True)
+                        
+                        with fighters_col3:
+                            st.markdown(f"<h4 style='color: #4d79ff; text-align: left;'>{blue_match}</h4>", unsafe_allow_html=True)
+                        
+                        # Créer une barre de probabilités avec des colonnes Streamlit
+                        red_pct = int(red_prob * 100)
+                        blue_pct = int(blue_prob * 100)
+                        
+                        # S'assurer que chaque barre a au moins 1% pour qu'elle soit visible
+                        if red_pct == 0: red_pct = 1
+                        if blue_pct == 0: blue_pct = 1
+                        
+                        # S'assurer que la somme est exactement 100
+                        total = red_pct + blue_pct
+                        if total != 100:
+                            # Ajuster proportionnellement
+                            red_pct = int((red_pct / total) * 100)
+                            blue_pct = 100 - red_pct
+                        
+                        prob_cols = st.columns([red_pct, blue_pct])
+                        
+                        with prob_cols[0]:
+                            st.markdown(f"""
+                            <div style="background-color: #ff4d4d; padding: 8px; color: white; text-align: center; border-radius: 5px 0 0 5px;">
+                            {red_prob:.0%}
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                        with prob_cols[1]:
+                            st.markdown(f"""
+                            <div style="background-color: #4d79ff; padding: 8px; color: white; text-align: center; border-radius: 0 5px 5px 0;">
+                            {blue_prob:.0%}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Afficher le vainqueur prédit
+                        pred_cols = st.columns([1, 1])
+                        
+                        with pred_cols[0]:
+                            # Badge du gagnant
+                            winner_bg = "#ff4d4d" if winner_color == "red" else "#4d79ff"
+                            st.markdown(f"""
+                            <div style="background-color: {winner_bg}; color: white; display: inline-block; 
+                                 padding: 5px 10px; border-radius: 5px; margin-top: 5px;">
+                                Vainqueur prédit: {winner_name}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        with pred_cols[1]:
+                            # Info sur la méthode et la confiance
+                            conf_bg = "#4CAF50" if confidence == "Élevé" else "#FFC107"
+                            conf_color = "#fff" if confidence == "Élevé" else "#000"
+                            
+                            st.markdown(f"""
+                            <div style="text-align: right;">
+                                <span style="color: #888; font-size: 0.9rem;">Méthode: {method}</span>
+                                <span style="background-color: {conf_bg}; color: {conf_color}; 
+                                     padding: 2px 8px; border-radius: 3px; margin-left: 5px; font-size: 0.8rem;">
+                                    {confidence}
+                                </span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Si ML est disponible, afficher l'info sur le consensus
+                        if ml_result:
+                            consensus_text = "✅ Les deux méthodes prédisent le même vainqueur" if consensus else "⚠️ Les méthodes prédisent des vainqueurs différents"
+                            consensus_color = "green" if consensus else "orange"
+                            
+                            st.markdown(f"""
+                            <div style="text-align: center; margin-top: 5px; margin-bottom: 10px;">
+                                <span style="color: {consensus_color};">{consensus_text}</span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Créer un expander pour les détails du combat
+                        with st.expander("Voir détails et statistiques"):
+                            # Créer deux colonnes pour les prédictions
+                            detail_cols = st.columns(2 if ml_result else 1)
+                            
+                            # Afficher la prédiction statistique
+                            with detail_cols[0]:
+                                st.markdown("### Prédiction Statistique")
+                                winner_color_classic = "red" if classic_result['prediction'] == 'Red' else "blue"
+                                winner_name_classic = classic_result['winner_name']
+                                
+                                st.markdown(f"**Vainqueur prédit:** <span style='color:{winner_color_classic};'>{winner_name_classic}</span>", unsafe_allow_html=True)
+                                st.markdown(f"**Probabilités:** {classic_result['red_probability']:.2f} (Rouge) vs {classic_result['blue_probability']:.2f} (Bleu)")
+                                st.markdown(f"**Confiance:** {classic_result['confidence']}")
+                            
+                            # Afficher la prédiction ML si disponible
+                            if ml_result:
+                                with detail_cols[1]:
+                                    st.markdown("### Prédiction Machine Learning")
+                                    winner_color_ml = "red" if ml_result['prediction'] == 'Red' else "blue"
+                                    winner_name_ml = ml_result['winner_name']
+                                    
+                                    st.markdown(f"**Vainqueur prédit:** <span style='color:{winner_color_ml};'>{winner_name_ml}</span>", unsafe_allow_html=True)
+                                    st.markdown(f"**Probabilités:** {ml_result['red_probability']:.2f} (Rouge) vs {ml_result['blue_probability']:.2f} (Bleu)")
+                                    st.markdown(f"**Confiance:** {ml_result['confidence']}")
+                            
+                            # Afficher les statistiques comparatives
+                            st.markdown("### Statistiques comparatives")
+                            stats_df = create_stats_comparison_df(red_stats, blue_stats)
+                            
+                            # Appliquer un style conditionnel pour mettre en évidence les avantages
+                            def highlight_advantage(row):
+                                styles = [''] * len(row)
+                                advantage = row['Avantage']
+                                
+                                if advantage == red_match:
+                                    styles[1] = 'background-color: rgba(255, 0, 0, 0.2); font-weight: bold;'
+                                elif advantage == blue_match:
+                                    styles[2] = 'background-color: rgba(0, 0, 255, 0.2); font-weight: bold;'
+                                
+                                return styles
+                            
+                            # Appliquer le style et afficher
+                            styled_df = stats_df.style.apply(highlight_advantage, axis=1)
+                            st.dataframe(styled_df, use_container_width=True)
+                            
+                            # Visualisation radar
+                            st.markdown("### Visualisation comparative")
+                            radar_fig = create_radar_chart(red_stats, blue_stats)
+                            st.plotly_chart(radar_fig, use_container_width=True)
+                        
+                        # Séparateur entre combats
+                        st.markdown("---")
+    
+    # Onglet de gestion de bankroll
+    with tabs[2]:
         st.markdown("""
         <div style="text-align:center;">
             <h2>💰 Gestion de bankroll et paris 💰</h2>
@@ -2058,7 +2733,7 @@ def main():
                     st.error("Erreur lors de l'enregistrement du pari.")
     
     # Onglet historique et performance
-    with tabs[2]:
+    with tabs[3]:
         st.markdown("""
         <div style="text-align:center;">
             <h2>📊 Historique des paris et performances 📊</h2>
@@ -2339,4 +3014,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-                
