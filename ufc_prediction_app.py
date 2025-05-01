@@ -2677,40 +2677,32 @@ def show_upcoming_events_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Bouton pour récupérer les événements à venir
-    if st.button("🔍 Récupérer les événements à venir", key="load_events_btn", type="primary"):
+    # Bouton pour récupérer UNIQUEMENT les noms des événements à venir
+    if st.button("🔍 Récupérer les noms des événements à venir", key="load_events_btn", type="primary"):
         with st.spinner("Récupération des événements à venir..."):
             st.session_state.upcoming_events = get_upcoming_events(max_events=3)
             st.session_state.upcoming_events_timestamp = datetime.datetime.now()
             
-            # Initialiser le dictionnaire des combats
-            st.session_state.upcoming_fights = {}
+            # Initialiser le dictionnaire des combats s'il n'existe pas déjà
+            if 'upcoming_fights' not in st.session_state:
+                st.session_state.upcoming_fights = {}
             
-            # Récupérer les combats pour chaque événement
-            for event in st.session_state.upcoming_events:
-                event_url = event['url']
-                st.session_state.upcoming_fights[event_url] = extract_upcoming_fights(event_url)
+            # Initialiser les prédictions s'il n'existe pas déjà
+            if 'fight_predictions' not in st.session_state:
+                st.session_state.fight_predictions = {}
             
-            st.success("Événements récupérés avec succès!")
+            st.success(f"Événements récupérés avec succès! {len(st.session_state.upcoming_events)} événements trouvés.")
     
     # Afficher les événements s'ils existent
-    if st.session_state.upcoming_events:
-        # Bouton pour rafraîchir les données
+    if st.session_state.get('upcoming_events'):
+        # Bouton pour rafraîchir la liste des événements
         refresh_col, _ = st.columns([1, 3])
         with refresh_col:
-            if st.button("🔄 Rafraîchir les données", key="refresh_events_btn"):
-                with st.spinner("Mise à jour des données..."):
+            if st.button("🔄 Rafraîchir la liste des événements", key="refresh_events_btn"):
+                with st.spinner("Mise à jour des événements..."):
                     st.session_state.upcoming_events = get_upcoming_events(max_events=3)
                     st.session_state.upcoming_events_timestamp = datetime.datetime.now()
-                    
-                    # Initialiser le dictionnaire des combats
-                    st.session_state.upcoming_fights = {}
-                    
-                    # Récupérer les combats pour chaque événement
-                    for event in st.session_state.upcoming_events:
-                        event_url = event['url']
-                        st.session_state.upcoming_fights[event_url] = extract_upcoming_fights(event_url)
-                st.success("Données mises à jour!")
+                st.success("Liste des événements mise à jour!")
         
         # Créer des onglets pour chaque événement
         event_names = [event['name'] for event in st.session_state.upcoming_events]
@@ -2726,56 +2718,113 @@ def show_upcoming_events_page():
                 st.header(f"🥊 {event_name}")
                 st.markdown("---")
                 
-                # Récupérer les combats pour cet événement
-                if event_url not in st.session_state.upcoming_fights:
-                    with st.spinner(f"Récupération des combats pour {event_name}..."):
-                        st.session_state.upcoming_fights[event_url] = extract_upcoming_fights(event_url)
-                
+                # Vérifier si les combats pour cet événement sont déjà chargés
                 fights = st.session_state.upcoming_fights.get(event_url, [])
                 
-                if not fights or len(fights) == 0:
-                    st.info(f"Aucun combat trouvé pour {event_name}. L'événement n'est peut-être pas encore finalisé.")
-                    
-                    # Tenter de récupérer les combats à nouveau
-                    if st.button(f"Réessayer pour {event_name}", key=f"retry_{i}"):
-                        with st.spinner(f"Nouvelle tentative de récupération des combats pour {event_name}..."):
-                            new_fights = extract_upcoming_fights(event_url)
-                            if new_fights and len(new_fights) > 0:
-                                st.session_state.upcoming_fights[event_url] = new_fights
-                                st.success(f"{len(new_fights)} combats trouvés!")
+                # Bouton pour charger les combats de cet événement spécifique
+                if not fights:
+                    if st.button(f"🔍 Charger les combats pour {event_name}", key=f"load_fights_btn_{i}"):
+                        with st.spinner(f"Récupération des combats pour {event_name}..."):
+                            fights = extract_upcoming_fights(event_url)
+                            st.session_state.upcoming_fights[event_url] = fights
+                            if fights and len(fights) > 0:
+                                st.success(f"{len(fights)} combats chargés avec succès!")
                             else:
-                                st.error("Impossible de récupérer les combats. Veuillez rafraîchir la page ou réessayer plus tard.")
+                                st.warning(f"Aucun combat trouvé pour {event_name}. L'événement n'est peut-être pas encore finalisé.")
+                
+                if not fights:
+                    st.info(f"Cliquez sur le bouton 'Charger les combats pour {event_name}' pour voir les combats.")
                 else:
-                    # Afficher chaque combat avec prédictions directement visibles
+                    # Afficher le nombre de combats chargés
+                    st.write(f"**{len(fights)} combats chargés**")
+                    
+                    # Vérifier si les prédictions ont déjà été générées
+                    predictions_generated = event_url in st.session_state.fight_predictions
+                    
+                    # Bouton pour générer les prédictions
+                    if not predictions_generated:
+                        if st.button(f"🔮 Générer les prédictions pour {event_name}", key=f"predict_fights_btn_{i}"):
+                            with st.spinner(f"Génération des prédictions pour {len(fights)} combats..."):
+                                # Initialiser le dictionnaire pour cet événement
+                                st.session_state.fight_predictions[event_url] = {}
+                                
+                                # Générer les prédictions pour chaque combat
+                                for fight in fights:
+                                    red_fighter_name = fight['red_fighter']
+                                    blue_fighter_name = fight['blue_fighter']
+                                    
+                                    # Trouver la correspondance dans la base de données
+                                    red_match = find_best_match(red_fighter_name, app_data["fighters_dict"])
+                                    blue_match = find_best_match(blue_fighter_name, app_data["fighters_dict"])
+                                    
+                                    fight_key = f"{red_fighter_name}_vs_{blue_fighter_name}"
+                                    
+                                    if not red_match or not blue_match:
+                                        # Pas de prédiction si un combattant n'est pas reconnu
+                                        st.session_state.fight_predictions[event_url][fight_key] = {
+                                            'status': 'error',
+                                            'message': "Données insuffisantes pour faire une prédiction"
+                                        }
+                                        continue
+                                    
+                                    # Récupérer les statistiques des combattants
+                                    red_stats = app_data["fighters_dict"][red_match]
+                                    blue_stats = app_data["fighters_dict"][blue_match]
+                                    
+                                    # Faire les prédictions
+                                    classic_result = predict_fight_classic(red_stats, blue_stats)
+                                    ml_result = None
+                                    
+                                    if app_data["ml_model"] is not None:
+                                        ml_result = predict_with_ml(red_stats, blue_stats, app_data["ml_model"], app_data["scaler"], app_data["feature_names"])
+                                        if ml_result is not None:
+                                            ml_result['winner_name'] = red_match if ml_result['prediction'] == 'Red' else blue_match
+                                    
+                                    # Stocker les résultats
+                                    st.session_state.fight_predictions[event_url][fight_key] = {
+                                        'status': 'success',
+                                        'red_match': red_match,
+                                        'blue_match': blue_match,
+                                        'red_stats': red_stats,
+                                        'blue_stats': blue_stats,
+                                        'classic_result': classic_result,
+                                        'ml_result': ml_result
+                                    }
+                                
+                                st.success(f"Prédictions générées pour {len(fights)} combats!")
+                    
+                    # Afficher les combats et leurs prédictions
                     for j, fight in enumerate(fights):
                         red_fighter_name = fight['red_fighter']
                         blue_fighter_name = fight['blue_fighter']
-                        
-                        # Trouver la correspondance dans la base de données
-                        red_match = find_best_match(red_fighter_name, app_data["fighters_dict"])
-                        blue_match = find_best_match(blue_fighter_name, app_data["fighters_dict"])
+                        fight_key = f"{red_fighter_name}_vs_{blue_fighter_name}"
                         
                         st.markdown(f"### Combat {j+1}")
                         
-                        if not red_match or not blue_match:
-                            # Afficher un combat sans prédiction si un combattant n'est pas reconnu
+                        # Vérifier si les prédictions ont été générées pour ce combat
+                        prediction_data = st.session_state.fight_predictions.get(event_url, {}).get(fight_key, None)
+                        
+                        if not prediction_data:
+                            # Afficher juste les noms des combattants sans prédiction
                             st.write(f"**🔴 {red_fighter_name}** vs **🔵 {blue_fighter_name}**")
-                            st.info("Données insuffisantes pour faire une prédiction")
+                            st.info("Cliquez sur 'Générer les prédictions' pour obtenir l'analyse de ce combat.")
                             st.markdown("---")
                             continue
                         
-                        # Récupérer les statistiques des combattants
-                        red_stats = app_data["fighters_dict"][red_match]
-                        blue_stats = app_data["fighters_dict"][blue_match]
+                        if prediction_data['status'] == 'error':
+                            # Afficher le message d'erreur
+                            st.write(f"**🔴 {red_fighter_name}** vs **🔵 {blue_fighter_name}**")
+                            st.info(prediction_data['message'])
+                            st.markdown("---")
+                            continue
                         
-                        # Faire les prédictions
-                        classic_result = predict_fight_classic(red_stats, blue_stats)
-                        ml_result = None
-                        
-                        if app_data["ml_model"] is not None:
-                            ml_result = predict_with_ml(red_stats, blue_stats, app_data["ml_model"], app_data["scaler"], app_data["feature_names"])
-                            if ml_result is not None:
-                                ml_result['winner_name'] = red_match if ml_result['prediction'] == 'Red' else blue_match
+                        # Extraire les données de prédiction
+                        red_match = prediction_data['red_match']
+                        blue_match = prediction_data['blue_match']
+                        red_stats = prediction_data['red_stats']
+                        blue_stats = prediction_data['blue_stats']
+                        classic_result = prediction_data['classic_result']
+                        ml_result = prediction_data['ml_result']
                         
                         # Calculer les valeurs pour l'affichage
                         # Résultat classique
@@ -2945,7 +2994,7 @@ def show_upcoming_events_page():
                         # Séparateur entre combats
                         st.markdown("---")
     else:
-        st.info("Cliquez sur le bouton 'Récupérer les événements à venir' pour charger les prochains événements UFC.")
+        st.info("Cliquez sur le bouton 'Récupérer les noms des événements à venir' pour charger les prochains événements UFC.")
 
 def show_bankroll_page():
     st.markdown("""
