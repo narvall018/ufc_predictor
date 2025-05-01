@@ -501,12 +501,9 @@ HEADERS = {
 # Cache pour les requêtes
 request_cache = {}
 
-# ---- OPTIMISATION 1: CHARGEMENT UNIQUE DES DONNÉES ----
-@st.cache_resource
+@st.cache_resource(ttl=3600*24)
 def load_app_data():
-    """
-    Fonction d'initialisation centrale qui charge toutes les données nécessaires pour l'application
-    """
+    """Version optimisée du chargement des données"""
     data = {
         "ml_model": None,
         "scaler": None,
@@ -517,105 +514,68 @@ def load_app_data():
         "current_bankroll": 1000
     }
     
-    # 1. Charger le modèle ML
+    # Charger le modèle ML avec gestion d'erreur améliorée
     try:
-        if os.path.exists("ufc_prediction_model.joblib"):
-            model_data = joblib.load("ufc_prediction_model.joblib")
-        elif os.path.exists("ufc_prediction_model.pkl"):
-            with open("ufc_prediction_model.pkl", 'rb') as file:
-                model_data = pickle.load(file)
-        
-        if model_data:
-            data["ml_model"] = model_data.get('model')
-            data["scaler"] = model_data.get('scaler')
-            data["feature_names"] = model_data.get('feature_names')
+        model_files = ["ufc_prediction_model.joblib", "ufc_prediction_model.pkl"]
+        for model_file in model_files:
+            if os.path.exists(model_file):
+                if model_file.endswith('.joblib'):
+                    model_data = joblib.load(model_file)
+                else:
+                    with open(model_file, 'rb') as file:
+                        model_data = pickle.load(file)
+                
+                if model_data:
+                    data["ml_model"] = model_data.get('model')
+                    data["scaler"] = model_data.get('scaler')
+                    data["feature_names"] = model_data.get('feature_names')
+                    break
     except Exception as e:
         print(f"Erreur lors du chargement du modèle ML: {e}")
     
-    # 2. Charger les statistiques des combattants
+    # Optimisation du chargement des stats des combattants
     fighter_stats_path = 'fighters_stats.txt'
     if os.path.exists(fighter_stats_path):
         fighters = load_fighters_stats(fighter_stats_path)
-        # Appliquer la déduplication
         fighters = deduplicate_fighters(fighters)
         data["fighters"] = fighters
         
-        # Créer un dictionnaire pour accéder rapidement aux statistiques
+        # Création optimisée du dictionnaire
         data["fighters_dict"] = {fighter['name']: fighter for fighter in fighters}
         data["fighter_names"] = sorted([fighter['name'] for fighter in fighters])
-    else:
-        # Données d'exemple si le fichier n'existe pas
-        example_fighters = [
-            {
-                'name': 'Josh Emmett',
-                'wins': 19,
-                'losses': 5,
-                'height': 167.64,
-                'weight': 65.77,
-                'reach': 177.8,
-                'stance': 'Orthodox',
-                'age': 40,
-                'SLpM': 3.75,
-                'sig_str_acc': 0.35,
-                'SApM': 4.46,
-                'str_def': 0.6,
-                'td_avg': 1.09,
-                'td_acc': 0.37,
-                'td_def': 0.46,
-                'sub_avg': 0.1
-            },
-            {
-                'name': 'Lerone Murphy',
-                'wins': 16,
-                'losses': 0,
-                'height': 175.26,
-                'weight': 65.77,
-                'reach': 185.42,
-                'stance': 'Orthodox',
-                'age': 33,
-                'SLpM': 4.53,
-                'sig_str_acc': 0.54,
-                'SApM': 2.48,
-                'str_def': 0.61,
-                'td_avg': 1.45,
-                'td_acc': 0.54,
-                'td_def': 0.52,
-                'sub_avg': 0.5
-            }
-        ]
-        data["fighters"] = example_fighters
-        data["fighters_dict"] = {fighter['name']: fighter for fighter in example_fighters}
-        data["fighter_names"] = sorted([fighter['name'] for fighter in example_fighters])
     
-    # 3. Initialiser/Charger la bankroll
+    # Initialiser/Charger la bankroll
     data["current_bankroll"] = init_bankroll()
     init_bets_file()
     
     return data
 
-# FONCTIONS POUR LES ÉVÉNEMENTS À VENIR
-# OPTIMISATION 2: AMÉLIORATION DU CACHE - Augmenter le TTL à 24h (86400 secondes)
 @st.cache_data(ttl=86400, show_spinner=False)
 def make_request(url, max_retries=3, delay_range=(0.5, 1.5)):
-    """Effectue une requête HTTP avec gestion des erreurs et des délais"""
+    """Requête HTTP avec cache intelligent"""
+    # Vérifier d'abord dans le cache
     if url in request_cache:
         return request_cache[url]
     
+    # Stratégie de backoff exponentiel
     for attempt in range(max_retries):
         try:
-            time.sleep(random.uniform(delay_range[0], delay_range[1]))
+            # Ajouter un délai pour éviter de surcharger les serveurs
+            backoff_time = delay_range[0] * (2 ** attempt) if attempt > 0 else delay_range[0]
+            actual_delay = min(backoff_time, delay_range[1] * 3)
+            time.sleep(actual_delay)
+            
             response = requests.get(url, headers=HEADERS, timeout=20)
             
-            status = response.status_code
-            if status == 200:
+            if response.status_code == 200:
                 request_cache[url] = response
                 return response
             
-            if status in [403, 429]:
-                longer_delay = random.uniform(5, 15)
-                time.sleep(longer_delay)
+            # Délai spécial pour les erreurs de limitation
+            if response.status_code in [403, 429]:
+                time.sleep(5 * (attempt + 1))
         except Exception:
-            time.sleep(random.uniform(2, 5))
+            pass
     
     return None
 
@@ -1244,7 +1204,7 @@ def predict_both_methods(fighter_a, fighter_b, odds_a=0, odds_b=0, model=None, s
     return classic_prediction, ml_prediction
 
 # FONCTIONS DE VISUALISATION
-
+@st.cache_data(ttl=3600)
 def create_radar_chart(fighter_a, fighter_b):
     """Crée un graphique radar comparant les attributs des combattants"""
     categories = ['Win Ratio', 'Striking', 'Defense', 'Ground', 'Experience']
@@ -1313,7 +1273,7 @@ def create_radar_chart(fighter_a, fighter_b):
     )
     
     return fig
-
+@st.cache_data(ttl=3600)
 def create_strengths_weaknesses_chart(fighter_a, fighter_b):
     """Crée un graphique des forces et faiblesses des combattants"""
     attributes = ['Striking', 'Ground Game', 'Defense', 'Endurance', 'Experience']
@@ -1365,7 +1325,7 @@ def create_strengths_weaknesses_chart(fighter_a, fighter_b):
     )
     
     return fig
-
+@st.cache_data(ttl=3600)
 def create_style_analysis_chart(fighter_a, fighter_b):
     """Crée un graphique d'analyse des styles de combat"""
     # Calculer des indicateurs de style
