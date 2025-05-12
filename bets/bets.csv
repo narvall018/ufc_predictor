@@ -1,4 +1,6 @@
 bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stake,kelly_fraction,model_probability,status,result,profit,roi
 1,2025-04-14,UFC 314,2025-04-12,Michael Chandler,Paddy Pimblett,Paddy Pimblett,1.62,130.0,,,closed,win,80.60000000000001,62.000000000000014
 2,2025-04-14,UFC Fight Night Garry vs Prates,2025-04-27,Ian Machado Garry,Carlos Prates,Ian Machado Garry,1.82,260.0,,,closed,win,213.2,82.0
-3,2025-04-30,UFC Fight Night,2025-05-04,Juliana Miller,Ivana Petrovic,Ivana Petrovic,1.42,140.0,,,open,,0.0,0.0
+3,2025-04-30,UFC Fight Night,2025-05-04,Juliana Miller,Ivana Petrovic,Ivana Petrovic,1.42,140.0,,,closed,loss,-140.0,-100.0
+4,2025-05-12,UFC 315 ,2025-05-11,Alexa Grasso,Natalia Silva,Natalia Silva,1.46,180.0,4.0,0.860112611060347,closed,win,82.8,46.0
+5,2025-05-12,UFC Fight Night,2025-05-17,Jared Gordon,Thiago Moises,Jared Gordon,2.0,176.87,4.0,0.7860524309717569,open,,0.0,0.0
