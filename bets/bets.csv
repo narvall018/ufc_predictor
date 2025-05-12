@@ -4,3 +4,8 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 3,2025-04-30,UFC Fight Night,2025-05-04,Juliana Miller,Ivana Petrovic,Ivana Petrovic,1.42,140.0,,,closed,loss,-140.0,-100.0
 4,2025-05-12,UFC 315 ,2025-05-11,Alexa Grasso,Natalia Silva,Natalia Silva,1.46,180.0,4.0,0.860112611060347,closed,win,82.8,46.0
 5,2025-05-12,UFC Fight Night,2025-05-17,Jared Gordon,Thiago Moises,Jared Gordon,2.0,176.87,4.0,0.7860524309717569,open,,0.0,0.0
+6,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Sodiq Yusuff,Mairon Santos,Mairon Santos,1.76,74.54928811538528,1.0,0.905294962943009,open,,0.0,0.0
+7,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Dustin Stoltzfus,Nursulton Ruziboev,Dustin Stoltzfus,3.35,53.96133126550864,1.0,0.6949104991418739,open,,0.0,0.0
+8,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Jared Gordon,Thiago Moises,Jared Gordon,1.94,53.32759171118624,1.0,0.7860524309717569,open,,0.0,0.0
+9,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Luana Santos,Tainara Lisboa,Luana Santos,1.71,52.39161518009807,1.0,0.8125961440453948,open,,0.0,0.0
+10,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,HyunSung Park,Carlos Hernandez,HyunSung Park,1.66,65.77017372782178,1.0,0.876249141812631,open,,0.0,0.0
