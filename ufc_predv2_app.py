@@ -3015,6 +3015,8 @@ def show_upcoming_events_page():
                                     }
                                 
                                 st.success(f"Prédictions générées pour {len(fights)} combats!")
+                                st.session_state[f"show_strategy_{event_url}"] = True
+
                     
                     # Afficher les combats et leurs prédictions
                     for j, fight in enumerate(fights):
@@ -3217,8 +3219,18 @@ def show_upcoming_events_page():
                         # Séparateur entre combats
                         st.markdown("---")
                     
-                    # AJOUT DE LA NOUVELLE FONCTIONNALITÉ: Stratégie de paris
-                    if predictions_generated:
+                    # # AJOUT DE LA NOUVELLE FONCTIONNALITÉ: Stratégie de paris
+                    # if predictions_generated:
+                    #     # Afficher la section de stratégie de paris
+                    #     show_betting_strategy_section(
+                    #         event_url=event_url,
+                    #         event_name=event_name,
+                    #         fights=fights,
+                    #         predictions_data=st.session_state.fight_predictions[event_url],
+                    #         current_bankroll=app_data["current_bankroll"]
+                    #     )
+                        
+                    if predictions_generated or st.session_state.get(f"show_strategy_{event_url}", False):
                         # Afficher la section de stratégie de paris
                         show_betting_strategy_section(
                             event_url=event_url,
@@ -3227,17 +3239,14 @@ def show_upcoming_events_page():
                             predictions_data=st.session_state.fight_predictions[event_url],
                             current_bankroll=app_data["current_bankroll"]
                         )
+
+                        # Réinitialiser le flag après affichage
+                        if st.session_state.get(f"show_strategy_{event_url}", False):
+                            st.session_state[f"show_strategy_{event_url}"] = False
+                        
+                        
     else:
         st.info("Cliquez sur le bouton 'Récupérer les noms des événements à venir' pour charger les prochains événements UFC.")
-
-
-
-
-
-
-
-
-
 
 def show_bankroll_page():
     st.markdown("""
