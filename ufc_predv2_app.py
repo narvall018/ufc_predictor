@@ -1827,6 +1827,12 @@ if 'current_tab' not in st.session_state:
 
 if 'kelly_strategy' not in st.session_state:
     st.session_state.kelly_strategy = "Kelly/4"
+# Au début du script, après les autres initialisations de session_state
+if 'saved_bet_events' not in st.session_state:
+    st.session_state.saved_bet_events = {}
+    
+if 'betting_recommendations' not in st.session_state:
+    st.session_state.betting_recommendations = {}
 
 # Charger les données une seule fois au démarrage
 app_data = load_app_data()
@@ -2664,9 +2670,12 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
             else:
                 st.error("Erreur lors de l'enregistrement du pari.")
 
-# NOUVELLE FONCTION POUR LA STRATÉGIE DE PARIS
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes"""
+    
+    # Vérifier si on a déjà fait des recommandations
+    event_key = f"recommendations_{event_url}"
+    has_existing_recommendations = event_key in st.session_state.betting_recommendations
     
     st.markdown("""
     <div class="divider"></div>
@@ -2674,6 +2683,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         <h2>💰 Stratégie de paris optimisée 💰</h2>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Si on a des paris sauvegardés pour cet événement, afficher un message
+    if event_url in st.session_state.saved_bet_events:
+        st.success(f"Vos paris pour cet événement ont été enregistrés avec succès! ({st.session_state.saved_bet_events[event_url]} paris)")
     
     # Paramètres de la stratégie
     st.markdown("### Configurez votre stratégie de paris")
@@ -2778,62 +2791,13 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             'odds': odds
         })
     
-    # Bouton pour générer la stratégie de paris
-    if st.button("📊 Générer la stratégie de paris", key=f"generate_strategy_{event_url}"):
-        # Filtrer les combats intéressants
-        filtered_fights = []
-        for fight in bettable_fights:
-            # Vérifier la confiance du modèle
-            if fight['probability'] < 0.65:
-                continue
-                
-            # Vérifier le value betting
-            implicit_prob = 1 / fight['odds']
-            if implicit_prob >= fight['probability']:
-                continue
-            
-            value = fight['probability'] * fight['odds']
-            if value < 1.15:
-                continue
-                
-            # Calculer la fraction Kelly
-            p = fight['probability']
-            q = 1 - p
-            b = fight['odds'] - 1
-            kelly = (p * b - q) / b
-            
-            # Appliquer le diviseur Kelly
-            fractional_kelly = kelly / kelly_divisor
-            
-            # Ajouter aux paris recommandés
-            if fractional_kelly > 0:
-                filtered_fights.append({
-                    **fight,
-                    'kelly': kelly,
-                    'fractional_kelly': fractional_kelly,
-                    'edge': p - implicit_prob,
-                    'value': value
-                })
+    # Récupérer les recommandations existantes ou générer de nouvelles
+    if has_existing_recommendations and not st.button("📊 Recalculer la stratégie de paris", key=f"recalculate_strategy_{event_url}"):
+        filtered_fights = st.session_state.betting_recommendations[event_key]
+        st.markdown("### 💰 Recommandations de paris")
         
-        # Afficher les résultats
-        if not filtered_fights:
-            st.warning("Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).")
-        else:
-            # Calculer la somme totale des fractions Kelly
-            total_kelly = sum(fight['fractional_kelly'] for fight in filtered_fights)
-            
-            # Calculer les montants à miser
-            for fight in filtered_fights:
-                if total_kelly > 0:
-                    # Répartir le budget proportionnellement
-                    fight['stake'] = total_budget * (fight['fractional_kelly'] / total_kelly)
-                else:
-                    fight['stake'] = 0
-            
-            # Afficher les recommandations
-            st.markdown("### 💰 Recommandations de paris")
-            
-            # Tableau des combats recommandés
+        # Afficher les recommandations sauvegardées
+        if filtered_fights:
             recommendation_data = []
             for fight in filtered_fights:
                 recommendation_data.append({
@@ -2846,52 +2810,192 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     "Montant": f"{fight['stake']:.2f} €",
                     "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
                 })
+                
+            df = pd.DataFrame(recommendation_data)
+            st.dataframe(df, use_container_width=True)
             
-            if recommendation_data:
-                df = pd.DataFrame(recommendation_data)
-                st.dataframe(df, use_container_width=True)
-                
-                # Résumé de la stratégie
-                total_stake = sum(fight['stake'] for fight in filtered_fights)
-                total_potential_profit = sum(fight['stake'] * (fight['odds']-1) for fight in filtered_fights)
-                
-                st.markdown(f"""
-                <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:15px;">
-                    <h4>Résumé de la stratégie</h4>
-                    <ul>
-                        <li>Budget total: <b>{total_budget:.2f} €</b></li>
-                        <li>Montant total misé: <b>{total_stake:.2f} €</b> ({total_stake/total_budget*100:.1f}% du budget)</li>
-                        <li>Gain potentiel maximal: <b>{total_potential_profit:.2f} €</b> (ROI: {total_potential_profit/total_stake*100:.1f}%)</li>
-                        <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
-                        <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
-                    </ul>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Option pour enregistrer les paris
+            # Résumé de la stratégie
+            total_stake = sum(fight['stake'] for fight in filtered_fights)
+            total_potential_profit = sum(fight['stake'] * (fight['odds']-1) for fight in filtered_fights)
+            
+            st.markdown(f"""
+            <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:15px;">
+                <h4>Résumé de la stratégie</h4>
+                <ul>
+                    <li>Budget total: <b>{total_budget:.2f} €</b></li>
+                    <li>Montant total misé: <b>{total_stake:.2f} €</b> ({total_stake/total_budget*100:.1f}% du budget)</li>
+                    <li>Gain potentiel maximal: <b>{total_potential_profit:.2f} €</b> (ROI: {total_potential_profit/total_stake*100:.1f}%)</li>
+                    <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                    <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Option pour enregistrer les paris seulement si pas déjà sauvegardés
+            if event_url not in st.session_state.saved_bet_events:
                 if st.button("💾 Enregistrer ces paris dans mon suivi", key=f"save_all_bets_{event_url}"):
-                    successful_bets = 0
-                    for fight in filtered_fights:
-                        # Ajouter le pari à l'historique
-                        if add_manual_bet(
-                            event_name=event_name,
-                            event_date=datetime.datetime.now(),  # Utiliser la date actuelle
-                            fighter_red=fight['red_fighter'],
-                            fighter_blue=fight['blue_fighter'],
-                            pick=fight['winner_name'],
-                            odds=fight['odds'],
-                            stake=fight['stake'],
-                            model_probability=fight['probability'],
-                            kelly_fraction=kelly_divisor
-                        ):
-                            successful_bets += 1
+                    # Cette partie s'exécute quand on clique sur le bouton
+                    try:
+                        successful_bets = 0
+                        for fight in filtered_fights:
+                            # Ajouter le pari à l'historique
+                            result = add_manual_bet(
+                                event_name=event_name,
+                                event_date=datetime.datetime.now(),
+                                fighter_red=fight['red_fighter'],
+                                fighter_blue=fight['blue_fighter'],
+                                pick=fight['winner_name'],
+                                odds=fight['odds'],
+                                stake=fight['stake'],
+                                model_probability=fight['probability'],
+                                kelly_fraction=kelly_divisor
+                            )
+                            if result:
+                                successful_bets += 1
+                        
+                        # Sauvegarder l'état dans la session pour le prochain chargement
+                        st.session_state.saved_bet_events[event_url] = successful_bets
+                        
+                        # Forcer un message qui apparaîtra au prochain rechargement
+                        if successful_bets == len(filtered_fights):
+                            st.success(f"Tous les paris ({successful_bets}) ont été enregistrés avec succès!")
+                        elif successful_bets > 0:
+                            st.warning(f"{successful_bets}/{len(filtered_fights)} paris ont été enregistrés. Certains paris n'ont pas pu être enregistrés.")
+                        else:
+                            st.error("Aucun pari n'a pu être enregistré.")
+                    except Exception as e:
+                        st.error(f"Erreur lors de l'enregistrement des paris: {e}")
+        else:
+            st.warning("Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).")
+    else:
+        # Bouton pour générer/régénérer la stratégie
+        generate_btn = st.button("📊 Générer la stratégie de paris", key=f"generate_strategy_{event_url}")
+        
+        if generate_btn or (has_existing_recommendations and "recalculate" in st.session_state):
+            # Filtrer les combats intéressants
+            filtered_fights = []
+            for fight in bettable_fights:
+                # Vérifier la confiance du modèle
+                if fight['probability'] < 0.65:
+                    continue
                     
-                    if successful_bets == len(filtered_fights):
-                        st.success(f"Tous les paris ({successful_bets}) ont été enregistrés avec succès!")
-                    elif successful_bets > 0:
-                        st.warning(f"{successful_bets}/{len(filtered_fights)} paris ont été enregistrés. Certains paris n'ont pas pu être enregistrés.")
+                # Vérifier le value betting
+                implicit_prob = 1 / fight['odds']
+                if implicit_prob >= fight['probability']:
+                    continue
+                
+                value = fight['probability'] * fight['odds']
+                if value < 1.15:
+                    continue
+                    
+                # Calculer la fraction Kelly
+                p = fight['probability']
+                q = 1 - p
+                b = fight['odds'] - 1
+                kelly = (p * b - q) / b
+                
+                # Appliquer le diviseur Kelly
+                fractional_kelly = kelly / kelly_divisor
+                
+                # Ajouter aux paris recommandés
+                if fractional_kelly > 0:
+                    filtered_fights.append({
+                        **fight,
+                        'kelly': kelly,
+                        'fractional_kelly': fractional_kelly,
+                        'edge': p - implicit_prob,
+                        'value': value
+                    })
+            
+            # Sauvegarder les recommandations dans la session state
+            st.session_state.betting_recommendations[event_key] = filtered_fights
+            
+            # Afficher les résultats
+            if not filtered_fights:
+                st.warning("Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).")
+            else:
+                # Calculer la somme totale des fractions Kelly
+                total_kelly = sum(fight['fractional_kelly'] for fight in filtered_fights)
+                
+                # Calculer les montants à miser
+                for fight in filtered_fights:
+                    if total_kelly > 0:
+                        # Répartir le budget proportionnellement
+                        fight['stake'] = total_budget * (fight['fractional_kelly'] / total_kelly)
                     else:
-                        st.error("Aucun pari n'a pu être enregistré.")
+                        fight['stake'] = 0
+                
+                # Afficher les recommandations
+                st.markdown("### 💰 Recommandations de paris")
+                
+                # Tableau des combats recommandés
+                recommendation_data = []
+                for fight in filtered_fights:
+                    recommendation_data.append({
+                        "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
+                        "Pari sur": fight['winner_name'],
+                        "Probabilité": f"{fight['probability']:.2f}",
+                        "Cote": f"{fight['odds']:.2f}",
+                        "Value": f"{fight['edge']*100:.1f}%",
+                        "Rendement": f"{fight['value']:.2f}",  
+                        "Montant": f"{fight['stake']:.2f} €",
+                        "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
+                    })
+                
+                if recommendation_data:
+                    df = pd.DataFrame(recommendation_data)
+                    st.dataframe(df, use_container_width=True)
+                    
+                    # Résumé de la stratégie
+                    total_stake = sum(fight['stake'] for fight in filtered_fights)
+                    total_potential_profit = sum(fight['stake'] * (fight['odds']-1) for fight in filtered_fights)
+                    
+                    st.markdown(f"""
+                    <div style="background-color:rgba(76, 175, 80, 0.1); padding:15px; border-radius:10px; margin-top:15px;">
+                        <h4>Résumé de la stratégie</h4>
+                        <ul>
+                            <li>Budget total: <b>{total_budget:.2f} €</b></li>
+                            <li>Montant total misé: <b>{total_stake:.2f} €</b> ({total_stake/total_budget*100:.1f}% du budget)</li>
+                            <li>Gain potentiel maximal: <b>{total_potential_profit:.2f} €</b> (ROI: {total_potential_profit/total_stake*100:.1f}%)</li>
+                            <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                            <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
+                        </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Option pour enregistrer les paris seulement si pas déjà sauvegardés
+                    if event_url not in st.session_state.saved_bet_events:
+                        if st.button("💾 Enregistrer ces paris dans mon suivi", key=f"save_all_bets_{event_url}"):
+                            try:
+                                successful_bets = 0
+                                for fight in filtered_fights:
+                                    # Ajouter le pari à l'historique
+                                    result = add_manual_bet(
+                                        event_name=event_name,
+                                        event_date=datetime.datetime.now(),
+                                        fighter_red=fight['red_fighter'],
+                                        fighter_blue=fight['blue_fighter'],
+                                        pick=fight['winner_name'],
+                                        odds=fight['odds'],
+                                        stake=fight['stake'],
+                                        model_probability=fight['probability'],
+                                        kelly_fraction=kelly_divisor
+                                    )
+                                    if result:
+                                        successful_bets += 1
+                                
+                                # Sauvegarder l'état dans la session pour le prochain chargement
+                                st.session_state.saved_bet_events[event_url] = successful_bets
+                                
+                                # Afficher un message de confirmation
+                                if successful_bets == len(filtered_fights):
+                                    st.success(f"Tous les paris ({successful_bets}) ont été enregistrés avec succès!")
+                                elif successful_bets > 0:
+                                    st.warning(f"{successful_bets}/{len(filtered_fights)} paris ont été enregistrés. Certains paris n'ont pas pu être enregistrés.")
+                                else:
+                                    st.error("Aucun pari n'a pu être enregistré.")
+                            except Exception as e:
+                                st.error(f"Erreur lors de l'enregistrement des paris: {e}")
 
 def show_upcoming_events_page():
     st.markdown("""
@@ -3240,9 +3344,7 @@ def show_upcoming_events_page():
                             current_bankroll=app_data["current_bankroll"]
                         )
 
-                        # Réinitialiser le flag après affichage
-                        if st.session_state.get(f"show_strategy_{event_url}", False):
-                            st.session_state[f"show_strategy_{event_url}"] = False
+
                         
                         
     else:
