@@ -2452,6 +2452,16 @@ if 'theme_mode' not in st.session_state:
 if 'show_loading_welcome' not in st.session_state:
     st.session_state.show_loading_welcome = True
 
+# Au début du script, après les autres initialisations de session_state
+if 'odds_dicts' not in st.session_state:
+    st.session_state.odds_dicts = {}
+
+if 'saved_bet_events' not in st.session_state:
+    st.session_state.saved_bet_events = {}
+    
+if 'betting_recommendations' not in st.session_state:
+    st.session_state.betting_recommendations = {}
+
 # Charger les données une seule fois au démarrage
 # AMÉLIORATION UI: Fonction de chargement avec indicateur de progression
 with st.spinner("Chargement des données de l'application..."):
@@ -3459,6 +3469,14 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     event_key = f"recommendations_{event_url}"
     has_existing_recommendations = event_key in st.session_state.betting_recommendations
     
+    # Vérifier si on a un dictionnaire global des cotes
+    if 'odds_dicts' not in st.session_state:
+        st.session_state.odds_dicts = {}
+
+    # Récupérer ou créer le dictionnaire des cotes pour cet événement
+    if event_url not in st.session_state.odds_dicts:
+        st.session_state.odds_dicts[event_url] = {}
+    
     # AMÉLIORATION UI: Titre de section plus attrayant
     st.markdown("""
     <div class="divider"></div>
@@ -3524,11 +3542,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     </div>
     """, unsafe_allow_html=True)
     
-    # Créer un dictionnaire pour stocker les cotes entrées
+    # Initialiser ou récupérer le dictionnaire pour stocker les cotes entrées
     if f"odds_dict_{event_url}" not in st.session_state:
-        st.session_state[f"odds_dict_{event_url}"] = {}
+        st.session_state[f"odds_dict_{event_url}"] = st.session_state.odds_dicts.get(event_url, {})
     
-    # AMÉLIORATION UI: Disposition des combats en grille
     # Calculer le nombre de combats bettables
     bettable_fights = []
     for fight in fights:
@@ -3630,19 +3647,30 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             key=f"slider_{odds_key}"
                         )
                     
-                    # Ajouter la cote au combat
+                    # CORRECTION: Mettre à jour à la fois dans le combat et dans le dictionnaire
                     fight['odds'] = odds
+                    st.session_state[f"odds_dict_{event_url}"][odds_key] = odds
+                    
+                    # Sauvegarder aussi dans le dictionnaire global
+                    st.session_state.odds_dicts[event_url] = st.session_state[f"odds_dict_{event_url}"]
                     
                     # Fermeture de la div
                     st.markdown("</div>", unsafe_allow_html=True)
-                    
-                    # Sauvegarder la valeur dans la session
-                    st.session_state[f"odds_dict_{event_url}"][odds_key] = odds
     else:
         st.info("Aucun combat avec prédiction n'est disponible. Veuillez d'abord générer des prédictions.")
     
+    # CORRECTION: Recalcul de la stratégie avec un flag d'état
+    recalculate_btn = st.button("📊 Recalculer la stratégie de paris", key=f"recalculate_strategy_{event_url}")
+    
+    # Quand le bouton de recalcul est cliqué, définir un flag
+    if recalculate_btn:
+        st.session_state[f"recalculate_{event_url}"] = True
+        generate_strategy = True
+    else:
+        generate_strategy = False
+
     # Récupérer les recommandations existantes ou générer de nouvelles
-    if has_existing_recommendations and not st.button("📊 Recalculer la stratégie de paris", key=f"recalculate_strategy_{event_url}"):
+    if has_existing_recommendations and not (generate_strategy or st.session_state.get(f"recalculate_{event_url}", False)):
         filtered_fights = st.session_state.betting_recommendations[event_key]
         # AMÉLIORATION UI: Titre de section amélioré
         st.markdown("""
@@ -3782,15 +3810,32 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             </div>
             """, unsafe_allow_html=True)
     else:
+        # CORRECTION: Si on a cliqué sur recalculer, effacer le flag pour le prochain chargement
+        if st.session_state.get(f"recalculate_{event_url}", False):
+            st.session_state[f"recalculate_{event_url}"] = False
+            
         # Bouton pour générer/régénérer la stratégie
         generate_btn = st.button("📊 Générer la stratégie de paris", type="primary", key=f"generate_strategy_{event_url}", use_container_width=True)
         
-        if generate_btn or (has_existing_recommendations and "recalculate" in st.session_state):
+        if generate_btn or generate_strategy:
             # Animation de chargement
             with st.spinner("Analyse des opportunités de paris..."):
                 # Filtrer les combats intéressants
                 filtered_fights = []
+                
+                # CORRECTION: S'assurer que les cotes sont correctement appliquées aux combats
                 for fight in bettable_fights:
+                    fight_key = fight['fight_key']
+                    odds_key = f"odds_{fight_key}"
+                    
+                    # Récupérer la cote depuis le dictionnaire de session
+                    if odds_key in st.session_state[f"odds_dict_{event_url}"]:
+                        fight['odds'] = st.session_state[f"odds_dict_{event_url}"][odds_key]
+                    else:
+                        # Valeur par défaut si non définie (ne devrait pas arriver)
+                        fight['odds'] = 2.0
+                        st.session_state[f"odds_dict_{event_url}"][odds_key] = 2.0
+                        
                     # Vérifier la confiance du modèle
                     if fight['probability'] < 0.65:
                         continue
@@ -3846,17 +3891,47 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).</p>
                 </div>
                 """, unsafe_allow_html=True)
+                
+                # Afficher des informations de débogage sur les combats évalués
+                debug_info = st.expander("🔍 Détails des combats évalués", expanded=False)
+                with debug_info:
+                    for fight in bettable_fights:
+                        odds_key = f"odds_{fight['fight_key']}"
+                        odds_value = st.session_state[f"odds_dict_{event_url}"].get(odds_key, "Non définie")
+                        implicit_prob = 1 / float(odds_value) if isinstance(odds_value, (int, float)) and odds_value > 0 else "N/A"
+                        edge = fight['probability'] - implicit_prob if isinstance(implicit_prob, float) else "N/A"
+                        
+                        st.markdown(f"""
+                        <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div><b>{fight['red_fighter']} vs {fight['blue_fighter']}</b></div>
+                            <div>Vainqueur prédit: <b>{fight['winner_name']}</b> ({fight['probability']:.0%})</div>
+                            <div>Cote: <b>{odds_value}</b> (Probabilité implicite: {implicit_prob if isinstance(implicit_prob, float) else implicit_prob})</div>
+                            <div>Edge: <b>{edge if isinstance(edge, float) else edge}</b></div>
+                            <div>Raison: {
+                                "Confiance < 65%" if fight['probability'] < 0.65 
+                                else "Cote trop basse (probabilité implicite trop élevée)" if isinstance(implicit_prob, float) and implicit_prob >= fight['probability']
+                                else "Value insuffisante" if isinstance(implicit_prob, float) and fight['probability'] * float(odds_value) < 1.15
+                                else "Raison inconnue"
+                            }</div>
+                        </div>
+                        """, unsafe_allow_html=True)
             else:
                 # Calculer la somme totale des fractions Kelly
                 total_kelly = sum(fight['fractional_kelly'] for fight in filtered_fights)
                 
-                # Calculer les montants à miser
-                for fight in filtered_fights:
-                    if total_kelly > 0:
+                # CORRECTION: Ajouter une vérification pour éviter la division par zéro
+                if total_kelly <= 0:
+                    st.warning("Impossible de calculer les mises : la somme des fractions Kelly est nulle ou négative.")
+                    for fight in filtered_fights:
+                        fight['stake'] = 0
+                else:
+                    # Calculer les montants à miser
+                    for fight in filtered_fights:
                         # Répartir le budget proportionnellement
                         fight['stake'] = total_budget * (fight['fractional_kelly'] / total_kelly)
-                    else:
-                        fight['stake'] = 0
+                        
+                        # CORRECTION: Arrondir les mises pour plus de clarté
+                        fight['stake'] = round(fight['stake'], 2)
                 
                 # AMÉLIORATION UI: Afficher les recommandations dans un tableau moderne
                 recommendation_data = []
@@ -3974,6 +4049,33 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
+    
+    # Fonction de débogage
+    def debug_betting_strategy(event_url, bettable_fights, filtered_fights):
+        """Fonction de débogage pour la stratégie de paris"""
+        
+        debug_info = st.expander("📝 Informations de débogage (développeur)", expanded=False)
+        
+        with debug_info:
+            st.write("### État du dictionnaire des cotes")
+            st.write(st.session_state.get(f"odds_dict_{event_url}", {}))
+            
+            st.write("### Combats bettables")
+            for fight in bettable_fights:
+                fight_key = fight['fight_key']
+                odds_key = f"odds_{fight_key}"
+                odds_value = st.session_state.get(f"odds_dict_{event_url}", {}).get(odds_key, "Non définie")
+                
+                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={odds_value}")
+            
+            st.write("### Combats filtrés pour paris")
+            for fight in filtered_fights:
+                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={fight['odds']}, Kelly={fight.get('fractional_kelly', 0):.4f}, Mise={fight.get('stake', 0):.2f}€")
+    
+    # # Ajouter le débogage pour les développeurs
+    # if st.checkbox("Afficher le débogage (développeur)", value=False, key=f"debug_{event_url}"):
+    #     debug_betting_strategy(event_url, bettable_fights, filtered_fights)
+        
 
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
