@@ -2467,7 +2467,7 @@ if 'betting_recommendations' not in st.session_state:
 with st.spinner("Chargement des données de l'application..."):
     app_data = load_app_data()
     if st.session_state.show_loading_welcome:
-        st.balloons()
+        # st.balloons()
         st.session_state.show_loading_welcome = False
 
 # FONCTION PRINCIPALE
@@ -2636,17 +2636,19 @@ def show_welcome_page():
 # PARTIE 6
 
 
+
+
 def show_prediction_page():
     """Interface de prédiction améliorée avec une meilleure organisation"""
-    # AMÉLIORATION UI: Section titre 
+    # Section titre 
     st.title("🎯 Prédicteur de Combat")
     st.write("Sélectionnez deux combattants et obtenez des prédictions précises")
     
-    # AMÉLIORATION UI: Layout à deux colonnes
+    # Layout à deux colonnes
     main_cols = st.columns([1, 3])
     
     with main_cols[0]:
-        # AMÉLIORATION UI: Sélection des combattants
+        # Sélection des combattants
         st.subheader("Sélection des combattants")
         
         # Message d'avertissement sur l'importance de l'ordre des combattants
@@ -2780,7 +2782,7 @@ def show_prediction_page():
                     'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
                 })
                 
-                # AMÉLIORATION UI: Graphique modernisé
+                # Graphique modernisé
                 fig = go.Figure()
                 
                 # Ajouter les barres pour chaque méthode avec un style amélioré
@@ -2872,42 +2874,103 @@ def show_prediction_page():
                 
                 st.plotly_chart(fig, use_container_width=True)
             
-            # Créer deux colonnes pour les deux prédictions
+            # NOUVELLE SECTION: Affichage amélioré des prédictions
+            st.subheader("📊 Résultats des prédictions")
+            
+            # Conteneurs pour les prédictions
             pred_cols = st.columns(2 if ml_prediction else 1)
             
             # Afficher la prédiction statistique
             with pred_cols[0]:
-                winner_color = "red" if classic_prediction['prediction'] == 'Red' else "blue"
-                winner_name = classic_prediction['winner_name']
+                # Créer un conteneur avec bordure pour la prédiction statistique
+                stat_container = st.container()
                 
-                # Box de prédiction statistique améliorée
-                st.write("### Prédiction statistique")
-                st.write(f"**Vainqueur prédit:** {winner_name}")
-                st.write(f"**Probabilités:** {classic_prediction['red_probability']:.0%} pour {fighter_a['name']}, {classic_prediction['blue_probability']:.0%} pour {fighter_b['name']}")
-                
-                confidence = classic_prediction['confidence']
-                if confidence == "Élevé":
-                    st.success(f"Confiance: {confidence}")
-                else:
-                    st.warning(f"Confiance: {confidence}")
+                with stat_container:
+                    st.subheader("Prédiction Statistique")
+                    
+                    # Métriques pour une meilleure visualisation
+                    red_prob = classic_prediction['red_probability']
+                    blue_prob = classic_prediction['blue_probability']
+                    
+                    # Afficher le vainqueur prédit en grand
+                    winner_name = classic_prediction['winner_name']
+                    st.markdown(f"### Vainqueur prédit: {winner_name}")
+                    
+                    # Créer deux colonnes pour les probabilités
+                    prob_cols = st.columns(2)
+                    
+                    with prob_cols[0]:
+                        # Métrique pour le combattant rouge
+                        st.metric(
+                            f"🔴 {fighter_a['name']}",
+                            f"{red_prob:.0%}",
+                            delta=None
+                        )
+                        
+                    with prob_cols[1]:
+                        # Métrique pour le combattant bleu
+                        st.metric(
+                            f"🔵 {fighter_b['name']}",
+                            f"{blue_prob:.0%}",
+                            delta=None
+                        )
+                    
+                    # Barre de progression pour visualiser les probabilités
+                    st.progress(red_prob)
+                    
+                    # Afficher la confiance
+                    confidence = classic_prediction['confidence']
+                    if confidence == "Élevé":
+                        st.success(f"Confiance: {confidence}")
+                    else:
+                        st.warning(f"Confiance: {confidence}")
 
             # Afficher la prédiction ML si disponible
             if ml_prediction:
                 with pred_cols[1]:
-                    winner_color_ml = "red" if ml_prediction['prediction'] == 'Red' else "blue"
-                    winner_name_ml = ml_prediction['winner_name']
+                    # Créer un conteneur avec bordure pour la prédiction ML
+                    ml_container = st.container()
                     
-                    # Box de prédiction ML améliorée
-                    st.write("### Prédiction Machine Learning")
-                    st.write(f"**Vainqueur prédit:** {winner_name_ml}")
-                    st.write(f"**Probabilités:** {ml_prediction['red_probability']:.0%} pour {fighter_a['name']}, {ml_prediction['blue_probability']:.0%} pour {fighter_b['name']}")
-                    
-                    confidence_ml = ml_prediction['confidence']
-                    if confidence_ml == "Élevé":
-                        st.success(f"Confiance: {confidence_ml}")
-                    else:
-                        st.warning(f"Confiance: {confidence_ml}")
-            
+                    with ml_container:
+                        st.subheader("Prédiction Machine Learning")
+                        
+                        # Métriques pour une meilleure visualisation
+                        red_prob_ml = ml_prediction['red_probability']
+                        blue_prob_ml = ml_prediction['blue_probability']
+                        
+                        # Afficher le vainqueur prédit en grand
+                        winner_name_ml = ml_prediction['winner_name']
+                        st.markdown(f"### Vainqueur prédit: {winner_name_ml}")
+                        
+                        # Créer deux colonnes pour les probabilités
+                        prob_cols_ml = st.columns(2)
+                        
+                        with prob_cols_ml[0]:
+                            # Métrique pour le combattant rouge
+                            st.metric(
+                                f"🔴 {fighter_a['name']}",
+                                f"{red_prob_ml:.0%}",
+                                delta=None
+                            )
+                            
+                        with prob_cols_ml[1]:
+                            # Métrique pour le combattant bleu
+                            st.metric(
+                                f"🔵 {fighter_b['name']}",
+                                f"{blue_prob_ml:.0%}",
+                                delta=None
+                            )
+                        
+                        # Barre de progression pour visualiser les probabilités
+                        st.progress(red_prob_ml)
+                        
+                        # Afficher la confiance
+                        confidence_ml = ml_prediction['confidence']
+                        if confidence_ml == "Élevé":
+                            st.success(f"Confiance: {confidence_ml}")
+                        else:
+                            st.warning(f"Confiance: {confidence_ml}")
+
             # Message de convergence/divergence si les deux méthodes sont disponibles
             if ml_prediction:
                 same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
@@ -3310,6 +3373,761 @@ def show_prediction_page():
             
             # Message d'information
             st.warning("⚠️ L'ordre des combattants est important! La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions. Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge.")
+
+
+
+def show_prediction_page():
+    """Interface de prédiction améliorée avec une meilleure organisation"""
+    # Section titre 
+    st.title("🎯 Prédicteur de Combat")
+    st.write("Sélectionnez deux combattants et obtenez des prédictions précises")
+    
+    # Layout à deux colonnes
+    main_cols = st.columns([1, 3])
+    
+    with main_cols[0]:
+        # Sélection des combattants
+        st.subheader("Sélection des combattants")
+        
+        # Message d'avertissement sur l'importance de l'ordre des combattants
+        st.warning("⚠️ Important : L'ordre des combattants (Rouge/Bleu) influence les prédictions. Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.")
+        
+        # Sélection du combattant rouge
+        st.subheader("🔴 Combattant Rouge")
+        fighter_a_name = st.selectbox(
+            "Sélectionner combattant rouge",
+            options=app_data["fighter_names"],
+            key="fighter_a_selectbox"
+        )
+        
+        # Sélection du combattant bleu (en excluant le combattant rouge)
+        st.subheader("🔵 Combattant Bleu")
+        fighter_b_options = [name for name in app_data["fighter_names"] if name != fighter_a_name]
+        fighter_b_name = st.selectbox(
+            "Sélectionner combattant bleu",
+            options=fighter_b_options,
+            key="fighter_b_selectbox"
+        )
+        
+        # Options de paris
+        st.subheader("Options de paris")
+
+        # Mode de saisie des cotes (manuel ou slider)
+        cote_input_mode = st.radio(
+            "Mode de saisie des cotes",
+            options=["Manuel", "Slider"],
+            index=0,  # Manuel par défaut
+            key="cote_input_mode"
+        )
+        
+        if cote_input_mode == "Manuel":
+            odds_a = st.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.01, format="%.2f", key="odds_a_input_manual")
+            odds_b = st.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.01, format="%.2f", key="odds_b_input_manual")
+        else:
+            odds_a = st.slider("Cote Rouge", min_value=1.01, max_value=10.0, value=2.0, step=0.05, format="%.2f", key="odds_a_input_slider")
+            odds_b = st.slider("Cote Bleu", min_value=1.01, max_value=10.0, value=1.8, step=0.05, format="%.2f", key="odds_b_input_slider")
+        
+        # Stratégie Kelly
+        st.subheader("📈 Critères Kelly")
+        kelly_strategy = st.selectbox(
+            "Stratégie Kelly",
+            options=["Kelly pur", "Kelly/2", "Kelly/3", "Kelly/4", "Kelly/5", "Kelly/10"],
+            index=3,  # Kelly/4 par défaut
+            key="kelly_strategy_select"
+        )
+        st.session_state.kelly_strategy = kelly_strategy
+        
+        # Bankroll actuelle
+        st.subheader("💼 Bankroll actuelle")
+        st.metric(
+            "",
+            f"{app_data['current_bankroll']:.2f} €", 
+            delta=None
+        )
+        
+        # Bouton de prédiction
+        predict_btn = st.button(
+            "🔮 Prédire le combat", 
+            type="primary", 
+            key="predict_btn", 
+            use_container_width=True
+        )
+    
+    with main_cols[1]:
+        # Récupérer les statistiques des combattants sélectionnés
+        fighter_a = app_data["fighters_dict"].get(fighter_a_name)
+        fighter_b = app_data["fighters_dict"].get(fighter_b_name)
+        
+        # Vérifier si on peut faire une prédiction
+        if predict_btn and fighter_a and fighter_b:
+            if fighter_a_name == fighter_b_name:
+                st.error("Veuillez sélectionner deux combattants différents.")
+            else:
+                # Afficher un spinner pendant le calcul
+                with st.spinner("Analyse en cours..."):
+                    # Faire les prédictions avec les deux méthodes
+                    classic_prediction, ml_prediction = predict_both_methods(
+                        fighter_a, 
+                        fighter_b,
+                        odds_a=odds_a,
+                        odds_b=odds_b,
+                        model=app_data["ml_model"],
+                        scaler=app_data["scaler"],
+                        feature_names=app_data["feature_names"]
+                    )
+                    
+                    # Stocker les résultats dans la session
+                    st.session_state.prediction_result = {
+                        'fighter_a': fighter_a,
+                        'fighter_b': fighter_b,
+                        'classic_prediction': classic_prediction,
+                        'ml_prediction': ml_prediction,
+                        'odds_a': odds_a,
+                        'odds_b': odds_b
+                    }
+        
+        # Afficher les résultats de prédiction
+        if st.session_state.prediction_result:
+            result = st.session_state.prediction_result
+            fighter_a = result['fighter_a']
+            fighter_b = result['fighter_b']
+            classic_prediction = result['classic_prediction']
+            ml_prediction = result['ml_prediction']
+            odds_a = result['odds_a']
+            odds_b = result['odds_b']
+            
+            # Afficher une vue en tête-à-tête des combattants
+            st.subheader("Combat")
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col1:
+                st.write(f"### 🔴 {fighter_a['name']}")
+                st.write(f"Record: {fighter_a['wins']}-{fighter_a['losses']}")
+            with col2:
+                st.write("## VS")
+            with col3:
+                st.write(f"### 🔵 {fighter_b['name']}")
+                st.write(f"Record: {fighter_b['wins']}-{fighter_b['losses']}")
+            
+            # Afficher les résultats des deux prédictions
+            st.subheader("🔮 Prédictions du combat")
+            
+            # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
+            if ml_prediction:
+                # Créer un DataFrame pour le graphique comparatif
+                proba_data = pd.DataFrame({
+                    'Combattant': [fighter_a['name'], fighter_b['name']],
+                    'Statistique': [classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
+                })
+                
+                # Graphique modernisé
+                fig = go.Figure()
+                
+                # Ajouter les barres pour chaque méthode avec un style amélioré
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Statistique'],
+                    name='Prédiction Statistique',
+                    marker_color='#2196F3',
+                    text=[f"{proba:.0%}" for proba in proba_data['Statistique']],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Machine Learning'],
+                    name='Prédiction ML',
+                    marker_color='#4CAF50',
+                    text=[f"{proba:.0%}" for proba in proba_data['Machine Learning']],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                # Configurer la mise en page
+                fig.update_layout(
+                    title=None,
+                    xaxis_title=None,
+                    yaxis_title="Probabilité de victoire",
+                    yaxis=dict(
+                        range=[0, 1],
+                        tickformat='.0%',
+                        gridcolor='rgba(255,255,255,0.1)',
+                        showgrid=True
+                    ),
+                    xaxis=dict(
+                        gridcolor='rgba(255,255,255,0.1)',
+                    ),
+                    legend_title=None,
+                    height=400,
+                    barmode='group',
+                    bargap=0.30,
+                    bargroupgap=0.1,
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="center",
+                        x=0.5
+                    ),
+                    margin=dict(t=50, b=50)
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                # Si seulement la méthode statistique est disponible
+                # Graphique modernisé pour la méthode unique
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    x=[fighter_a['name'], fighter_b['name']],
+                    y=[classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    marker_color=['#E53935', '#1E88E5'],
+                    text=[f"{classic_prediction['red_probability']:.0%}", f"{classic_prediction['blue_probability']:.0%}"],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    title=None,
+                    xaxis_title=None,
+                    yaxis_title="Probabilité de victoire",
+                    yaxis=dict(
+                        range=[0, 1],
+                        tickformat='.0%',
+                        gridcolor='rgba(255,255,255,0.1)',
+                        showgrid=True
+                    ),
+                    xaxis=dict(
+                        gridcolor='rgba(255,255,255,0.1)',
+                    ),
+                    height=400,
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
+                    margin=dict(t=50, b=50)
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # NOUVELLE SECTION: Affichage amélioré des prédictions
+            st.subheader("📊 Résultats des prédictions")
+            
+            # Utiliser un layout alternatif pour éviter le nidification de colonnes
+            pred_cols = st.columns(2 if ml_prediction else 1)
+            
+            # Prédiction Statistique (première colonne)
+            with pred_cols[0]:
+                st.subheader("Prédiction Statistique")
+                
+                # Vainqueur prédit avec mise en évidence améliorée
+                winner_name = classic_prediction['winner_name']
+                is_red_winner = classic_prediction['prediction'] == 'Red'
+                
+                # AMÉLIORATION: Vainqueur prédit en TRÈS GRAND
+                winner_color = "#E53935" if is_red_winner else "#1E88E5"
+                st.markdown("### Vainqueur prédit:")
+                
+                # Utiliser Markdown pour afficher le vainqueur en très grand et en couleur
+                st.markdown(f"<h1 style='color: {winner_color}; font-size: 36px; text-align: center;'>{'🔴' if is_red_winner else '🔵'} {winner_name}</h1>", unsafe_allow_html=True)
+                
+                # Les probabilités pour chaque combattant
+                red_prob = classic_prediction['red_probability']
+                blue_prob = classic_prediction['blue_probability']
+                
+                # Afficher les métriques avec les valeurs originales
+                st.metric(f"🔴 {fighter_a['name']}", f"{red_prob:.0%}")
+                st.metric(f"🔵 {fighter_b['name']}", f"{blue_prob:.0%}")
+                
+                # AMÉLIORATION: Toujours afficher une barre de progression significative
+                if red_prob < 0 or red_prob > 1 or blue_prob < 0 or blue_prob > 1:
+                    # Message expliquant l'adaptation mais plus concis
+                    st.caption(f"Note: Probabilités originales: {red_prob:.0%} vs {blue_prob:.0%}")
+                    
+                    # Adaptation de la visualisation pour probabilités extrêmes
+                    if is_red_winner:
+                        # Vainqueur rouge - montrer une barre à 80% (dominance claire mais pas totale)
+                        progress_value = 0.8
+                    else:
+                        # Vainqueur bleu - montrer une barre à 20% (dominance claire du bleu)
+                        progress_value = 0.2
+                else:
+                    # Probabilités normales, utilisation directe
+                    progress_value = red_prob
+                
+                # Toujours afficher la barre de progression
+                st.progress(progress_value)
+                
+                # Afficher la confiance
+                confidence = classic_prediction['confidence']
+                if confidence == "Élevé":
+                    st.success(f"Confiance: {confidence}")
+                else:
+                    st.warning(f"Confiance: {confidence}")
+            
+            # Prédiction ML (deuxième colonne, si disponible)
+            if ml_prediction:
+                with pred_cols[1]:
+                    st.subheader("Prédiction Machine Learning")
+                    
+                    # Vainqueur prédit avec mise en évidence améliorée
+                    winner_name_ml = ml_prediction['winner_name']
+                    is_red_winner_ml = ml_prediction['prediction'] == 'Red'
+                    
+                    # AMÉLIORATION: Vainqueur prédit en TRÈS GRAND
+                    winner_color_ml = "#E53935" if is_red_winner_ml else "#1E88E5"
+                    st.markdown("### Vainqueur prédit:")
+                    
+                    # Utiliser Markdown pour afficher le vainqueur en très grand et en couleur
+                    st.markdown(f"<h1 style='color: {winner_color_ml}; font-size: 36px; text-align: center;'>{'🔴' if is_red_winner_ml else '🔵'} {winner_name_ml}</h1>", unsafe_allow_html=True)
+                    
+                    # Les probabilités pour chaque combattant
+                    red_prob_ml = ml_prediction['red_probability']
+                    blue_prob_ml = ml_prediction['blue_probability']
+                    
+                    # Afficher les métriques avec les valeurs originales
+                    st.metric(f"🔴 {fighter_a['name']}", f"{red_prob_ml:.0%}")
+                    st.metric(f"🔵 {fighter_b['name']}", f"{blue_prob_ml:.0%}")
+                    
+                    # AMÉLIORATION: Toujours afficher une barre de progression significative
+                    if red_prob_ml < 0 or red_prob_ml > 1 or blue_prob_ml < 0 or blue_prob_ml > 1:
+                        # Message expliquant l'adaptation mais plus concis
+                        st.caption(f"Note: Probabilités originales: {red_prob_ml:.0%} vs {blue_prob_ml:.0%}")
+                        
+                        # Adaptation de la visualisation pour probabilités extrêmes
+                        if is_red_winner_ml:
+                            # Vainqueur rouge - montrer une barre à 80% (dominance claire mais pas totale)
+                            progress_value_ml = 0.8
+                        else:
+                            # Vainqueur bleu - montrer une barre à 20% (dominance claire du bleu)
+                            progress_value_ml = 0.2
+                    else:
+                        # Probabilités normales, utilisation directe
+                        progress_value_ml = red_prob_ml
+                    
+                    # Toujours afficher la barre de progression
+                    st.progress(progress_value_ml)
+                    
+                    # Afficher la confiance
+                    confidence_ml = ml_prediction['confidence']
+                    if confidence_ml == "Élevé":
+                        st.success(f"Confiance: {confidence_ml}")
+                    else:
+                        st.warning(f"Confiance: {confidence_ml}")
+            
+            # Message de convergence/divergence si les deux méthodes sont disponibles
+            if ml_prediction:
+                same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
+                if same_prediction:
+                    st.success("✅ Les deux méthodes prédisent le même vainqueur!")
+                else:
+                    st.warning("⚠️ Les méthodes prédisent des vainqueurs différents!")
+                
+            # PARTIE 7: Analyse Kelly et recommandations de paris
+            if ml_prediction:
+                st.divider()
+                st.subheader("📊 Analyse Kelly et recommandations de paris")
+                
+                # Obtenir la fraction Kelly sélectionnée
+                kelly_fractions = {
+                    "Kelly pur": 1,
+                    "Kelly/2": 2,
+                    "Kelly/3": 3, 
+                    "Kelly/4": 4,
+                    "Kelly/5": 5,
+                    "Kelly/10": 10
+                }
+                selected_fraction = kelly_fractions[st.session_state.kelly_strategy]
+                
+                # Détermine le combattant qui a la plus forte valeur attendue
+                if ml_prediction['prediction'] == 'Red':
+                    best_fighter = fighter_a['name']
+                    best_odds = odds_a
+                    best_prob = ml_prediction['red_probability']
+                else:
+                    best_fighter = fighter_b['name']
+                    best_odds = odds_b
+                    best_prob = ml_prediction['blue_probability']
+                
+                # Ajustement pour éviter les erreurs si probabilité hors limites
+                best_prob = max(0.01, min(0.99, best_prob))
+                
+                # Calculer les recommandations Kelly pour le combattant favori selon le ML
+                kelly_amount = calculate_kelly(best_prob, best_odds, app_data["current_bankroll"], selected_fraction)
+                
+                # Section Kelly modernisée avec composants Streamlit natifs
+                st.write("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
+                st.write("Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:")
+                
+                # Créer un DataFrame au lieu d'une table HTML
+                kelly_data = pd.DataFrame({
+                    "Combattant": [best_fighter],
+                    "Probabilité ML": [f"{best_prob:.0%}"],
+                    "Cote": [f"{best_odds:.2f}"],
+                    "Mise recommandée": [f"{kelly_amount:.2f} €"],
+                    "% de bankroll": [f"{(kelly_amount/app_data['current_bankroll']*100):.1f}%"],
+                    "Gain potentiel": [f"{kelly_amount * (best_odds-1):.2f} €"]
+                })
+                
+                # Afficher le DataFrame avec style
+                st.dataframe(kelly_data, use_container_width=True, hide_index=True)
+                
+                st.caption("Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.")
+                
+                # Section pour placer un pari modernisée
+                st.subheader(f"Placer un pari sur {best_fighter}")
+                
+                # Colonnes pour les informations du pari
+                bet_cols = st.columns(2)
+                
+                with bet_cols[0]:
+                    # Nom de l'événement
+                    event_name = st.text_input("Nom de l'événement", value="UFC Fight Night", key="event_name_input")
+                    
+                    # Date de l'événement
+                    event_date = st.date_input("Date de l'événement", value=datetime.datetime.now(), key="event_date_input")
+                
+                with bet_cols[1]:
+                    # Montant à miser
+                    bet_amount = st.number_input(
+                        "Montant à miser (€)",
+                        min_value=0.0,
+                        max_value=float(app_data["current_bankroll"]),
+                        value=float(kelly_amount),
+                        step=5.0,
+                        format="%.2f",
+                        key="bet_amount_input"
+                    )
+                    
+                    # Utiliser la mise Kelly recommandée
+                    use_kelly = st.checkbox("Utiliser la mise Kelly recommandée", value=True, key="use_kelly_checkbox")
+                    if use_kelly:
+                        bet_amount = kelly_amount
+                
+                # Afficher les détails du pari avec un design attractif
+                pot_gain = bet_amount * (best_odds-1)
+                roi_pct = (pot_gain / bet_amount) * 100 if bet_amount > 0 else 0
+                
+                # Créer 3 colonnes pour les métriques
+                bet_metrics_cols = st.columns(3)
+                with bet_metrics_cols[0]:
+                    st.metric("Mise", f"{bet_amount:.2f}€")
+                with bet_metrics_cols[1]:
+                    st.metric("Gain potentiel", f"{pot_gain:.2f}€")
+                with bet_metrics_cols[2]:
+                    st.metric("ROI", f"{roi_pct:.1f}%")
+                
+                # Bouton pour placer le pari
+                if st.button("💰 Placer ce pari", type="primary", key="place_bet_btn", use_container_width=True):
+                    if bet_amount > app_data["current_bankroll"]:
+                        st.error(f"Montant du pari ({bet_amount:.2f}€) supérieur à votre bankroll actuelle ({app_data['current_bankroll']:.2f}€)")
+                    elif bet_amount <= 0:
+                        st.error("Le montant du pari doit être supérieur à 0€")
+                    else:
+                        # Animation de chargement
+                        with st.spinner("Enregistrement du pari..."):
+                            # Ajouter le pari à l'historique
+                            if add_manual_bet(
+                                event_name=event_name,
+                                event_date=event_date,
+                                fighter_red=fighter_a['name'],
+                                fighter_blue=fighter_b['name'],
+                                pick=best_fighter,
+                                odds=best_odds,
+                                stake=bet_amount,
+                                model_probability=best_prob,
+                                kelly_fraction=selected_fraction
+                            ):
+                                # Message de succès avec détails
+                                st.success(f"Pari enregistré avec succès! {bet_amount:.2f}€ sur {best_fighter} @ {best_odds:.2f}")
+                                
+                                # Ajouter un petit délai pour l'animation
+                                time.sleep(0.5)
+                                
+                                # Afficher une confirmation
+                                st.info(f"Vous avez parié {bet_amount:.2f}€ sur {best_fighter}. Gain potentiel: {pot_gain:.2f}€ (ROI: {roi_pct:.1f}%)")
+                                st.write("Vous pouvez suivre ce pari dans l'onglet 'Gestion de Bankroll'")
+                            else:
+                                st.error("Erreur lors de l'enregistrement du pari.")
+            
+            # Analyse des paris (utiliser les deux méthodes si disponibles)
+            if 'betting' in classic_prediction:
+                st.divider()
+                st.subheader("💰 Analyse des paris")
+                st.write("Comparaison des cotes du marché avec nos probabilités prédites")
+                
+                # Analyse des paris pour les deux combattants avec un design modernisé
+                col1, col2 = st.columns(2)
+                
+                # Combattant Rouge
+                with col1:
+                    st.write(f"### 🔴 {fighter_a['name']}")
+                    
+                    # Données de paris
+                    betting_classic = classic_prediction['betting']
+                    betting_ml = ml_prediction.get('betting') if ml_prediction else None
+                    
+                    # Créer une table pour les données du combattant rouge
+                    st.write("**Données de paris:**")
+                    red_data = [
+                        ["Cote du marché", f"{betting_classic['odds_red']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_red']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['red_probability']:.0%}"]
+                    ]
+                    
+                    if betting_ml:
+                        red_data.append(["Probabilité ML", f"{ml_prediction['red_probability']:.0%}"])
+                    
+                    red_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_red']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_red']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    red_df = pd.DataFrame(red_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(red_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_red'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_red'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_red'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_red'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant rouge
+                    if st.button(f"Parier sur {fighter_a['name']}", key="bet_on_red_btn", use_container_width=True):
+                        # Calculer le montant Kelly pour ce combattant
+                        red_prob_for_kelly = max(0.01, min(0.99, ml_prediction['red_probability'] if ml_prediction else classic_prediction['red_probability']))
+                        
+                        red_kelly = calculate_kelly(
+                            red_prob_for_kelly,
+                            odds_a,
+                            app_data["current_bankroll"],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+                        # Stocker dans la session pour précharger le formulaire
+                        st.session_state.temp_bet = {
+                            "fighter": fighter_a['name'],
+                            "odds": odds_a,
+                            "kelly_amount": red_kelly,
+                            "probability": red_prob_for_kelly
+                        }
+                        
+                        # Afficher le formulaire pour parier
+                        show_bet_form(
+                            fighter_a['name'], 
+                            fighter_b['name'], 
+                            fighter_a['name'], 
+                            odds_a, 
+                            red_kelly,
+                            red_prob_for_kelly,
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                
+                # Combattant Bleu
+                with col2:
+                    st.write(f"### 🔵 {fighter_b['name']}")
+                    
+                    # Créer une table pour les données du combattant bleu
+                    st.write("**Données de paris:**")
+                    blue_data = [
+                        ["Cote du marché", f"{betting_classic['odds_blue']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_blue']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['blue_probability']:.0%}"]
+                    ]
+                    
+                    if betting_ml:
+                        blue_data.append(["Probabilité ML", f"{ml_prediction['blue_probability']:.0%}"])
+                    
+                    blue_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_blue']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_blue']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    blue_df = pd.DataFrame(blue_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(blue_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_blue'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_blue'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_blue'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_blue'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant bleu
+                    if st.button(f"Parier sur {fighter_b['name']}", key="bet_on_blue_btn", use_container_width=True):
+                        # Calculer le montant Kelly pour ce combattant
+                        blue_prob_for_kelly = max(0.01, min(0.99, ml_prediction['blue_probability'] if ml_prediction else classic_prediction['blue_probability']))
+                        
+                        blue_kelly = calculate_kelly(
+                            blue_prob_for_kelly,
+                            odds_b,
+                            app_data["current_bankroll"],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+                        # Stocker dans la session pour précharger le formulaire
+                        st.session_state.temp_bet = {
+                            "fighter": fighter_b['name'],
+                            "odds": odds_b,
+                            "kelly_amount": blue_kelly,
+                            "probability": blue_prob_for_kelly
+                        }
+                        
+                        # Afficher le formulaire pour parier
+                        show_bet_form(
+                            fighter_a['name'], 
+                            fighter_b['name'], 
+                            fighter_b['name'], 
+                            odds_b, 
+                            blue_kelly,
+                            blue_prob_for_kelly,
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+            # PARTIE 8: Nouvel onglet avec les statistiques et graphiques
+            stats_tabs = st.tabs(["🔍 Statistiques", "📊 Graphiques", "📝 Notes"])
+            
+            # Onglet des statistiques
+            with stats_tabs[0]:
+                # Afficher les statistiques comparatives
+                st.subheader("📊 Statistiques comparatives")
+                
+                # Création du DataFrame des statistiques comparatives
+                stats_df = create_stats_comparison_df(fighter_a, fighter_b)
+                
+                # Appliquer un style conditionnel pour mettre en évidence les avantages
+                def highlight_advantage(row):
+                    styles = [''] * len(row)
+                    advantage = row['Avantage']
+                    
+                    if advantage == fighter_a['name']:
+                        styles[1] = 'background-color: rgba(229, 57, 53, 0.2); font-weight: bold;'
+                    elif advantage == fighter_b['name']:
+                        styles[2] = 'background-color: rgba(30, 136, 229, 0.2); font-weight: bold;'
+                    
+                    return styles
+                
+                # Appliquer le style et afficher avec un design plus moderne
+                styled_df = stats_df.style.apply(highlight_advantage, axis=1)
+                st.dataframe(
+                    styled_df, 
+                    use_container_width=True, 
+                    height=500,
+                    hide_index=True,
+                )
+            
+            # Onglet des visualisations
+            with stats_tabs[1]:
+                st.subheader("📈 Visualisations des performances")
+                
+                # Disposer les graphiques en deux colonnes
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Graphique radar
+                    radar_fig = create_radar_chart(fighter_a, fighter_b)
+                    st.plotly_chart(radar_fig, use_container_width=True, height=400)
+                
+                with col2:
+                    # Graphique des forces et faiblesses
+                    strengths_fig = create_strengths_weaknesses_chart(fighter_a, fighter_b)
+                    st.plotly_chart(strengths_fig, use_container_width=True, height=400)
+                
+                # Style de combat
+                style_fig = create_style_analysis_chart(fighter_a, fighter_b)
+                st.plotly_chart(style_fig, use_container_width=True)
+            
+            # Onglet des notes
+            with stats_tabs[2]:
+                st.subheader("📝 Notes d'analyse")
+                
+                # Analyse textuelle générée
+                # Déterminer les styles de combat
+                a_striking = fighter_a['SLpM'] * fighter_a['sig_str_acc']
+                a_ground = fighter_a['td_avg'] * fighter_a['td_acc'] + fighter_a['sub_avg']
+                a_style = "striker" if a_striking > a_ground * 1.5 else "grappler" if a_ground > a_striking * 1.5 else "équilibré"
+                
+                b_striking = fighter_b['SLpM'] * fighter_b['sig_str_acc']
+                b_ground = fighter_b['td_avg'] * fighter_b['td_acc'] + fighter_b['sub_avg']
+                b_style = "striker" if b_striking > b_ground * 1.5 else "grappler" if b_ground > b_striking * 1.5 else "équilibré"
+                
+                # Expérience
+                a_exp = fighter_a['wins'] + fighter_a['losses']
+                b_exp = fighter_b['wins'] + fighter_b['losses']
+                exp_diff = abs(a_exp - b_exp)
+                exp_advantage = f"{fighter_a['name']} a {exp_diff} combats de plus" if a_exp > b_exp else f"{fighter_b['name']} a {exp_diff} combats de plus" if b_exp > a_exp else "Les deux combattants ont le même niveau d'expérience"
+                
+                # Forme récente (à calculer à partir du record)
+                a_winrate = fighter_a['wins'] / max(a_exp, 1)
+                b_winrate = fighter_b['wins'] / max(b_exp, 1)
+                
+                # Stats physiques
+                height_diff = abs(fighter_a['height'] - fighter_b['height'])
+                reach_diff = abs(fighter_a['reach'] - fighter_b['reach'])
+                
+                physical_advantage = ""
+                if fighter_a['height'] > fighter_b['height'] and fighter_a['reach'] > fighter_b['reach']:
+                    physical_advantage = f"{fighter_a['name']} a un avantage de taille ({height_diff:.1f} cm) et d'allonge ({reach_diff:.1f} cm)"
+                elif fighter_b['height'] > fighter_a['height'] and fighter_b['reach'] > fighter_a['reach']:
+                    physical_advantage = f"{fighter_b['name']} a un avantage de taille ({height_diff:.1f} cm) et d'allonge ({reach_diff:.1f} cm)"
+                else:
+                    physical_advantage = "Les avantages physiques sont partagés entre les deux combattants"
+                
+                # Profil des combattants
+                st.write("#### Profil des combattants")
+                st.write(f"**{fighter_a['name']}** est un combattant de style **{a_style}** avec un taux de victoires de **{a_winrate:.0%}** sur {a_exp} combats.")
+                st.write(f"**{fighter_b['name']}** est un combattant de style **{b_style}** avec un taux de victoires de **{b_winrate:.0%}** sur {b_exp} combats.")
+                
+                # Facteurs clés
+                st.write("#### Facteurs clés du combat")
+                st.write(f"* **Expérience:** {exp_advantage}.")
+                st.write(f"* **Avantage physique:** {physical_advantage}.")
+                st.write(f"* **Dynamique du combat:** {fighter_a['name']} donne {fighter_a['SLpM']:.1f} coups par minute contre {fighter_b['SLpM']:.1f} pour {fighter_b['name']}.")
+                st.write(f"* **Facteur sol:** {fighter_a['name']} tente {fighter_a['td_avg']:.1f} takedowns par combat contre {fighter_b['td_avg']:.1f} pour {fighter_b['name']}.")
+                
+                # Points à surveiller
+                st.write("#### Points à surveiller")
+                st.write(f"Ce combat présente un affrontement de styles {a_style if a_style != b_style else 'similaires'}, où {fighter_a['name'] if a_winrate > b_winrate else fighter_b['name']} a l'avantage en termes d'historique de victoires.")
+                
+                if a_style != b_style:
+                    st.write(f"Le vainqueur sera probablement celui qui pourra imposer sa stratégie préférée: {fighter_a['name']} voudra maintenir le combat {a_style}, tandis que {fighter_b['name']} cherchera à l'amener vers une dynamique {b_style}.")
+                else:
+                    st.write("Les deux combattants auront des approches similaires, donc la technique et les adaptations en cours de combat seront déterminantes.")
+        else:
+            # Message d'accueil
+            st.info("Bienvenue sur le Prédicteur de Combats UFC! Sélectionnez deux combattants et cliquez sur 'Prédire le combat' pour obtenir une analyse complète.")
+            
+            # Message d'information
+            st.warning("⚠️ L'ordre des combattants est important! La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions. Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge.")
+
+
 
 def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probability, kelly_fraction):
     """Affiche un formulaire modernisé pour placer un pari"""
