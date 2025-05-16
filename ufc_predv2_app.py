@@ -1,3 +1,5 @@
+# PARTIE 1 
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -765,6 +767,42 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Correction des styles pour recommandations */
+    .recommendation-box {
+        margin-top: 15px;
+    }
+    
+    .recommendation-label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .recommendation-value {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .recommendation-favorable {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        border: 1px solid rgba(76, 175, 80, 0.5);
+    }
+    
+    .recommendation-neutral {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #FFC107;
+        border: 1px solid rgba(255, 193, 7, 0.5);
+    }
+    
+    .recommendation-unfavorable {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+        border: 1px solid rgba(244, 67, 54, 0.5);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -878,6 +916,9 @@ def make_request(url, max_retries=3, delay_range=(0.5, 1.5)):
         st.warning(f"Échec de la requête à {url}: {error_message}")
         
     return None
+
+
+# PARTIE 2 
 
 def split_fighter_names(text):
     """Sépare automatiquement les noms concaténés des combattants"""
@@ -1541,8 +1582,9 @@ def predict_both_methods(fighter_a, fighter_b, odds_a=0, odds_b=0, model=None, s
                 }
     
     return classic_prediction, ml_prediction
-    
-    
+
+# PARTIE 3 
+
 # FONCTIONS DE VISUALISATION AMÉLIORÉES
 @st.cache_data(ttl=3600)
 def create_radar_chart(fighter_a, fighter_b):
@@ -1982,6 +2024,7 @@ def init_bets_file():
     except Exception as e:
         st.error(f"Erreur lors de l'initialisation du fichier de paris: {e}")
 
+
 def calculate_kelly(prob, odds, bankroll, fraction=1):
     """
     Calcule la mise optimale selon le critère de Kelly fractionné
@@ -2372,10 +2415,10 @@ def get_betting_summary(bets_df):
         "current_streak": current_streak,
         "longest_win_streak": longest_win_streak,
         "current_streak_type": current_streak_type
-    }    
-    
-    
-    
+    }
+
+# PARTIE 4 
+
 # Initialiser l'état de session pour éviter le rechargement de page
 if 'prediction_result' not in st.session_state:
     st.session_state.prediction_result = None
@@ -2452,6 +2495,8 @@ def main():
     # Onglet historique et performance
     with tabs[4]:
         show_history_page()
+
+# PARTIE 5 
 
 def show_welcome_page():
     """Affiche la page d'accueil avec un design moderne et attrayant"""
@@ -2578,6 +2623,7 @@ def show_welcome_page():
             </div>
         </div>
         """, unsafe_allow_html=True)
+# PARTIE 6
 
 def show_prediction_page():
     """Interface de prédiction améliorée avec une meilleure organisation"""
@@ -2631,9 +2677,21 @@ def show_prediction_page():
             <div class="card-title">Options de paris</div>
         </div>
         """, unsafe_allow_html=True)
+
+        # Mode de saisie des cotes (manuel ou slider)
+        cote_input_mode = st.radio(
+            "Mode de saisie des cotes",
+            options=["Manuel", "Slider"],
+            index=0,  # Manuel par défaut
+            key="cote_input_mode"
+        )
         
-        odds_a = st.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.05, format="%.2f", key="odds_a_input")
-        odds_b = st.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.05, format="%.2f", key="odds_b_input")
+        if cote_input_mode == "Manuel":
+            odds_a = st.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.01, format="%.2f", key="odds_a_input_manual")
+            odds_b = st.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.01, format="%.2f", key="odds_b_input_manual")
+        else:
+            odds_a = st.slider("Cote Rouge", min_value=1.01, max_value=10.0, value=2.0, step=0.05, format="%.2f", key="odds_a_input_slider")
+            odds_b = st.slider("Cote Bleu", min_value=1.01, max_value=10.0, value=1.8, step=0.05, format="%.2f", key="odds_b_input_slider")
         
         # Stratégie Kelly
         st.markdown("### 📈 Critères Kelly")
@@ -2907,8 +2965,9 @@ def show_prediction_page():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-            
-            # Analyse Kelly et recommandations de paris
+# PARTIE 7 
+
+# Analyse Kelly et recommandations de paris
             if ml_prediction:
                 st.markdown("""
                 <div class="divider"></div>
@@ -2941,54 +3000,24 @@ def show_prediction_page():
                 # Calculer les recommandations Kelly pour le combattant favori selon le ML
                 kelly_amount = calculate_kelly(best_prob, best_odds, app_data["current_bankroll"], selected_fraction)
                 
-
                 # AMÉLIORATION UI: Section Kelly modernisée avec composants Streamlit natifs
-                st.markdown(f"""
-                <div class="kelly-box section-fade-in">
-                    <h3 class="kelly-title">Recommandation de mise avec la méthode {st.session_state.kelly_strategy}</h3>
-                    <p>Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:</p>
-                </div>
-                """, unsafe_allow_html=True)
-
-                # Utiliser un DataFrame pour la table
-                kelly_data = {
+                st.markdown("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
+                st.write("Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:")
+                
+                # Créer un DataFrame au lieu d'une table HTML
+                kelly_data = pd.DataFrame({
                     "Combattant": [best_fighter],
                     "Probabilité ML": [f"{best_prob:.0%}"],
                     "Cote": [f"{best_odds:.2f}"],
                     "Mise recommandée": [f"{kelly_amount:.2f} €"],
                     "% de bankroll": [f"{(kelly_amount/app_data['current_bankroll']*100):.1f}%"],
                     "Gain potentiel": [f"{kelly_amount * (best_odds-1):.2f} €"]
-                }
-                kelly_df = pd.DataFrame(kelly_data)
-                st.dataframe(kelly_df, use_container_width=True, hide_index=True)
-
-                st.markdown("""
-                <p style="margin-top:10px; color: rgba(255,255,255,0.7); font-style: italic;">
-                    Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.
-                </p>
-                """, unsafe_allow_html=True)               
+                })
                 
+                # Afficher le DataFrame avec style
+                st.dataframe(kelly_data, use_container_width=True, hide_index=True)
                 
-                
-                # Remplacer la section avec des composants Streamlit natifs
-                if ml_prediction:
-                    st.markdown("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
-                    st.write("Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:")
-                    
-                    # Créer un DataFrame au lieu d'une table HTML
-                    kelly_data = pd.DataFrame({
-                        "Combattant": [best_fighter],
-                        "Probabilité ML": [f"{best_prob:.0%}"],
-                        "Cote": [f"{best_odds:.2f}"],
-                        "Mise recommandée": [f"{kelly_amount:.2f} €"],
-                        "% de bankroll": [f"{(kelly_amount/app_data['current_bankroll']*100):.1f}%"],
-                        "Gain potentiel": [f"{kelly_amount * (best_odds-1):.2f} €"]
-                    })
-                    
-                    # Afficher le DataFrame avec style
-                    st.dataframe(kelly_data, use_container_width=True, hide_index=True)
-                    
-                    st.caption("Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.")
+                st.caption("Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.")
                 
                 # AMÉLIORATION UI: Section pour placer un pari modernisée
                 st.markdown(f"""
@@ -3112,6 +3141,10 @@ def show_prediction_page():
                     betting_classic = classic_prediction['betting']
                     betting_ml = ml_prediction.get('betting') if ml_prediction else None
                     
+                    # FIX: Utiliser des classes pour les recommandations pour garantir l'affichage
+                    rec_class_red = "recommendation-favorable" if betting_classic['recommendation_red'] == "Favorable" else "recommendation-neutral" if betting_classic['recommendation_red'] == "Neutre" else "recommendation-unfavorable"
+                    rec_ml_class_red = "recommendation-favorable" if betting_ml and betting_ml['recommendation_red'] == "Favorable" else "recommendation-neutral" if betting_ml and betting_ml['recommendation_red'] == "Neutre" else "recommendation-unfavorable"
+                    
                     # AMÉLIORATION UI: Affichage des données de paris avec un design card
                     st.markdown(f"""
                     <div class="betting-card betting-card-red">
@@ -3140,46 +3173,16 @@ def show_prediction_page():
                             <div style="font-weight: 600;">{betting_classic['ev_red']*100:.1f}%</div>
                         </div>
                         
-                        <div style="margin-top: 15px;">
-                            <div style="margin-bottom: 5px; font-weight: 500;">Recommandation statistique:</div>
-                            <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; 
-                                 background-color: {
-                                     '#4CAF5020' if betting_classic['recommendation_red'] == 'Favorable' 
-                                     else '#FFC10720' if betting_classic['recommendation_red'] == 'Neutre' 
-                                     else '#F4433620'
-                                 }; 
-                                 color: {
-                                     '#4CAF50' if betting_classic['recommendation_red'] == 'Favorable' 
-                                     else '#FFC107' if betting_classic['recommendation_red'] == 'Neutre' 
-                                     else '#F44336'
-                                 }; 
-                                 border: 1px solid {
-                                     '#4CAF5050' if betting_classic['recommendation_red'] == 'Favorable' 
-                                     else '#FFC10750' if betting_classic['recommendation_red'] == 'Neutre' 
-                                     else '#F4433650'
-                                 };">
+                        <div class="recommendation-box">
+                            <div class="recommendation-label">Recommandation statistique:</div>
+                            <div class="recommendation-value {rec_class_red}">
                                 {betting_classic['recommendation_red']}
                             </div>
                         </div>
                         
-                        {f'''<div style="margin-top: 10px;">
-                            <div style="margin-bottom: 5px; font-weight: 500;">Recommandation ML:</div>
-                            <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; 
-                                 background-color: {
-                                     '#4CAF5020' if betting_ml['recommendation_red'] == 'Favorable' 
-                                     else '#FFC10720' if betting_ml['recommendation_red'] == 'Neutre' 
-                                     else '#F4433620'
-                                 }; 
-                                 color: {
-                                     '#4CAF50' if betting_ml['recommendation_red'] == 'Favorable' 
-                                     else '#FFC107' if betting_ml['recommendation_red'] == 'Neutre' 
-                                     else '#F44336'
-                                 }; 
-                                 border: 1px solid {
-                                     '#4CAF5050' if betting_ml['recommendation_red'] == 'Favorable' 
-                                     else '#FFC10750' if betting_ml['recommendation_red'] == 'Neutre' 
-                                     else '#F4433650'
-                                 };">
+                        {f'''<div class="recommendation-box" style="margin-top: 10px;">
+                            <div class="recommendation-label">Recommandation ML:</div>
+                            <div class="recommendation-value {rec_ml_class_red}">
                                 {betting_ml['recommendation_red']}
                             </div>
                         </div>''' if betting_ml else ''}
@@ -3224,6 +3227,10 @@ def show_prediction_page():
                     </div>
                     """, unsafe_allow_html=True)
                     
+                    # FIX: Utiliser des classes pour les recommandations pour garantir l'affichage
+                    rec_class_blue = "recommendation-favorable" if betting_classic['recommendation_blue'] == "Favorable" else "recommendation-neutral" if betting_classic['recommendation_blue'] == "Neutre" else "recommendation-unfavorable"
+                    rec_ml_class_blue = "recommendation-favorable" if betting_ml and betting_ml['recommendation_blue'] == "Favorable" else "recommendation-neutral" if betting_ml and betting_ml['recommendation_blue'] == "Neutre" else "recommendation-unfavorable"
+                    
                     # AMÉLIORATION UI: Affichage des données de paris avec un design card
                     st.markdown(f"""
                     <div class="betting-card betting-card-blue">
@@ -3252,46 +3259,16 @@ def show_prediction_page():
                             <div style="font-weight: 600;">{betting_classic['ev_blue']*100:.1f}%</div>
                         </div>
                         
-                        <div style="margin-top: 15px;">
-                            <div style="margin-bottom: 5px; font-weight: 500;">Recommandation statistique:</div>
-                            <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; 
-                                 background-color: {
-                                     '#4CAF5020' if betting_classic['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC10720' if betting_classic['recommendation_blue'] == 'Neutre' 
-                                     else '#F4433620'
-                                 }; 
-                                 color: {
-                                     '#4CAF50' if betting_classic['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC107' if betting_classic['recommendation_blue'] == 'Neutre' 
-                                     else '#F44336'
-                                 }; 
-                                 border: 1px solid {
-                                     '#4CAF5050' if betting_classic['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC10750' if betting_classic['recommendation_blue'] == 'Neutre' 
-                                     else '#F4433650'
-                                 };">
+                        <div class="recommendation-box">
+                            <div class="recommendation-label">Recommandation statistique:</div>
+                            <div class="recommendation-value {rec_class_blue}">
                                 {betting_classic['recommendation_blue']}
                             </div>
                         </div>
                         
-                        {f'''<div style="margin-top: 10px;">
-                            <div style="margin-bottom: 5px; font-weight: 500;">Recommandation ML:</div>
-                            <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; 
-                                 background-color: {
-                                     '#4CAF5020' if betting_ml['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC10720' if betting_ml['recommendation_blue'] == 'Neutre' 
-                                     else '#F4433620'
-                                 }; 
-                                 color: {
-                                     '#4CAF50' if betting_ml['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC107' if betting_ml['recommendation_blue'] == 'Neutre' 
-                                     else '#F44336'
-                                 }; 
-                                 border: 1px solid {
-                                     '#4CAF5050' if betting_ml['recommendation_blue'] == 'Favorable' 
-                                     else '#FFC10750' if betting_ml['recommendation_blue'] == 'Neutre' 
-                                     else '#F4433650'
-                                 };">
+                        {f'''<div class="recommendation-box" style="margin-top: 10px;">
+                            <div class="recommendation-label">Recommandation ML:</div>
+                            <div class="recommendation-value {rec_ml_class_blue}">
                                 {betting_ml['recommendation_blue']}
                             </div>
                         </div>''' if betting_ml else ''}
@@ -3326,8 +3303,10 @@ def show_prediction_page():
                             ml_prediction['blue_probability'] if ml_prediction else classic_prediction['blue_probability'],
                             kelly_fractions[st.session_state.kelly_strategy]
                         )
-            
-            # AMÉLIORATION UI: Nouvel onglet avec les statistiques et graphiques
+                        
+# PARTIE 8
+
+# AMÉLIORATION UI: Nouvel onglet avec les statistiques et graphiques
             stats_tabs = st.tabs(["🔍 Statistiques", "📊 Graphiques", "📝 Notes"])
             
             # Onglet des statistiques
@@ -3510,7 +3489,6 @@ def show_prediction_page():
             """, unsafe_allow_html=True)
 
 
-
 def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probability, kelly_fraction):
     """Affiche un formulaire modernisé pour placer un pari"""
     # AMÉLIORATION UI: Box de placement de paris améliorée
@@ -3532,16 +3510,36 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
         event_date = st.date_input("Date de l'événement", value=datetime.datetime.now(), key="bet_event_date")
     
     with bet_cols[1]:
-        # Montant à miser avec slider pour une meilleure UX
-        bet_amount = st.slider(
-            "Montant à miser (€)",
-            min_value=0.0,
-            max_value=float(app_data["current_bankroll"]),
-            value=float(kelly_amount),
-            step=5.0,
-            format="%.2f",
-            key="place_bet_amount"
+        # Mode de saisie pour le montant à miser
+        bet_input_mode = st.radio(
+            "Mode de saisie du montant",
+            options=["Manuel", "Slider"],
+            index=0,  # Manuel par défaut
+            key="bet_input_mode"
         )
+        
+        if bet_input_mode == "Manuel":
+            # Montant à miser - saisie manuelle
+            bet_amount = st.number_input(
+                "Montant à miser (€)",
+                min_value=0.0,
+                max_value=float(app_data["current_bankroll"]),
+                value=float(kelly_amount),
+                step=5.0,
+                format="%.2f",
+                key="place_bet_amount_manual"
+            )
+        else:
+            # Montant à miser avec slider pour une meilleure UX
+            bet_amount = st.slider(
+                "Montant à miser (€)",
+                min_value=0.0,
+                max_value=float(app_data["current_bankroll"]),
+                value=float(kelly_amount),
+                step=5.0,
+                format="%.2f",
+                key="place_bet_amount_slider"
+            )
         
         # Utiliser la mise Kelly recommandée
         use_kelly = st.checkbox("Utiliser la mise Kelly recommandée", value=True, key="place_use_kelly")
@@ -3639,6 +3637,8 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
                     """, unsafe_allow_html=True)
                 else:
                     st.error("❌ Erreur lors de l'enregistrement du pari.")
+
+# PARTIE 9 
 
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
@@ -3753,6 +3753,14 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             'probability': winner_prob
         })
     
+    # AMÉLIORATION UI: Mode de saisie des cotes (manuel vs slider)
+    odds_input_mode = st.radio(
+        "Mode de saisie des cotes",
+        options=["Manuel", "Slider"],
+        index=0,  # Manuel par défaut
+        key=f"odds_input_mode_{event_url}"
+    )
+    
     # AMÉLIORATION UI: Afficher les combats en grille responsive
     if bettable_fights:
         # Créer des rangées de 2 combats chacune
@@ -3787,16 +3795,28 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     if odds_key not in st.session_state[f"odds_dict_{event_url}"]:
                         st.session_state[f"odds_dict_{event_url}"][odds_key] = 2.0
                     
-                    # Champ de saisie de la cote avec slider pour meilleure UX
-                    odds = st.slider(
-                        "Cote",
-                        min_value=1.01,
-                        max_value=10.0,
-                        value=st.session_state[f"odds_dict_{event_url}"][odds_key],
-                        step=0.05,
-                        format="%.2f",
-                        key=f"input_{odds_key}"
-                    )
+                    # Selon le mode de saisie choisi
+                    if odds_input_mode == "Manuel":
+                        # Saisie manuelle de la cote
+                        odds = st.number_input(
+                            "Cote",
+                            min_value=1.01,
+                            value=st.session_state[f"odds_dict_{event_url}"][odds_key],
+                            step=0.01,
+                            format="%.2f",
+                            key=f"manual_{odds_key}"
+                        )
+                    else:
+                        # Saisie avec slider
+                        odds = st.slider(
+                            "Cote",
+                            min_value=1.01,
+                            max_value=10.0,
+                            value=st.session_state[f"odds_dict_{event_url}"][odds_key],
+                            step=0.05,
+                            format="%.2f",
+                            key=f"slider_{odds_key}"
+                        )
                     
                     # Ajouter la cote au combat
                     fight['odds'] = odds
@@ -4424,6 +4444,10 @@ def show_upcoming_events_page():
                                         method = "Statistique"
                                         consensus = True  # Pas de comparaison possible
                                     
+                                    # FIX: Correction de l'affichage de la barre de probabilité
+                                    red_prob_pct = red_prob * 100
+                                    blue_prob_pct = blue_prob * 100
+                                    
                                     # AMÉLIORATION UI: Carte de combat modernisée
                                     st.markdown(f"""
                                     <div class="fight-card-improved">
@@ -4435,10 +4459,10 @@ def show_upcoming_events_page():
                                         
                                         <div class="probability-container">
                                             <div class="probability-bar">
-                                                <div class="probability-bar-red" style="width: {red_prob*100}%">
+                                                <div class="probability-bar-red" style="width: {red_prob_pct}%">
                                                     {red_prob:.0%}
                                                 </div>
-                                                <div class="probability-bar-blue" style="width: {blue_prob*100}%">
+                                                <div class="probability-bar-blue" style="width: {blue_prob_pct}%">
                                                     {blue_prob:.0%}
                                                 </div>
                                             </div>
@@ -4550,6 +4574,9 @@ def show_upcoming_events_page():
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+# PARTIE 10
+
 
 def show_bankroll_page():
     """Affiche la page de gestion de bankroll avec une interface améliorée"""
@@ -4739,18 +4766,49 @@ def show_bankroll_page():
         bet_cols = st.columns(3)
         with bet_cols[0]:
             manual_pick = st.selectbox("Pari sur", options=[manual_fighter_red, manual_fighter_blue], key="manual_pick")
+        
+        # Mode de saisie de la cote (manuel vs slider)
         with bet_cols[1]:
-            manual_odds = st.number_input("Cote", min_value=1.01, value=2.0, step=0.05, format="%.2f", key="manual_odds")
-        with bet_cols[2]:
-            # AMÉLIORATION UI: Utiliser un slider pour la mise
-            manual_stake = st.slider(
-                "Mise (€)",
-                min_value=0.0, 
-                max_value=float(app_data['current_bankroll']),
-                value=min(50.0, float(app_data['current_bankroll'])),
-                step=5.0,
-                key="manual_stake"
+            manual_odds_mode = st.radio(
+                "Mode de saisie de la cote",
+                options=["Manuel", "Slider"],
+                index=0,  # Manuel par défaut
+                key="manual_odds_mode"
             )
+            
+            if manual_odds_mode == "Manuel":
+                manual_odds = st.number_input("Cote", min_value=1.01, value=2.0, step=0.01, format="%.2f", key="manual_odds_manual")
+            else:
+                manual_odds = st.slider("Cote", min_value=1.01, max_value=10.0, value=2.0, step=0.05, format="%.2f", key="manual_odds_slider")
+        
+        with bet_cols[2]:
+            # Mode de saisie de la mise (manuel vs slider)
+            manual_stake_mode = st.radio(
+                "Mode de saisie de la mise",
+                options=["Manuel", "Slider"],
+                index=0,  # Manuel par défaut
+                key="manual_stake_mode"
+            )
+            
+            if manual_stake_mode == "Manuel":
+                manual_stake = st.number_input(
+                    "Mise (€)",
+                    min_value=0.0, 
+                    max_value=float(app_data['current_bankroll']),
+                    value=min(50.0, float(app_data['current_bankroll'])),
+                    step=5.0,
+                    key="manual_stake_manual"
+                )
+            else:
+                # AMÉLIORATION UI: Utiliser un slider pour la mise
+                manual_stake = st.slider(
+                    "Mise (€)",
+                    min_value=0.0, 
+                    max_value=float(app_data['current_bankroll']),
+                    value=min(50.0, float(app_data['current_bankroll'])),
+                    step=5.0,
+                    key="manual_stake_slider"
+                )
         
         # AMÉLIORATION UI: Calculer et afficher le gain potentiel
         potential_profit = manual_stake * (manual_odds - 1)
@@ -5178,7 +5236,7 @@ def show_history_page():
                     
                     display_closed_bets['formatted_result'] = display_closed_bets['result'].apply(format_result)
                     
-                    # Sélectionner et renommer les colonnes
+# Sélectionner et renommer les colonnes
                     display_closed_bets = display_closed_bets[["bet_id", "event_name", "event_date", "fighter_red", "fighter_blue", "pick", "odds", "stake", "formatted_result", "profit", "roi"]]
                     display_closed_bets.columns = ["ID", "Événement", "Date", "Rouge", "Bleu", "Pari sur", "Cote", "Mise (€)", "Résultat", "Profit (€)", "ROI (%)"]
                     
@@ -5323,40 +5381,24 @@ def show_history_page():
                             
                             st.plotly_chart(fig_finances, use_container_width=True)
                     
-
-                                            
-                        with analysis_tabs[1]:
-                            # Convertir la date pour le graphique
-                            perf_df = closed_bets.copy()
-                            
-                            # CORRECTION: Vérifier le nom correct de la colonne date
-                            if "Date" in perf_df.columns:
-                                date_column = "Date"
-                            elif "event_date" in perf_df.columns:
-                                date_column = "event_date"
-                            else:
-                                # Créer une colonne date par défaut si aucune n'existe
-                                perf_df["date_column"] = pd.to_datetime("today")
-                                date_column = "date_column"
-                            
-                            perf_df[date_column] = pd.to_datetime(perf_df[date_column])
-                            perf_df = perf_df.sort_values(date_column)
-
-                            # Calculer le profit cumulatif
-                            perf_df["profit_cumul"] = perf_df["Profit (€)"].cumsum()
-                            
-                            # Utiliser la bonne colonne date dans le graphique
-                            fig_profit = px.line(
-                                perf_df,
-                                x=date_column,
-                                y="profit_cumul",
-                                title="Évolution du profit cumulé",
-                                markers=True
-                            )
-                            
-                            
-    
-
+                    # FIX: Correction du code pour l'onglet Performance (avec profit_cumul)
+                    with analysis_tabs[1]:
+                        # Convertir la date pour le graphique
+                        perf_df = display_closed_bets.copy()  # Utiliser display_closed_bets au lieu de closed_bets
+                        perf_df["Date"] = pd.to_datetime(perf_df["Date"])
+                        perf_df = perf_df.sort_values("Date")
+                        
+                        # Calculer le profit cumulatif
+                        perf_df["profit_cumul"] = perf_df["Profit (€)"].cumsum()
+                        
+                        # Créer le graphique d'évolution du profit
+                        fig_profit = px.line(
+                            perf_df,
+                            x="Date",
+                            y="profit_cumul",
+                            title="Évolution du profit cumulé",
+                            markers=True
+                        )
                         
                         fig_profit.update_traces(
                             line=dict(width=3, color='#4CAF50'),
@@ -5383,8 +5425,8 @@ def show_history_page():
                         # Ajouter une ligne horizontale à zéro
                         fig_profit.add_shape(
                             type="line",
-                            x0=perf_df[date_column].min(),
-                            x1=perf_df[date_column].max(),
+                            x0=perf_df["Date"].min(),
+                            x1=perf_df["Date"].max(),
                             y0=0,
                             y1=0,
                             line=dict(color="rgba(255,255,255,0.3)", width=1, dash="dash")
@@ -5394,7 +5436,7 @@ def show_history_page():
                         
                         # Graphique ROI par cote
                         roi_by_odds = px.scatter(
-                            closed_bets,
+                            display_closed_bets,
                             x="Cote",
                             y="ROI (%)",
                             title="ROI par rapport à la cote",
@@ -5427,8 +5469,8 @@ def show_history_page():
                         # Ajouter une ligne horizontale à zéro
                         roi_by_odds.add_shape(
                             type="line",
-                            x0=closed_bets["Cote"].min(),
-                            x1=closed_bets["Cote"].max(),
+                            x0=display_closed_bets["Cote"].min(),
+                            x1=display_closed_bets["Cote"].max(),
                             y0=0,
                             y1=0,
                             line=dict(color="rgba(255,255,255,0.3)", width=1, dash="dash")
@@ -5439,16 +5481,18 @@ def show_history_page():
                     # Onglet Détails
                     with analysis_tabs[2]:
                         # Métrique par mois
-                        if not closed_bets.empty and "Date" in closed_bets.columns:
-                            closed_bets["Date"] = pd.to_datetime(closed_bets["Date"])
-                            closed_bets["Mois"] = closed_bets["Date"].dt.strftime("%Y-%m")
+                        if not display_closed_bets.empty and "Date" in display_closed_bets.columns:
+                            # Convertir la date au format datetime si ce n'est pas déjà fait
+                            display_closed_bets["Date"] = pd.to_datetime(display_closed_bets["Date"])
+                            display_closed_bets["Mois"] = display_closed_bets["Date"].dt.strftime("%Y-%m")
                             
-                            monthly_stats = closed_bets.groupby("Mois").agg({
+                            monthly_stats = display_closed_bets.groupby("Mois").agg({
                                 "ID": "count",
                                 "Profit (€)": "sum",
                                 "Mise (€)": "sum"
                             }).reset_index()
                             
+                            # Calculer le ROI mensuel
                             monthly_stats["ROI (%)"] = monthly_stats["Profit (€)"] / monthly_stats["Mise (€)"] * 100
                             monthly_stats.columns = ["Mois", "Nombre de paris", "Profit (€)", "Total misé (€)", "ROI (%)"]
                             
@@ -5779,9 +5823,7 @@ def show_history_page():
                         key="download_bankroll_btn",
                         use_container_width=True
                     )
-
 # Lancer l'application
 if __name__ == "__main__":
     main()
-
-
+    
