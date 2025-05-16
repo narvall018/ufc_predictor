@@ -2625,37 +2625,25 @@ def show_welcome_page():
         """, unsafe_allow_html=True)
 # PARTIE 6
 
+
 def show_prediction_page():
     """Interface de prédiction améliorée avec une meilleure organisation"""
-    # AMÉLIORATION UI: Section titre avec animation
-    st.markdown("""
-    <div class="section-fade-in" style="text-align:center; margin-bottom: 25px;">
-        <h2>🎯 Prédicteur de Combat</h2>
-        <p style="color: #aaa;">Sélectionnez deux combattants et obtenez des prédictions précises</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # AMÉLIORATION UI: Section titre 
+    st.title("🎯 Prédicteur de Combat")
+    st.write("Sélectionnez deux combattants et obtenez des prédictions précises")
     
     # AMÉLIORATION UI: Layout à deux colonnes
     main_cols = st.columns([1, 3])
     
     with main_cols[0]:
-        # AMÉLIORATION UI: Sélection des combattants regroupée dans un card
-        st.markdown("""
-        <div class="card">
-            <div class="card-title">Sélection des combattants</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # AMÉLIORATION UI: Sélection des combattants
+        st.subheader("Sélection des combattants")
         
         # Message d'avertissement sur l'importance de l'ordre des combattants
-        st.markdown("""
-        <div class="info-box">
-            <b>⚠️ Important :</b> L'ordre des combattants (Rouge/Bleu) influence les prédictions. 
-            Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.
-        </div>
-        """, unsafe_allow_html=True)
+        st.warning("⚠️ Important : L'ordre des combattants (Rouge/Bleu) influence les prédictions. Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.")
         
         # Sélection du combattant rouge
-        st.markdown("### 🔴 Combattant Rouge")
+        st.subheader("🔴 Combattant Rouge")
         fighter_a_name = st.selectbox(
             "Sélectionner combattant rouge",
             options=app_data["fighter_names"],
@@ -2663,7 +2651,7 @@ def show_prediction_page():
         )
         
         # Sélection du combattant bleu (en excluant le combattant rouge)
-        st.markdown("### 🔵 Combattant Bleu")
+        st.subheader("🔵 Combattant Bleu")
         fighter_b_options = [name for name in app_data["fighter_names"] if name != fighter_a_name]
         fighter_b_name = st.selectbox(
             "Sélectionner combattant bleu",
@@ -2672,11 +2660,7 @@ def show_prediction_page():
         )
         
         # Options de paris
-        st.markdown("""
-        <div class="card" style="margin-top: 20px;">
-            <div class="card-title">Options de paris</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.subheader("Options de paris")
 
         # Mode de saisie des cotes (manuel ou slider)
         cote_input_mode = st.radio(
@@ -2694,7 +2678,7 @@ def show_prediction_page():
             odds_b = st.slider("Cote Bleu", min_value=1.01, max_value=10.0, value=1.8, step=0.05, format="%.2f", key="odds_b_input_slider")
         
         # Stratégie Kelly
-        st.markdown("### 📈 Critères Kelly")
+        st.subheader("📈 Critères Kelly")
         kelly_strategy = st.selectbox(
             "Stratégie Kelly",
             options=["Kelly pur", "Kelly/2", "Kelly/3", "Kelly/4", "Kelly/5", "Kelly/10"],
@@ -2704,7 +2688,7 @@ def show_prediction_page():
         st.session_state.kelly_strategy = kelly_strategy
         
         # Bankroll actuelle
-        st.markdown("### 💼 Bankroll actuelle")
+        st.subheader("💼 Bankroll actuelle")
         st.metric(
             "",
             f"{app_data['current_bankroll']:.2f} €", 
@@ -2762,38 +2746,20 @@ def show_prediction_page():
             odds_a = result['odds_a']
             odds_b = result['odds_b']
             
-            # AMÉLIORATION UI: Afficher une vue en tête-à-tête des combattants
-            st.markdown("""
-            <div class="card section-fade-in">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div style="flex: 1; text-align: center;">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #E53935;">🔴</div>
-                        <div style="font-size: 1.4rem; font-weight: 600; color: #E53935;">{0}</div>
-                        <div style="color: #aaa; font-size: 0.9rem;">Record: {1}-{2}</div>
-                    </div>
-                    <div style="font-size: 1.8rem; margin: 0 20px;">VS</div>
-                    <div style="flex: 1; text-align: center;">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #1E88E5;">🔵</div>
-                        <div style="font-size: 1.4rem; font-weight: 600; color: #1E88E5;">{3}</div>
-                        <div style="color: #aaa; font-size: 0.9rem;">Record: {4}-{5}</div>
-                    </div>
-                </div>
-            </div>
-            """.format(
-                fighter_a['name'], 
-                fighter_a['wins'], 
-                fighter_a['losses'], 
-                fighter_b['name'], 
-                fighter_b['wins'], 
-                fighter_b['losses']
-            ), unsafe_allow_html=True)
+            # Afficher une vue en tête-à-tête des combattants
+            st.subheader("Combat")
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col1:
+                st.write(f"### 🔴 {fighter_a['name']}")
+                st.write(f"Record: {fighter_a['wins']}-{fighter_a['losses']}")
+            with col2:
+                st.write("## VS")
+            with col3:
+                st.write(f"### 🔵 {fighter_b['name']}")
+                st.write(f"Record: {fighter_b['wins']}-{fighter_b['losses']}")
             
             # Afficher les résultats des deux prédictions
-            st.markdown("""
-            <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
-                <h2>🔮 Prédictions du combat</h2>
-            </div>
-            """, unsafe_allow_html=True)
+            st.subheader("🔮 Prédictions du combat")
             
             # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
             if ml_prediction:
@@ -2828,7 +2794,7 @@ def show_prediction_page():
                     hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
                 ))
                 
-                # Configurer la mise en page moderne
+                # Configurer la mise en page
                 fig.update_layout(
                     title=None,
                     xaxis_title=None,
@@ -2863,7 +2829,7 @@ def show_prediction_page():
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 # Si seulement la méthode statistique est disponible
-                # AMÉLIORATION UI: Graphique modernisé pour la méthode unique
+                # Graphique modernisé pour la méthode unique
                 fig = go.Figure()
                 fig.add_trace(go.Bar(
                     x=[fighter_a['name'], fighter_b['name']],
@@ -2901,80 +2867,49 @@ def show_prediction_page():
             
             # Afficher la prédiction statistique
             with pred_cols[0]:
-                winner_color = "#E53935" if classic_prediction['prediction'] == 'Red' else "#1E88E5"
+                winner_color = "red" if classic_prediction['prediction'] == 'Red' else "blue"
                 winner_name = classic_prediction['winner_name']
                 
-                # AMÉLIORATION UI: Box de prédiction modernisée
-                st.markdown(f"""
-                <div class="prediction-box section-fade-in">
-                    <div style="text-align:center;">
-                        <span class="classic-badge">Prédiction statistique</span>
-                    </div>
-                    <h3 style="text-align:center; color:{winner_color}; margin: 15px 0;" class="winner">
-                        🏆 {winner_name} 🏆
-                    </h3>
-                    <div style="text-align:center; font-size:1.1em; margin: 10px 0;">
-                        <span class="red-fighter">{classic_prediction['red_probability']:.0%}</span> pour {fighter_a['name']}, 
-                        <span class="blue-fighter">{classic_prediction['blue_probability']:.0%}</span> pour {fighter_b['name']}
-                    </div>
-                    <div style="text-align:center; margin-top: 10px;">
-                        <span class="badge" style="background-color: {('#4CAF50' if classic_prediction['confidence'] == 'Élevé' else '#FFC107')};">
-                            Confiance: {classic_prediction['confidence']}
-                        </span>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                # Box de prédiction statistique améliorée
+                st.write("### Prédiction statistique")
+                st.write(f"**Vainqueur prédit:** {winner_name}")
+                st.write(f"**Probabilités:** {classic_prediction['red_probability']:.0%} pour {fighter_a['name']}, {classic_prediction['blue_probability']:.0%} pour {fighter_b['name']}")
+                
+                confidence = classic_prediction['confidence']
+                if confidence == "Élevé":
+                    st.success(f"Confiance: {confidence}")
+                else:
+                    st.warning(f"Confiance: {confidence}")
 
             # Afficher la prédiction ML si disponible
             if ml_prediction:
                 with pred_cols[1]:
-                    winner_color_ml = "#E53935" if ml_prediction['prediction'] == 'Red' else "#1E88E5"
+                    winner_color_ml = "red" if ml_prediction['prediction'] == 'Red' else "blue"
                     winner_name_ml = ml_prediction['winner_name']
                     
-                    # AMÉLIORATION UI: Box de prédiction ML modernisée
-                    st.markdown(f"""
-                    <div class="prediction-box section-fade-in">
-                        <div style="text-align:center;">
-                            <span class="ml-badge">Prédiction Machine Learning</span>
-                        </div>
-                        <h3 style="text-align:center; color:{winner_color_ml}; margin: 15px 0;" class="winner">
-                            🏆 {winner_name_ml} 🏆
-                        </h3>
-                        <div style="text-align:center; font-size:1.1em; margin: 10px 0;">
-                            <span class="red-fighter">{ml_prediction['red_probability']:.0%}</span> pour {fighter_a['name']}, 
-                            <span class="blue-fighter">{ml_prediction['blue_probability']:.0%}</span> pour {fighter_b['name']}
-                        </div>
-                        <div style="text-align:center; margin-top: 10px;">
-                            <span class="badge" style="background-color: {('#4CAF50' if ml_prediction['confidence'] == 'Élevé' else '#FFC107')};">
-                                Confiance: {ml_prediction['confidence']}
-                            </span>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Box de prédiction ML améliorée
+                    st.write("### Prédiction Machine Learning")
+                    st.write(f"**Vainqueur prédit:** {winner_name_ml}")
+                    st.write(f"**Probabilités:** {ml_prediction['red_probability']:.0%} pour {fighter_a['name']}, {ml_prediction['blue_probability']:.0%} pour {fighter_b['name']}")
+                    
+                    confidence_ml = ml_prediction['confidence']
+                    if confidence_ml == "Élevé":
+                        st.success(f"Confiance: {confidence_ml}")
+                    else:
+                        st.warning(f"Confiance: {confidence_ml}")
             
             # Message de convergence/divergence si les deux méthodes sont disponibles
             if ml_prediction:
                 same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
-                agreement_message = "✅ Les deux méthodes prédisent le même vainqueur!" if same_prediction else "⚠️ Les méthodes prédisent des vainqueurs différents!"
-                agreement_color = "#4CAF50" if same_prediction else "#FFC107"
+                if same_prediction:
+                    st.success("✅ Les deux méthodes prédisent le même vainqueur!")
+                else:
+                    st.warning("⚠️ Les méthodes prédisent des vainqueurs différents!")
                 
-                st.markdown(f"""
-                <div style="text-align:center; margin: 20px 0;">
-                    <div style="display: inline-block; padding: 8px 16px; border-radius: 20px; background-color: {agreement_color}30; border: 1px solid {agreement_color};">
-                        <span style="color:{agreement_color}; font-weight: 600;">{agreement_message}</span>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-# PARTIE 7 
-
-# Analyse Kelly et recommandations de paris
+            # PARTIE 7: Analyse Kelly et recommandations de paris
             if ml_prediction:
-                st.markdown("""
-                <div class="divider"></div>
-                <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
-                    <h2>📊 Analyse Kelly et recommandations de paris</h2>
-                </div>
-                """, unsafe_allow_html=True)
+                st.divider()
+                st.subheader("📊 Analyse Kelly et recommandations de paris")
                 
                 # Obtenir la fraction Kelly sélectionnée
                 kelly_fractions = {
@@ -3000,8 +2935,8 @@ def show_prediction_page():
                 # Calculer les recommandations Kelly pour le combattant favori selon le ML
                 kelly_amount = calculate_kelly(best_prob, best_odds, app_data["current_bankroll"], selected_fraction)
                 
-                # AMÉLIORATION UI: Section Kelly modernisée avec composants Streamlit natifs
-                st.markdown("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
+                # Section Kelly modernisée avec composants Streamlit natifs
+                st.write("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
                 st.write("Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:")
                 
                 # Créer un DataFrame au lieu d'une table HTML
@@ -3019,12 +2954,8 @@ def show_prediction_page():
                 
                 st.caption("Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.")
                 
-                # AMÉLIORATION UI: Section pour placer un pari modernisée
-                st.markdown(f"""
-                <div class="bet-placement-box section-fade-in">
-                    <h3 class="bet-placement-title">Placer un pari sur {best_fighter}</h3>
-                </div>
-                """, unsafe_allow_html=True)
+                # Section pour placer un pari modernisée
+                st.subheader(f"Placer un pari sur {best_fighter}")
                 
                 # Colonnes pour les informations du pari
                 bet_cols = st.columns(2)
@@ -3053,7 +2984,7 @@ def show_prediction_page():
                     if use_kelly:
                         bet_amount = kelly_amount
                 
-                # AMÉLIORATION UI: Afficher les détails du pari avec un design attractif
+                # Afficher les détails du pari avec un design attractif
                 pot_gain = bet_amount * (best_odds-1)
                 roi_pct = (pot_gain / bet_amount) * 100 if bet_amount > 0 else 0
                 
@@ -3087,109 +3018,74 @@ def show_prediction_page():
                                 model_probability=best_prob,
                                 kelly_fraction=selected_fraction
                             ):
-                                # AMÉLIORATION UI: Message de succès avec détails
+                                # Message de succès avec détails
                                 st.success(f"Pari enregistré avec succès! {bet_amount:.2f}€ sur {best_fighter} @ {best_odds:.2f}")
                                 
                                 # Ajouter un petit délai pour l'animation
                                 time.sleep(0.5)
                                 
-                                # AMÉLIORATION UI: Afficher une carte de confirmation animée
-                                st.markdown(f"""
-                                <div class="card section-fade-in" style="background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%); 
-                                                                         border: 1px solid rgba(76, 175, 80, 0.3);">
-                                    <div style="text-align: center;">
-                                        <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
-                                        <h3 style="margin-bottom: 15px; color: #4CAF50;">Pari enregistré avec succès</h3>
-                                        <div style="font-weight: 600; font-size: 1.1rem;">{best_fighter} @ {best_odds:.2f}</div>
-                                        <div style="display: flex; justify-content: space-between; margin: 15px 0; color: rgba(255,255,255,0.8);">
-                                            <div>Mise: <b>{bet_amount:.2f}€</b></div>
-                                            <div>Gain potentiel: <b>{pot_gain:.2f}€</b></div>
-                                            <div>ROI: <b>{roi_pct:.1f}%</b></div>
-                                        </div>
-                                        <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
-                                            Vous pouvez suivre ce pari dans l'onglet "Gestion de Bankroll"
-                                        </div>
-                                    </div>
-                                </div>
-                                """, unsafe_allow_html=True)
+                                # Afficher une confirmation
+                                st.info(f"Vous avez parié {bet_amount:.2f}€ sur {best_fighter}. Gain potentiel: {pot_gain:.2f}€ (ROI: {roi_pct:.1f}%)")
+                                st.write("Vous pouvez suivre ce pari dans l'onglet 'Gestion de Bankroll'")
                             else:
                                 st.error("Erreur lors de l'enregistrement du pari.")
             
             # Analyse des paris (utiliser les deux méthodes si disponibles)
             if 'betting' in classic_prediction:
-                st.markdown("""
-                <div class="divider"></div>
-                <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
-                    <h2>💰 Analyse des paris</h2>
-                    <p style="color: #aaa;">Comparaison des cotes du marché avec nos probabilités prédites</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.divider()
+                st.subheader("💰 Analyse des paris")
+                st.write("Comparaison des cotes du marché avec nos probabilités prédites")
                 
                 # Analyse des paris pour les deux combattants avec un design modernisé
                 col1, col2 = st.columns(2)
                 
-                # AMÉLIORATION UI: Combattant Rouge - Carte de paris modernisée
+                # Combattant Rouge
                 with col1:
-                    # Entête avec style
-                    st.markdown(f"""
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <span style="font-size: 1.5rem; font-weight: 600; color: #E53935;">🔴 {fighter_a['name']}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.write(f"### 🔴 {fighter_a['name']}")
                     
-                    # Créer un DataFrame pour les données du pari
+                    # Données de paris
                     betting_classic = classic_prediction['betting']
                     betting_ml = ml_prediction.get('betting') if ml_prediction else None
                     
-                    # FIX: Utiliser des classes pour les recommandations pour garantir l'affichage
-                    rec_class_red = "recommendation-favorable" if betting_classic['recommendation_red'] == "Favorable" else "recommendation-neutral" if betting_classic['recommendation_red'] == "Neutre" else "recommendation-unfavorable"
-                    rec_ml_class_red = "recommendation-favorable" if betting_ml and betting_ml['recommendation_red'] == "Favorable" else "recommendation-neutral" if betting_ml and betting_ml['recommendation_red'] == "Neutre" else "recommendation-unfavorable"
+                    # Créer une table pour les données du combattant rouge
+                    st.write("**Données de paris:**")
+                    red_data = [
+                        ["Cote du marché", f"{betting_classic['odds_red']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_red']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['red_probability']:.0%}"]
+                    ]
                     
-                    # AMÉLIORATION UI: Affichage des données de paris avec un design card
-                    st.markdown(f"""
-                    <div class="betting-card betting-card-red">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Cote du marché</div>
-                            <div style="font-weight: 600;">{betting_classic['odds_red']:.2f}</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité implicite</div>
-                            <div style="font-weight: 600;">{betting_classic['implied_prob_red']:.0%}</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité statistique</div>
-                            <div style="font-weight: 600;">{classic_prediction['red_probability']:.0%}</div>
-                        </div>
-                        {f'''<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité ML</div>
-                            <div style="font-weight: 600;">{ml_prediction['red_probability']:.0%}</div>
-                        </div>''' if betting_ml else ''}
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Avantage statistique</div>
-                            <div style="font-weight: 600;">{betting_classic['edge_red']*100:.1f}%</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                            <div>Valeur espérée</div>
-                            <div style="font-weight: 600;">{betting_classic['ev_red']*100:.1f}%</div>
-                        </div>
-                        
-                        <div class="recommendation-box">
-                            <div class="recommendation-label">Recommandation statistique:</div>
-                            <div class="recommendation-value {rec_class_red}">
-                                {betting_classic['recommendation_red']}
-                            </div>
-                        </div>
-                        
-                        {f'''<div class="recommendation-box" style="margin-top: 10px;">
-                            <div class="recommendation-label">Recommandation ML:</div>
-                            <div class="recommendation-value {rec_ml_class_red}">
-                                {betting_ml['recommendation_red']}
-                            </div>
-                        </div>''' if betting_ml else ''}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    if betting_ml:
+                        red_data.append(["Probabilité ML", f"{ml_prediction['red_probability']:.0%}"])
                     
-                    # Ajouter un bouton pour parier sur le combattant rouge
+                    red_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_red']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_red']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    red_df = pd.DataFrame(red_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(red_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_red'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_red'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_red'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_red'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant rouge
                     if st.button(f"Parier sur {fighter_a['name']}", key="bet_on_red_btn", use_container_width=True):
                         # Calculer le montant Kelly pour ce combattant
                         red_kelly = calculate_kelly(
@@ -3218,64 +3114,49 @@ def show_prediction_page():
                             kelly_fractions[st.session_state.kelly_strategy]
                         )
                 
-                # AMÉLIORATION UI: Combattant Bleu - Carte de paris modernisée
+                # Combattant Bleu
                 with col2:
-                    # Entête avec style
-                    st.markdown(f"""
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <span style="font-size: 1.5rem; font-weight: 600; color: #1E88E5;">🔵 {fighter_b['name']}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.write(f"### 🔵 {fighter_b['name']}")
                     
-                    # FIX: Utiliser des classes pour les recommandations pour garantir l'affichage
-                    rec_class_blue = "recommendation-favorable" if betting_classic['recommendation_blue'] == "Favorable" else "recommendation-neutral" if betting_classic['recommendation_blue'] == "Neutre" else "recommendation-unfavorable"
-                    rec_ml_class_blue = "recommendation-favorable" if betting_ml and betting_ml['recommendation_blue'] == "Favorable" else "recommendation-neutral" if betting_ml and betting_ml['recommendation_blue'] == "Neutre" else "recommendation-unfavorable"
+                    # Créer une table pour les données du combattant bleu
+                    st.write("**Données de paris:**")
+                    blue_data = [
+                        ["Cote du marché", f"{betting_classic['odds_blue']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_blue']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['blue_probability']:.0%}"]
+                    ]
                     
-                    # AMÉLIORATION UI: Affichage des données de paris avec un design card
-                    st.markdown(f"""
-                    <div class="betting-card betting-card-blue">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Cote du marché</div>
-                            <div style="font-weight: 600;">{betting_classic['odds_blue']:.2f}</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité implicite</div>
-                            <div style="font-weight: 600;">{betting_classic['implied_prob_blue']:.0%}</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité statistique</div>
-                            <div style="font-weight: 600;">{classic_prediction['blue_probability']:.0%}</div>
-                        </div>
-                        {f'''<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Probabilité ML</div>
-                            <div style="font-weight: 600;">{ml_prediction['blue_probability']:.0%}</div>
-                        </div>''' if betting_ml else ''}
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <div>Avantage statistique</div>
-                            <div style="font-weight: 600;">{betting_classic['edge_blue']*100:.1f}%</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                            <div>Valeur espérée</div>
-                            <div style="font-weight: 600;">{betting_classic['ev_blue']*100:.1f}%</div>
-                        </div>
-                        
-                        <div class="recommendation-box">
-                            <div class="recommendation-label">Recommandation statistique:</div>
-                            <div class="recommendation-value {rec_class_blue}">
-                                {betting_classic['recommendation_blue']}
-                            </div>
-                        </div>
-                        
-                        {f'''<div class="recommendation-box" style="margin-top: 10px;">
-                            <div class="recommendation-label">Recommandation ML:</div>
-                            <div class="recommendation-value {rec_ml_class_blue}">
-                                {betting_ml['recommendation_blue']}
-                            </div>
-                        </div>''' if betting_ml else ''}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    if betting_ml:
+                        blue_data.append(["Probabilité ML", f"{ml_prediction['blue_probability']:.0%}"])
                     
-                    # Ajouter un bouton pour parier sur le combattant bleu
+                    blue_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_blue']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_blue']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    blue_df = pd.DataFrame(blue_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(blue_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_blue'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_blue'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_blue'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_blue'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant bleu
                     if st.button(f"Parier sur {fighter_b['name']}", key="bet_on_blue_btn", use_container_width=True):
                         # Calculer le montant Kelly pour ce combattant
                         blue_kelly = calculate_kelly(
@@ -3304,19 +3185,13 @@ def show_prediction_page():
                             kelly_fractions[st.session_state.kelly_strategy]
                         )
                         
-# PARTIE 8
-
-# AMÉLIORATION UI: Nouvel onglet avec les statistiques et graphiques
+            # PARTIE 8: Nouvel onglet avec les statistiques et graphiques
             stats_tabs = st.tabs(["🔍 Statistiques", "📊 Graphiques", "📝 Notes"])
             
             # Onglet des statistiques
             with stats_tabs[0]:
                 # Afficher les statistiques comparatives
-                st.markdown("""
-                <div class="section-fade-in" style="margin-top: 15px;">
-                    <h3>📊 Statistiques comparatives</h3>
-                </div>
-                """, unsafe_allow_html=True)
+                st.subheader("📊 Statistiques comparatives")
                 
                 # Création du DataFrame des statistiques comparatives
                 stats_df = create_stats_comparison_df(fighter_a, fighter_b)
@@ -3344,11 +3219,7 @@ def show_prediction_page():
             
             # Onglet des visualisations
             with stats_tabs[1]:
-                st.markdown("""
-                <div class="section-fade-in" style="margin-top: 15px;">
-                    <h3>📈 Visualisations des performances</h3>
-                </div>
-                """, unsafe_allow_html=True)
+                st.subheader("📈 Visualisations des performances")
                 
                 # Disposer les graphiques en deux colonnes
                 col1, col2 = st.columns(2)
@@ -3369,15 +3240,9 @@ def show_prediction_page():
             
             # Onglet des notes
             with stats_tabs[2]:
-                st.markdown("""
-                <div class="section-fade-in" style="margin-top: 15px;">
-                    <h3>📝 Notes d'analyse</h3>
-                </div>
-                """, unsafe_allow_html=True)
+                st.subheader("📝 Notes d'analyse")
                 
-                # AMÉLIORATION UI: Analyse textuelle générée
-                # Générer automatiquement quelques insights
-                
+                # Analyse textuelle générée
                 # Déterminer les styles de combat
                 a_striking = fighter_a['SLpM'] * fighter_a['sig_str_acc']
                 a_ground = fighter_a['td_avg'] * fighter_a['td_acc'] + fighter_a['sub_avg']
@@ -3409,85 +3274,32 @@ def show_prediction_page():
                 else:
                     physical_advantage = "Les avantages physiques sont partagés entre les deux combattants"
                 
-                st.markdown(f"""
-                <div class="card section-fade-in">
-                    <h4>Profil des combattants</h4>
-                    <p>
-                        <span class="red-fighter">{fighter_a['name']}</span> est un combattant de style <b>{a_style}</b> 
-                        avec un taux de victoires de <b>{a_winrate:.0%}</b> sur {a_exp} combats.
-                    </p>
-                    <p>
-                        <span class="blue-fighter">{fighter_b['name']}</span> est un combattant de style <b>{b_style}</b>
-                        avec un taux de victoires de <b>{b_winrate:.0%}</b> sur {b_exp} combats.
-                    </p>
-                </div>
+                # Profil des combattants
+                st.write("#### Profil des combattants")
+                st.write(f"**{fighter_a['name']}** est un combattant de style **{a_style}** avec un taux de victoires de **{a_winrate:.0%}** sur {a_exp} combats.")
+                st.write(f"**{fighter_b['name']}** est un combattant de style **{b_style}** avec un taux de victoires de **{b_winrate:.0%}** sur {b_exp} combats.")
                 
-                <div class="card section-fade-in" style="margin-top: 15px;">
-                    <h4>Facteurs clés du combat</h4>
-                    <ul>
-                        <li><b>Expérience:</b> {exp_advantage}.</li>
-                        <li><b>Avantage physique:</b> {physical_advantage}.</li>
-                        <li><b>Dynamique du combat:</b> {fighter_a['name']} donne {fighter_a['SLpM']:.1f} coups par minute contre {fighter_b['SLpM']:.1f} pour {fighter_b['name']}.</li>
-                        <li><b>Facteur sol:</b> {fighter_a['name']} tente {fighter_a['td_avg']:.1f} takedowns par combat contre {fighter_b['td_avg']:.1f} pour {fighter_b['name']}.</li>
-                    </ul>
-                </div>
+                # Facteurs clés
+                st.write("#### Facteurs clés du combat")
+                st.write(f"* **Expérience:** {exp_advantage}.")
+                st.write(f"* **Avantage physique:** {physical_advantage}.")
+                st.write(f"* **Dynamique du combat:** {fighter_a['name']} donne {fighter_a['SLpM']:.1f} coups par minute contre {fighter_b['SLpM']:.1f} pour {fighter_b['name']}.")
+                st.write(f"* **Facteur sol:** {fighter_a['name']} tente {fighter_a['td_avg']:.1f} takedowns par combat contre {fighter_b['td_avg']:.1f} pour {fighter_b['name']}.")
                 
-                <div class="card section-fade-in" style="margin-top: 15px;">
-                    <h4>Points à surveiller</h4>
-                    <p>
-                        Ce combat présente un affrontement de styles {a_style if a_style != b_style else "similaires"}, 
-                        où {fighter_a['name'] if a_winrate > b_winrate else fighter_b['name']} a l'avantage en termes 
-                        d'historique de victoires.
-                    </p>
-                    <p>
-                        Le vainqueur sera probablement celui qui pourra imposer sa stratégie préférée: 
-                        {f" {fighter_a['name']} voudra maintenir le combat {a_style}, tandis que {fighter_b['name']} cherchera à l'amener vers une dynamique {b_style}." if a_style != b_style else " les deux combattants auront des approches similaires, donc la technique et les adaptations en cours de combat seront déterminantes."}
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
+                # Points à surveiller
+                st.write("#### Points à surveiller")
+                st.write(f"Ce combat présente un affrontement de styles {a_style if a_style != b_style else 'similaires'}, où {fighter_a['name'] if a_winrate > b_winrate else fighter_b['name']} a l'avantage en termes d'historique de victoires.")
+                
+                if a_style != b_style:
+                    st.write(f"Le vainqueur sera probablement celui qui pourra imposer sa stratégie préférée: {fighter_a['name']} voudra maintenir le combat {a_style}, tandis que {fighter_b['name']} cherchera à l'amener vers une dynamique {b_style}.")
+                else:
+                    st.write("Les deux combattants auront des approches similaires, donc la technique et les adaptations en cours de combat seront déterminantes.")
         else:
-            # AMÉLIORATION UI: Message d'accueil modernisé
-            st.markdown("""
-            <div class="card section-fade-in" style="text-align:center; padding: 40px 20px;">
-                <div style="font-size: 5rem; margin-bottom: 20px;">🎯</div>
-                <h2 style="margin-bottom: 15px;">Bienvenue sur le Prédicteur de Combats UFC!</h2>            
-                <p style="font-size:1.2em; margin-bottom: 20px;">Sélectionnez deux combattants et cliquez sur "Prédire le combat" pour obtenir une analyse complète.</p>
-                <div style="width: 80%; max-width: 400px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); margin: 30px auto;"></div>
-                <p>Vous pouvez également entrer les cotes proposées par les bookmakers pour recevoir des recommandations de paris optimisées avec la méthode Kelly.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            # Message d'accueil
+            st.info("Bienvenue sur le Prédicteur de Combats UFC! Sélectionnez deux combattants et cliquez sur 'Prédire le combat' pour obtenir une analyse complète.")
             
-            # AMÉLIORATION UI: Note d'information plus attrayante
-            st.markdown("""
-            <div class="info-box section-fade-in" style="margin-top: 20px;">
-                <h3 style="margin-top: 0;">⚠️ L'ordre des combattants est important!</h3>
-                <p>La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions, particulièrement avec le modèle ML.</p>
-                <p>Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge. Pour obtenir les résultats les plus précis, suivez cette convention.</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # AMÉLIORATION UI: Nouvelle fonctionnalité mise en évidence
-            st.markdown("""
-            <div class="card section-fade-in" style="margin-top: 25px; background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%); border-left: 3px solid #4CAF50;">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <span style="font-size: 2rem;">🔄</span>
-                    <h3 style="margin: 10px 0; color: #4CAF50;">Prédictions comparatives améliorées</h3>
-                </div>
-                <p>L'application affiche maintenant simultanément les prédictions des deux méthodes:</p>
-                <div style="display: flex; margin-top: 15px;">
-                    <div style="flex: 1; padding: 10px; background: rgba(30, 136, 229, 0.1); border-radius: 8px; margin-right: 10px;">
-                        <h4 style="color: #1E88E5; margin-top: 0;"><span style="font-size: 1.2rem;">🤖</span> Machine Learning</h4>
-                        <p style="margin-bottom: 0;">Prédiction basée sur un modèle entraîné sur des milliers de combats</p>
-                    </div>
-                    <div style="flex: 1; padding: 10px; background: rgba(76, 175, 80, 0.1); border-radius: 8px; margin-left: 10px;">
-                        <h4 style="color: #4CAF50; margin-top: 0;"><span style="font-size: 1.2rem;">📊</span> Calcul statistique</h4>
-                        <p style="margin-bottom: 0;">Prédiction basée sur une formule utilisant les statistiques des combattants</p>
-                    </div>
-                </div>
-                <p style="margin-top: 15px;">Cette double prédiction vous permet de comparer les résultats et d'avoir une vision plus complète des chances de victoire.</p>
-            </div>
-            """, unsafe_allow_html=True)
-
+            # Message d'information
+            st.warning("⚠️ L'ordre des combattants est important! La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions. Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge.")
 
 def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probability, kelly_fraction):
     """Affiche un formulaire modernisé pour placer un pari"""
@@ -4165,13 +3977,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
 
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
-    # AMÉLIORATION UI: Titre de page avec animation
-    st.markdown("""
-    <div class="section-fade-in" style="text-align:center; margin-bottom: 25px;">
-        <h2>🗓️ Événements UFC à venir</h2>
-        <p style="color: #aaa;">Consultez et analysez les prochains combats de l'UFC</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # AMÉLIORATION UI: Titre de page simple
+    st.title("🗓️ Événements UFC à venir")
+    st.write("Consultez et analysez les prochains combats de l'UFC")
     
     # AMÉLIORATION UI: Bouton de récupération plus visible et explicite
     col1, col2 = st.columns([1, 2])
@@ -4193,14 +4001,14 @@ def show_upcoming_events_page():
                 
                 # Message de réussite ou d'erreur selon le résultat
                 if events_result['status'] == 'success':
-                    # AMÉLIORATION UI: Message de succès avec animation
+                    # Message de succès
                     st.success(f"✅ {len(st.session_state.upcoming_events)} événements récupérés avec succès!")
                 else:
-                    # AMÉLIORATION UI: Message d'erreur plus informatif
+                    # Message d'erreur plus informatif
                     st.error(f"❌ Impossible de récupérer les événements: {events_result['message']}")
     
     with col2:
-        # AMÉLIORATION UI: Afficher la date de dernière mise à jour
+        # Afficher la date de dernière mise à jour
         if st.session_state.get('upcoming_events_timestamp'):
             last_update = st.session_state.upcoming_events_timestamp
             time_diff = (datetime.datetime.now() - last_update).total_seconds() / 60
@@ -4211,15 +4019,11 @@ def show_upcoming_events_page():
             else:
                 time_msg = f"il y a {int(time_diff/60)} heures"
             
-            st.markdown(f"""
-            <div style="text-align: right; color: #aaa; font-size: 0.9rem; padding: 10px;">
-                Dernière mise à jour: {time_msg}
-            </div>
-            """, unsafe_allow_html=True)
+            st.caption(f"Dernière mise à jour: {time_msg}")
     
     # Afficher les événements s'ils existent
     if st.session_state.get('upcoming_events'):
-        # AMÉLIORATION UI: Bouton de rafraîchissement flottant
+        # Bouton de rafraîchissement
         refresh_col, _ = st.columns([1, 3])
         with refresh_col:
             if st.button("🔄 Rafraîchir les événements", key="refresh_events_btn", use_container_width=True):
@@ -4229,7 +4033,7 @@ def show_upcoming_events_page():
                     st.session_state.upcoming_events_timestamp = datetime.datetime.now()
                 st.success("✅ Liste des événements mise à jour!")
         
-        # AMÉLIORATION UI: Onglets avec noms d'événements
+        # Onglets avec noms d'événements
         event_names = [event['name'] for event in st.session_state.upcoming_events]
         event_tabs = st.tabs(event_names)
         
@@ -4239,20 +4043,15 @@ def show_upcoming_events_page():
             event_url = event['url']
             
             with event_tab:
-                # AMÉLIORATION UI: Titre de l'événement stylisé
-                st.markdown(f"""
-                <div class="event-title">
-                    🥊 {event_name}
-                </div>
-                """, unsafe_allow_html=True)
+                # Titre de l'événement
+                st.subheader(f"🥊 {event_name}")
                 
                 # Vérifier si les combats pour cet événement sont déjà chargés
                 fights = st.session_state.upcoming_fights.get(event_url, [])
                 
-                # AMÉLIORATION UI: Bouton de chargement pour les combats spécifiques
+                # Bouton de chargement pour les combats spécifiques
                 if not fights:
                     if st.button(f"🔍 Charger les combats pour {event_name}", key=f"load_fights_btn_{i}", use_container_width=True):
-                        # AMÉLIORATION UI: Animation de chargement
                         with st.spinner(f"Récupération des combats pour {event_name}..."):
                             fights_result = extract_upcoming_fights(event_url)
                             fights = fights_result['fights']
@@ -4267,34 +4066,24 @@ def show_upcoming_events_page():
                                 st.error(f"❌ {fights_result['message']}")
                 
                 if not fights:
-                    # AMÉLIORATION UI: Message d'information plus attrayant
-                    st.markdown(f"""
-                    <div class="card" style="text-align: center; padding: 30px 20px;">
-                        <div style="font-size: 3rem; margin-bottom: 15px;">🔍</div>
-                        <h3 style="margin-bottom: 15px;">Aucun combat chargé</h3>
-                        <p>Cliquez sur le bouton 'Charger les combats pour {event_name}' pour voir les affrontements prévus.</p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Message d'information simple
+                    st.info(f"Aucun combat chargé. Cliquez sur le bouton 'Charger les combats pour {event_name}' pour voir les affrontements prévus.")
                 else:
                     # Afficher le nombre de combats chargés
-                    st.markdown(f"""
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <span class="badge" style="background-color: #1E88E5;">{len(fights)} combats chargés</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.success(f"{len(fights)} combats chargés")
                     
                     # Vérifier si les prédictions ont déjà été générées
                     predictions_generated = event_url in st.session_state.fight_predictions
                     
-                    # AMÉLIORATION UI: Bouton pour générer les prédictions
+                    # Bouton pour générer les prédictions
                     if not predictions_generated:
                         if st.button(f"🔮 Générer les prédictions", key=f"predict_fights_btn_{i}", type="primary", use_container_width=True):
-                            # AMÉLIORATION UI: Animation de chargement
+                            # Animation de chargement
                             with st.spinner(f"Génération des prédictions pour {len(fights)} combats..."):
                                 # Initialiser le dictionnaire pour cet événement
                                 st.session_state.fight_predictions[event_url] = {}
                                 
-                                # AMÉLIORATION UI: Barre de progression
+                                # Barre de progression
                                 progress_bar = st.progress(0)
                                 
                                 # Générer les prédictions pour chaque combat
@@ -4350,12 +4139,8 @@ def show_upcoming_events_page():
                                 st.success(f"✅ Prédictions générées pour {len(fights)} combats!")
                                 st.session_state[f"show_strategy_{event_url}"] = True
                     
-                    # AMÉLIORATION UI: Afficher les combats dans des cards modernes
-                    st.markdown("""
-                    <div style="margin: 30px 0 20px;">
-                        <h3>🔮 Carte des combats avec prédictions</h3>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Afficher les combats
+                    st.subheader("🔮 Carte des combats avec prédictions")
                     
                     # Disposer les combats en grille responsive de 2 colonnes
                     for j in range(0, len(fights), 2):
@@ -4369,39 +4154,22 @@ def show_upcoming_events_page():
                                 fight_key = f"{red_fighter_name}_vs_{blue_fighter_name}"
                                 
                                 with col:
+                                    # Créer un cadre pour chaque combat
+                                    st.write("---")
+                                    # Afficher les noms des combattants
+                                    st.write(f"**🔴 {red_fighter_name}** VS **🔵 {blue_fighter_name}**")
+                                    
                                     # Vérifier si les prédictions ont été générées pour ce combat
                                     prediction_data = st.session_state.fight_predictions.get(event_url, {}).get(fight_key, None)
                                     
                                     if not prediction_data:
-                                        # AMÉLIORATION UI: Affichage simplifié sans prédiction
-                                        st.markdown(f"""
-                                        <div class="fight-card-improved">
-                                            <div class="fighters-banner">
-                                                <div class="fighter-name-red">{red_fighter_name}</div>
-                                                <div class="vs-badge">VS</div>
-                                                <div class="fighter-name-blue">{blue_fighter_name}</div>
-                                            </div>
-                                            <div style="text-align: center; margin-top: 10px;">
-                                                <span class="badge" style="background-color: #FFC107;">En attente de prédiction</span>
-                                            </div>
-                                        </div>
-                                        """, unsafe_allow_html=True)
+                                        # Affichage simplifié sans prédiction
+                                        st.warning("En attente de prédiction")
                                         continue
                                     
                                     if prediction_data['status'] == 'error':
-                                        # AMÉLIORATION UI: Message d'erreur intégré
-                                        st.markdown(f"""
-                                        <div class="fight-card-improved">
-                                            <div class="fighters-banner">
-                                                <div class="fighter-name-red">{red_fighter_name}</div>
-                                                <div class="vs-badge">VS</div>
-                                                <div class="fighter-name-blue">{blue_fighter_name}</div>
-                                            </div>
-                                            <div style="text-align: center; margin-top: 10px;">
-                                                <span class="badge" style="background-color: #F44336;">{prediction_data['message']}</span>
-                                            </div>
-                                        </div>
-                                        """, unsafe_allow_html=True)
+                                        # Message d'erreur
+                                        st.error(prediction_data['message'])
                                         continue
                                     
                                     # Extraire les données de prédiction
@@ -4428,7 +4196,7 @@ def show_upcoming_events_page():
                                         consensus = winner_classic == winner_ml
                                         
                                         # Utiliser le ML pour l'affichage principal
-                                        winner_color = "#E53935" if winner_ml == "Red" else "#1E88E5"
+                                        winner_color = "red" if winner_ml == "Red" else "blue"
                                         winner_name = red_match if winner_ml == "Red" else blue_match
                                         red_prob = red_prob_ml
                                         blue_prob = blue_prob_ml
@@ -4436,7 +4204,7 @@ def show_upcoming_events_page():
                                         method = "Machine Learning"
                                     else:
                                         # Utiliser la méthode classique si ML n'est pas disponible
-                                        winner_color = "#E53935" if winner_classic == "Red" else "#1E88E5"
+                                        winner_color = "red" if winner_classic == "Red" else "blue"
                                         winner_name = red_match if winner_classic == "Red" else blue_match
                                         red_prob = red_prob_classic
                                         blue_prob = blue_prob_classic
@@ -4444,67 +4212,31 @@ def show_upcoming_events_page():
                                         method = "Statistique"
                                         consensus = True  # Pas de comparaison possible
                                     
-                                    # FIX: Correction de l'affichage de la barre de probabilité
-                                    red_prob_pct = red_prob * 100
-                                    blue_prob_pct = blue_prob * 100
+                                    # Affichage des probabilités avec une barre de progression Streamlit
+                                    st.write("**Probabilités de victoire:**")
+                                    col1, col2 = st.columns(2)
+                                    with col1:
+                                        st.write(f"🔴 {red_match}: {red_prob:.0%}")
+                                    with col2:
+                                        st.write(f"🔵 {blue_match}: {blue_prob:.0%}")
                                     
-                                    # AMÉLIORATION UI: Carte de combat modernisée
-                                    st.markdown(f"""
-                                    <div class="fight-card-improved">
-                                        <div class="fighters-banner">
-                                            <div class="fighter-name-red">{red_match}</div>
-                                            <div class="vs-badge">VS</div>
-                                            <div class="fighter-name-blue">{blue_match}</div>
-                                        </div>
-                                        
-                                        <div class="probability-container">
-                                            <div class="probability-bar">
-                                                <div class="probability-bar-red" style="width: {red_prob_pct}%">
-                                                    {red_prob:.0%}
-                                                </div>
-                                                <div class="probability-bar-blue" style="width: {blue_prob_pct}%">
-                                                    {blue_prob:.0%}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div style="text-align: center; margin: 10px 0;">
-                                            <div>Vainqueur prédit:</div>
-                                            <div style="font-weight: 700; font-size: 1.2rem; color: {winner_color}; margin: 5px 0;">
-                                                {winner_name}
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="prediction-summary">
-                                            <div class="prediction-method">
-                                                Méthode: {method}
-                                            </div>
-                                            <div>
-                                                <span class="confidence-badge {
-                                                    'confidence-high' if confidence == 'Élevé' else 'confidence-moderate'
-                                                }">
-                                                    {confidence}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    """, unsafe_allow_html=True)
+                                    # Utiliser la barre de progression pour montrer les probabilités
+                                    st.progress(red_prob)
+                                    
+                                    # Afficher le vainqueur prédit
+                                    st.write("**Vainqueur prédit:**")
+                                    st.markdown(f"### {winner_name}")
+                                    
+                                    # Afficher la méthode et la confiance
+                                    st.write(f"**Méthode:** {method}")
+                                    confidence_color = "green" if confidence == "Élevé" else "orange"
+                                    st.markdown(f"**Confiance:** :{confidence_color}[{confidence}]")
                                     
                                     # Si ML est disponible, afficher l'info sur le consensus
-                                    if ml_result:
-                                        consensus_icon = "✅" if consensus else "⚠️"
-                                        consensus_text = "Méthodes en accord" if consensus else "Méthodes en désaccord"
-                                        consensus_color = "#4CAF50" if consensus else "#FFC107"
-                                        
-                                        st.markdown(f"""
-                                        <div style="text-align: center; margin-top: 10px;">
-                                            <span style="color: {consensus_color}; font-size: 0.9rem;">
-                                                {consensus_icon} {consensus_text}
-                                            </span>
-                                        </div>
-                                        """, unsafe_allow_html=True)
-                                    
-                                    # Fermer la div principale
-                                    st.markdown("</div>", unsafe_allow_html=True)
+                                    if ml_result and not consensus:
+                                        st.warning("⚠️ Méthodes en désaccord")
+                                    elif ml_result:
+                                        st.success("✅ Méthodes en accord")
                                     
                                     # Ajouter un expander pour les détails du combat
                                     with st.expander("Voir les détails"):
@@ -4513,27 +4245,23 @@ def show_upcoming_events_page():
                                         
                                         # Afficher la prédiction statistique
                                         with detail_cols[0]:
-                                            st.markdown("### Prédiction Statistique")
-                                            winner_color_classic = "#E53935" if classic_result['prediction'] == 'Red' else "#1E88E5"
+                                            st.write("### Prédiction Statistique")
                                             winner_name_classic = classic_result['winner_name']
-                                            
-                                            st.markdown(f"**Vainqueur prédit:** <span style='color:{winner_color_classic};'>{winner_name_classic}</span>", unsafe_allow_html=True)
-                                            st.markdown(f"**Probabilités:** {classic_result['red_probability']:.0%} (Rouge) vs {classic_result['blue_probability']:.0%} (Bleu)")
-                                            st.markdown(f"**Confiance:** {classic_result['confidence']}")
+                                            st.write(f"**Vainqueur prédit:** {winner_name_classic}")
+                                            st.write(f"**Probabilités:** {classic_result['red_probability']:.0%} (Rouge) vs {classic_result['blue_probability']:.0%} (Bleu)")
+                                            st.write(f"**Confiance:** {classic_result['confidence']}")
                                         
                                         # Afficher la prédiction ML si disponible
                                         if ml_result:
                                             with detail_cols[1]:
-                                                st.markdown("### Prédiction Machine Learning")
-                                                winner_color_ml = "#E53935" if ml_result['prediction'] == 'Red' else "#1E88E5"
+                                                st.write("### Prédiction Machine Learning")
                                                 winner_name_ml = ml_result['winner_name']
-                                                
-                                                st.markdown(f"**Vainqueur prédit:** <span style='color:{winner_color_ml};'>{winner_name_ml}</span>", unsafe_allow_html=True)
-                                                st.markdown(f"**Probabilités:** {ml_result['red_probability']:.0%} (Rouge) vs {ml_result['blue_probability']:.0%} (Bleu)")
-                                                st.markdown(f"**Confiance:** {ml_result['confidence']}")
+                                                st.write(f"**Vainqueur prédit:** {winner_name_ml}")
+                                                st.write(f"**Probabilités:** {ml_result['red_probability']:.0%} (Rouge) vs {ml_result['blue_probability']:.0%} (Bleu)")
+                                                st.write(f"**Confiance:** {ml_result['confidence']}")
                                         
-                                        # AMÉLIORATION UI: Statistiques principales seulement
-                                        st.markdown("### Statistiques principales")
+                                        # Statistiques principales seulement
+                                        st.write("### Statistiques principales")
                                         
                                         # Extraire les stats les plus importantes
                                         key_stats = [
@@ -4549,7 +4277,7 @@ def show_upcoming_events_page():
                                         st.dataframe(stats_df, use_container_width=True, hide_index=True)
                                         
                                         # Lien pour plus de détails
-                                        st.markdown("<div style='text-align: center; margin-top: 10px;'><i>Utilisez l'onglet Prédiction pour une analyse complète</i></div>", unsafe_allow_html=True)
+                                        st.caption("Utilisez l'onglet Prédiction pour une analyse complète")
                     
                     # Ajouter la section de stratégie de paris si les prédictions sont générées
                     if predictions_generated or st.session_state.get(f"show_strategy_{event_url}", False):
@@ -4563,17 +4291,8 @@ def show_upcoming_events_page():
                         )
                         
     else:
-        # AMÉLIORATION UI: État vide avec illustration
-        st.markdown("""
-        <div class="card" style="text-align: center; padding: 40px 20px;">
-            <div style="font-size: 6rem; margin-bottom: 20px;">🗓️</div>
-            <h2 style="margin-bottom: 15px;">Aucun événement chargé</h2>
-            <p style="margin-bottom: 30px;">Utilisez le bouton ci-dessus pour récupérer les prochains événements UFC.</p>
-            <div style="opacity: 0.6; font-style: italic;">
-                Les données sont récupérées depuis UFC Stats en temps réel.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # État vide
+        st.info("Aucun événement chargé. Utilisez le bouton ci-dessus pour récupérer les prochains événements UFC.")
 
 # PARTIE 10
 
