@@ -4907,7 +4907,7 @@ def show_upcoming_events_page():
         if st.button("🔍 Récupérer les événements", key="load_events_btn", type="primary", use_container_width=True):
             # AMÉLIORATION UI: Animation de chargement
             with st.spinner("Récupération des événements en cours..."):
-                events_result = get_upcoming_events(max_events=10)
+                events_result = get_upcoming_events(max_events=8)
                 st.session_state.upcoming_events = events_result['events'] if events_result['status'] == 'success' else []
                 st.session_state.upcoming_events_timestamp = datetime.datetime.now()
                 
