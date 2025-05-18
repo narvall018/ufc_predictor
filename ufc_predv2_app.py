@@ -26,8 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS personnalisé amélioré avec une palette de couleurs cohérente
-# AMÉLIORATION UI: Palette de couleurs harmonisée et variables CSS pour faciliter la modification
+# CSS personnalisé avec correction pour thème clair/sombre
 st.markdown("""
 <style>
     /* Variables CSS pour une palette de couleurs cohérente */
@@ -40,10 +39,6 @@ st.markdown("""
         --success-color: #4CAF50;
         --warning-color: #FFC107;
         --error-color: #F44336;
-        --card-bg: rgba(255, 255, 255, 0.08);
-        --card-border: rgba(255, 255, 255, 0.1);
-        --elevation-1: 0 2px 5px rgba(0, 0, 0, 0.1);
-        --elevation-2: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     /* Styles globaux et typographie améliorés */
@@ -57,63 +52,30 @@ st.markdown("""
         letter-spacing: -0.02em;
     }
     
-    /* Composants de base */
-    .main-title {
-        text-align: center;
-        font-size: 2.8rem;
-        font-weight: 800;
-        color: var(--primary-red);
-        margin-bottom: 10px;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    /* Adaptations spécifiques au mode clair */
+    [data-testid="stAppViewContainer"][data-theme="light"] p,
+    [data-testid="stAppViewContainer"][data-theme="light"] span,
+    [data-testid="stAppViewContainer"][data-theme="light"] div,
+    [data-testid="stAppViewContainer"][data-theme="light"] h1,
+    [data-testid="stAppViewContainer"][data-theme="light"] h2,
+    [data-testid="stAppViewContainer"][data-theme="light"] h3,
+    [data-testid="stAppViewContainer"][data-theme="light"] h4,
+    [data-testid="stAppViewContainer"][data-theme="light"] h5,
+    [data-testid="stAppViewContainer"][data-theme="light"] h6,
+    [data-testid="stAppViewContainer"][data-theme="light"] li,
+    [data-testid="stAppViewContainer"][data-theme="light"] ol,
+    [data-testid="stAppViewContainer"][data-theme="light"] ul {
+        color: #262730 !important;
     }
     
-    .sub-title {
-        text-align: center;
-        font-size: 1.3rem;
-        margin-bottom: 30px;
-        color: rgba(255, 255, 255, 0.8);
-    }
-    
-    /* AMÉLIORATION UI: Design système de cartes */
-    .card {
-        background-color: var(--card-bg);
-        border-radius: 12px;
-        border: 1px solid var(--card-border);
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--elevation-1);
-        transition: all 0.2s ease;
-    }
-    
-    .card:hover {
-        box-shadow: var(--elevation-2);
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .card-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: white;
-    }
-    
-    /* Prédiction */
-    .prediction-box {
-        background-color: var(--card-bg);
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: var(--elevation-1);
-        margin-bottom: 20px;
-        border: 1px solid var(--card-border);
-    }
-    
+    /* Couleurs fixes pour les indicateurs */
     .red-fighter {
-        color: var(--primary-red);
+        color: #E53935 !important;
         font-weight: bold;
     }
     
     .blue-fighter {
-        color: var(--primary-blue);
+        color: #1E88E5 !important;
         font-weight: bold;
     }
     
@@ -122,20 +84,95 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* AMÉLIORATION UI: Métriques et KPIs */
+    .favorable {
+        color: #4CAF50 !important;
+        font-weight: bold;
+    }
+    
+    .neutral {
+        color: #FFC107 !important;
+        font-weight: bold;
+    }
+    
+    .unfavorable {
+        color: #F44336 !important;
+        font-weight: bold;
+    }
+    
+    /* Correction des cartes pour le mode clair */
+    [data-testid="stAppViewContainer"][data-theme="light"] .card {
+        background-color: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] .card {
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card {
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    /* Correction des légendes Plotly */
+    [data-testid="stAppViewContainer"][data-theme="light"] .js-plotly-plot .legend .traces .legendtext {
+        fill: #262730 !important;
+        color: #262730 !important;
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] .js-plotly-plot .legend .traces .legendtext {
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Correction des textes dans les graphiques */
+    [data-testid="stAppViewContainer"][data-theme="light"] .js-plotly-plot .main-svg text {
+        fill: #262730 !important;
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] .js-plotly-plot .main-svg text {
+        fill: #FFFFFF !important;
+    }
+    
+    /* Métriques et KPIs */
     [data-testid="stMetric"] {
-        background-color: rgba(255, 255, 255, 0.05);
         padding: 16px;
         border-radius: 10px;
         transition: all 0.2s ease;
     }
     
-    [data-testid="stMetric"]:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetric"] {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetric"] {
+        background-color: rgba(255, 255, 255, 0.05);
     }
     
     [data-testid="stMetric"] > div {
         width: 100%;
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetricLabel"] {
+        color: rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetricLabel"] {
+        color: rgba(255, 255, 255, 0.7) !important;
     }
     
     [data-testid="stMetricLabel"] {
@@ -143,7 +180,14 @@ st.markdown("""
         justify-content: center;
         font-weight: 500;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetricValue"] {
+        color: #262730 !important;
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetricValue"] {
+        color: white !important;
     }
     
     [data-testid="stMetricValue"] {
@@ -158,329 +202,33 @@ st.markdown("""
         justify-content: center;
     }
     
-    /* Compatibilité thème sombre pour les cartes */
-    .stTabs [data-baseweb="tab-panel"] {
-        background-color: rgba(255, 255, 255, 0.03);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+    /* DataFrames - correction pour les deux modes */
+    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stDataFrame"] td,
+    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stDataFrame"] th {
+        color: #262730 !important;
     }
     
-    /* AMÉLIORATION UI: Badges et labels plus modernes */
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
+    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stDataFrame"] td,
+    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stDataFrame"] th {
+        color: white !important;
     }
     
-    .ml-badge {
-        background-color: var(--success-color);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.75rem;
-        margin-left: 10px;
-    }
-    
-    .classic-badge {
-        background-color: var(--primary-blue);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.75rem;
-        margin-left: 10px;
-    }
-    
-    /* AMÉLIORATION UI: Boîtes d'information */
-    .info-box {
-        background-color: rgba(255, 193, 7, 0.1);
-        padding: 15px;
-        border-radius: 8px;
-        margin: 15px 0;
-        border-left: 3px solid var(--warning-color);
-    }
-    
-    /* Divider pour les sections */
-    .divider {
-        border-top: 1px solid rgba(200, 200, 200, 0.15);
-        margin: 25px 0;
-    }
-    
-    /* AMÉLIORATION UI: Cartes de paris */
-    .betting-card {
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        transition: transform 0.2s;
-    }
-    
-    .betting-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    .betting-card-red {
-        background: linear-gradient(135deg, rgba(229, 57, 53, 0.1) 0%, rgba(229, 57, 53, 0.05) 100%);
-        border: 1px solid rgba(229, 57, 53, 0.2);
-    }
-    
-    .betting-card-blue {
-        background: linear-gradient(135deg, rgba(30, 136, 229, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
-        border: 1px solid rgba(30, 136, 229, 0.2);
-    }
-    
-    /* AMÉLIORATION UI: Statuts et indicateurs */
-    .favorable {
-        color: var(--success-color);
-        font-weight: bold;
-    }
-    
-    .neutral {
-        color: var(--warning-color);
-        font-weight: bold;
-    }
-    
-    .unfavorable {
-        color: var(--error-color);
-        font-weight: bold;
-    }
-    
-    /* AMÉLIORATION UI: Boutons d'action modernisés */
-    .action-button {
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .action-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .delete-button {
-        background-color: var(--error-color);
-        color: white;
-    }
-    
-    .update-button {
-        background-color: var(--success-color);
-        color: white;
-    }
-
-    /* AMÉLIORATION UI: Gestion de paris améliorée */
-    .bet-management-container {
-        background-color: rgba(255, 255, 255, 0.03);
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    
-    /* Kelly Table */
-    .kelly-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    .kelly-table th {
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        text-align: left;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.9);
-    }
-    
-    .kelly-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 0.9rem;
-    }
-    
-    .kelly-table tr:last-child td {
-        border-bottom: none;
-    }
-    
-    .kelly-table tr:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    
-    .kelly-highlight {
-        background-color: rgba(76, 175, 80, 0.1);
-    }
-    
-    /* Style pour les événements à venir */
-    .upcoming-event {
-        background: linear-gradient(145deg, rgba(40, 42, 54, 0.8) 0%, rgba(30, 31, 38, 0.8) 100%);
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        box-shadow: var(--elevation-1);
-    }
-    
-    .upcoming-fight {
-        background-color: rgba(248, 249, 250, 0.03);
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    /* AMÉLIORATION UI: Loading state */
-    .loading-spinner {
-        text-align: center;
-        margin: 25px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .loading-spinner::after {
-        content: "";
-        width: 30px;
-        height: 30px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spinner 1s ease-in-out infinite;
-    }
-    
-    @keyframes spinner {
-        to { transform: rotate(360deg); }
-    }
-    
-    /* AMÉLIORATION UI: Combat cards plus modernes */
-    .fight-card {
-        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
-        padding: 25px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: var(--elevation-1);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.3s ease;
-    }
-    
-    .fight-card:hover {
-        box-shadow: var(--elevation-2);
-        border-color: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-    }
-    
-    .fight-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    
-    /* AMÉLIORATION UI: Sections d'événements */
-    .event-section {
-        background-color: rgba(38, 39, 48, 0.8);
-        border-radius: 15px;
-        padding: 25px;
-        margin-bottom: 30px;
-        box-shadow: var(--elevation-2);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-    }
-    
-    .event-title {
-        background: linear-gradient(135deg, var(--primary-red) 0%, #E63946 100%);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        box-shadow: 0 2px 10px rgba(230, 57, 70, 0.3);
-    }
-    
-    /* AMÉLIORATION UI: Combat cards modernisées */
-    .fight-card-improved {
-        background: linear-gradient(145deg, rgba(48, 51, 66, 0.5) 0%, rgba(33, 36, 46, 0.5) 100%);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: var(--elevation-1);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.2s ease;
-    }
-    
-    .fight-card-improved:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--elevation-2);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .fighters-banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    
-    .fighter-name-red {
-        color: var(--primary-red);
-        font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: left;
-    }
-    
-    .fighter-name-blue {
-        color: var(--primary-blue);
-        font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: right;
-    }
-    
-    .vs-badge {
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        margin: 0 10px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Suite du CSS amélioré
-st.markdown("""
-<style>
-    /* AMÉLIORATION UI: Barres de probabilité plus intuitives */
-    .probability-container {
-        margin: 15px 0;
-    }
-    
+    /* Probability bars */
     .probability-bar {
         height: 30px;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.1);
         border-radius: 15px;
         position: relative;
         overflow: hidden;
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="light"] .probability-bar {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-testid="stAppViewContainer"][data-theme="dark"] .probability-bar {
+        background-color: rgba(255, 255, 255, 0.1);
     }
     
     .probability-bar-red {
@@ -489,7 +237,7 @@ st.markdown("""
         float: left;
         text-align: center;
         line-height: 30px;
-        color: white;
+        color: white !important;
         font-weight: bold;
         border-radius: 15px 0 0 15px;
     }
@@ -500,308 +248,95 @@ st.markdown("""
         float: right;
         text-align: center;
         line-height: 30px;
-        color: white;
+        color: white !important;
         font-weight: bold;
         border-radius: 0 15px 15px 0;
     }
     
-    /* AMÉLIORATION UI: Badges et étiquettes */
-    .prediction-badge {
-        display: inline-block;
+    /* Adaptations pour les tabs */
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        color: inherit !important;
+    }
+    
+    .stTabs [data-baseweb="tab"], 
+    .stTabs [data-baseweb="tab-list"] button {
+        color: inherit !important;
+    }
+    
+    /* Badges with fixed colors */
+    .ml-badge {
+        background-color: #4CAF50;
+        color: white !important;
         padding: 5px 10px;
         border-radius: 20px;
         font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-top: 10px;
-    }
-    
-    .prediction-badge-red {
-        background-color: var(--primary-red);
-        color: white;
-    }
-    
-    .prediction-badge-blue {
-        background-color: var(--primary-blue);
-        color: white;
-    }
-    
-    .prediction-summary {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
-    }
-    
-    .prediction-method {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .confidence-badge {
-        padding: 4px 8px;
-        border-radius: 20px;
         font-size: 0.75rem;
+        margin-left: 10px;
+    }
+    
+    .classic-badge {
+        background-color: #1E88E5;
+        color: white !important;
+        padding: 5px 10px;
+        border-radius: 20px;
         font-weight: 600;
+        font-size: 0.75rem;
+        margin-left: 10px;
     }
     
-    .confidence-high {
-        background-color: rgba(76, 175, 80, 0.2);
-        color: #81c784;
-        border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-    
-    .confidence-moderate {
-        background-color: rgba(255, 193, 7, 0.2);
-        color: #ffd54f;
-        border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-    
-    /* AMÉLIORATION UI: Section d'accueil totalement repensée */
+    /* Welcome header with fixed text color */
     .welcome-header {
         text-align: center;
         padding: 50px 0;
         background: linear-gradient(135deg, rgba(229, 57, 53, 0.8) 0%, rgba(30, 136, 229, 0.8) 100%);
         border-radius: 15px;
         margin-bottom: 40px;
-        color: white;
-        box-shadow: var(--elevation-2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
-    .welcome-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 15px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        letter-spacing: -0.02em;
-    }
-    
-    .welcome-subtitle {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        color: rgba(255, 255, 255, 0.9);
-    }
-    
-    /* AMÉLIORATION UI: Feature cards plus visuelles */
-    .home-card {
-        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
-        border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 25px;
-        box-shadow: var(--elevation-1);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .home-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--elevation-2);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .feature-icon {
-        font-size: 2.8rem;
-        margin-bottom: 20px;
-        text-align: center;
-        color: var(--primary-accent);
-    }
-    
-    .feature-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        text-align: center;
-        color: white;
-    }
-    
-    .feature-description {
-        text-align: center;
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.8);
-        flex-grow: 1;
-    }
-    
-    /* AMÉLIORATION UI: Stratégie kelly */
-    .kelly-box {
-        background: linear-gradient(145deg, rgba(40, 124, 70, 0.1) 0%, rgba(30, 100, 60, 0.1) 100%);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 20px 0;
-        border-left: 3px solid var(--success-color);
-        box-shadow: var(--elevation-1);
-    }
-    
-    .kelly-title {
-        color: var(--success-color);
-        font-weight: bold;
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-    }
-    
-    /* AMÉLIORATION UI: Placement de paris */
-    .bet-placement-box {
-        background: linear-gradient(145deg, rgba(25, 70, 186, 0.1) 0%, rgba(20, 60, 150, 0.1) 100%);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 20px 0;
-        border-left: 3px solid var(--primary-blue);
-        box-shadow: var(--elevation-1);
-    }
-    
-    .bet-placement-title {
-        color: var(--primary-blue);
-        font-weight: bold;
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-    }
-    
-    /* AMÉLIORATION UI: Stratégie de paris */
-    .betting-strategy-box {
-        background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
-        border-radius: 12px;
-        padding: 25px;
-        margin: 20px 0;
-        border-left: 3px solid var(--success-color);
-        box-shadow: var(--elevation-1);
-    }
-    
-    .strategy-title {
-        color: var(--success-color);
-        font-weight: bold;
-        margin-bottom: 15px;
-        font-size: 1.3rem;
-    }
-    
-    .strategy-summary {
-        background-color: rgba(76, 175, 80, 0.05);
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        border: 1px solid rgba(76, 175, 80, 0.1);
-    }
-    
-    .value-betting-positive {
-        color: var(--success-color);
-        font-weight: bold;
-    }
-    
-    .value-betting-negative {
-        color: var(--error-color);
-        font-weight: bold;
-    }
-
-    /* NOUVELLE SECTION UI: Responsive design */
-    @media (max-width: 768px) {
-        .welcome-title {
-            font-size: 2.5rem;
-        }
-        
-        .welcome-subtitle {
-            font-size: 1.2rem;
-        }
-        
-        .feature-icon {
-            font-size: 2.2rem;
-        }
-        
-        .main-title {
-            font-size: 2.2rem;
-        }
-        
-        .fight-card, .prediction-box, .kelly-box, .bet-placement-box {
-            padding: 15px;
-        }
-        
-        .fighter-name-red, .fighter-name-blue {
-            font-size: 1.1rem;
-        }
-        
-        /* Adaptation des tableaux */
-        .kelly-table th, .kelly-table td {
-            padding: 8px 5px;
-            font-size: 0.8rem;
-        }
-    }
-
-    /* NOUVELLE SECTION UI: Animations subtiles */
-    .section-fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* NOUVELLE SECTION UI: Améliorations des formulaires */
-    input[type="number"], input[type="text"], input[type="date"], select {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
+    .welcome-title, .welcome-subtitle {
         color: white !important;
-        transition: all 0.2s !important;
     }
     
-    input[type="number"]:focus, input[type="text"]:focus, 
-    input[type="date"]:focus, select:focus {
-        border-color: var(--primary-blue) !important;
-        box-shadow: 0 0 0 1px var(--primary-blue) !important;
+    /* Adaptations des expanders */
+    [data-testid="stExpander"] details summary p {
+        color: inherit !important;
     }
     
-    /* Adaptation des contrôles Streamlit */
-    div.stButton > button {
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 0.5em 1em;
-        transition: all 0.2s;
+    /* Fighter names */
+    .fighter-name-red {
+        color: #E53935 !important;
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: left;
     }
     
-    div.stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    .fighter-name-blue {
+        color: #1E88E5 !important;
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: right;
     }
     
-    /* Correction des styles pour recommandations */
-    .recommendation-box {
-        margin-top: 15px;
-    }
-    
-    .recommendation-label {
-        margin-bottom: 5px;
-        font-weight: 500;
-    }
-    
-    .recommendation-value {
-        display: inline-block;
-        padding: 5px 12px;
+    /* VS badge in both themes */
+    .vs-badge {
+        padding: 6px 12px;
         border-radius: 20px;
+        margin: 0 10px;
+        font-size: 0.8rem;
         font-weight: 600;
-        font-size: 0.9rem;
     }
     
-    .recommendation-favorable {
-        background-color: rgba(76, 175, 80, 0.2);
-        color: #4CAF50;
-        border: 1px solid rgba(76, 175, 80, 0.5);
+    [data-testid="stAppViewContainer"][data-theme="light"] .vs-badge {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: #262730 !important;
     }
     
-    .recommendation-neutral {
-        background-color: rgba(255, 193, 7, 0.2);
-        color: #FFC107;
-        border: 1px solid rgba(255, 193, 7, 0.5);
-    }
-    
-    .recommendation-unfavorable {
-        background-color: rgba(244, 67, 54, 0.2);
-        color: #F44336;
-        border: 1px solid rgba(244, 67, 54, 0.5);
+    [data-testid="stAppViewContainer"][data-theme="dark"] .vs-badge {
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -4324,7 +3859,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
-    
+    event_id = event_url.split('/')[-1]
     with col1:
         total_budget = st.number_input(
             "Budget total (€)",
@@ -4333,7 +3868,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             value=min(300.0, float(current_bankroll)),
             step=10.0,
             format="%.2f",
-            key=f"total_budget_{event_url}"
+            key=f"total_budget_{event_id}"
         )
     
     with col2:
@@ -4907,7 +4442,7 @@ def show_upcoming_events_page():
         if st.button("🔍 Récupérer les événements", key="load_events_btn", type="primary", use_container_width=True):
             # AMÉLIORATION UI: Animation de chargement
             with st.spinner("Récupération des événements en cours..."):
-                events_result = get_upcoming_events(max_events=3)
+                events_result = get_upcoming_events(max_events=10)
                 st.session_state.upcoming_events = events_result['events'] if events_result['status'] == 'success' else []
                 st.session_state.upcoming_events_timestamp = datetime.datetime.now()
                 
