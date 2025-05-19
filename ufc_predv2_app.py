@@ -26,7 +26,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS personnalisé avec correction pour thème clair/sombre
+# CSS personnalisé amélioré avec une palette de couleurs cohérente
+# AMÉLIORATION UI: Palette de couleurs harmonisée et variables CSS pour faciliter la modification
 st.markdown("""
 <style>
     /* Variables CSS pour une palette de couleurs cohérente */
@@ -39,6 +40,10 @@ st.markdown("""
         --success-color: #4CAF50;
         --warning-color: #FFC107;
         --error-color: #F44336;
+        --card-bg: rgba(255, 255, 255, 0.08);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --elevation-1: 0 2px 5px rgba(0, 0, 0, 0.1);
+        --elevation-2: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     /* Styles globaux et typographie améliorés */
@@ -52,30 +57,63 @@ st.markdown("""
         letter-spacing: -0.02em;
     }
     
-    /* Adaptations spécifiques au mode clair */
-    [data-testid="stAppViewContainer"][data-theme="light"] p,
-    [data-testid="stAppViewContainer"][data-theme="light"] span,
-    [data-testid="stAppViewContainer"][data-theme="light"] div,
-    [data-testid="stAppViewContainer"][data-theme="light"] h1,
-    [data-testid="stAppViewContainer"][data-theme="light"] h2,
-    [data-testid="stAppViewContainer"][data-theme="light"] h3,
-    [data-testid="stAppViewContainer"][data-theme="light"] h4,
-    [data-testid="stAppViewContainer"][data-theme="light"] h5,
-    [data-testid="stAppViewContainer"][data-theme="light"] h6,
-    [data-testid="stAppViewContainer"][data-theme="light"] li,
-    [data-testid="stAppViewContainer"][data-theme="light"] ol,
-    [data-testid="stAppViewContainer"][data-theme="light"] ul {
-        color: #262730 !important;
+    /* Composants de base */
+    .main-title {
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--primary-red);
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
     }
     
-    /* Couleurs fixes pour les indicateurs */
+    .sub-title {
+        text-align: center;
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* AMÉLIORATION UI: Design système de cartes */
+    .card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--card-border);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--elevation-1);
+        transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: white;
+    }
+    
+    /* Prédiction */
+    .prediction-box {
+        background-color: var(--card-bg);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: var(--elevation-1);
+        margin-bottom: 20px;
+        border: 1px solid var(--card-border);
+    }
+    
     .red-fighter {
-        color: #E53935 !important;
+        color: var(--primary-red);
         font-weight: bold;
     }
     
     .blue-fighter {
-        color: #1E88E5 !important;
+        color: var(--primary-blue);
         font-weight: bold;
     }
     
@@ -84,95 +122,20 @@ st.markdown("""
         font-weight: bold;
     }
     
-    .favorable {
-        color: #4CAF50 !important;
-        font-weight: bold;
-    }
-    
-    .neutral {
-        color: #FFC107 !important;
-        font-weight: bold;
-    }
-    
-    .unfavorable {
-        color: #F44336 !important;
-        font-weight: bold;
-    }
-    
-    /* Correction des cartes pour le mode clair */
-    [data-testid="stAppViewContainer"][data-theme="light"] .card {
-        background-color: rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] .card {
-        background-color: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .card {
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
-    }
-    
-    .card:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .card-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
-    
-    /* Correction des légendes Plotly */
-    [data-testid="stAppViewContainer"][data-theme="light"] .js-plotly-plot .legend .traces .legendtext {
-        fill: #262730 !important;
-        color: #262730 !important;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] .js-plotly-plot .legend .traces .legendtext {
-        fill: #FFFFFF !important;
-        color: #FFFFFF !important;
-    }
-    
-    /* Correction des textes dans les graphiques */
-    [data-testid="stAppViewContainer"][data-theme="light"] .js-plotly-plot .main-svg text {
-        fill: #262730 !important;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] .js-plotly-plot .main-svg text {
-        fill: #FFFFFF !important;
-    }
-    
-    /* Métriques et KPIs */
+    /* AMÉLIORATION UI: Métriques et KPIs */
     [data-testid="stMetric"] {
+        background-color: rgba(255, 255, 255, 0.05);
         padding: 16px;
         border-radius: 10px;
         transition: all 0.2s ease;
     }
     
-    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetric"] {
-        background-color: rgba(0, 0, 0, 0.03);
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetric"] {
-        background-color: rgba(255, 255, 255, 0.05);
+    [data-testid="stMetric"]:hover {
+        background-color: rgba(255, 255, 255, 0.1);
     }
     
     [data-testid="stMetric"] > div {
         width: 100%;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetricLabel"] {
-        color: rgba(0, 0, 0, 0.7) !important;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetricLabel"] {
-        color: rgba(255, 255, 255, 0.7) !important;
     }
     
     [data-testid="stMetricLabel"] {
@@ -180,14 +143,7 @@ st.markdown("""
         justify-content: center;
         font-weight: 500;
         font-size: 0.9rem;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stMetricValue"] {
-        color: #262730 !important;
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stMetricValue"] {
-        color: white !important;
+        color: rgba(255, 255, 255, 0.7);
     }
     
     [data-testid="stMetricValue"] {
@@ -202,33 +158,329 @@ st.markdown("""
         justify-content: center;
     }
     
-    /* DataFrames - correction pour les deux modes */
-    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stDataFrame"] td,
-    [data-testid="stAppViewContainer"][data-theme="light"] [data-testid="stDataFrame"] th {
-        color: #262730 !important;
+    /* Compatibilité thème sombre pour les cartes */
+    .stTabs [data-baseweb="tab-panel"] {
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
     
-    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stDataFrame"] td,
-    [data-testid="stAppViewContainer"][data-theme="dark"] [data-testid="stDataFrame"] th {
-        color: white !important;
+    /* AMÉLIORATION UI: Badges et labels plus modernes */
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
     }
     
-    /* Probability bars */
+    .ml-badge {
+        background-color: var(--success-color);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        margin-left: 10px;
+    }
+    
+    .classic-badge {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        margin-left: 10px;
+    }
+    
+    /* AMÉLIORATION UI: Boîtes d'information */
+    .info-box {
+        background-color: rgba(255, 193, 7, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 3px solid var(--warning-color);
+    }
+    
+    /* Divider pour les sections */
+    .divider {
+        border-top: 1px solid rgba(200, 200, 200, 0.15);
+        margin: 25px 0;
+    }
+    
+    /* AMÉLIORATION UI: Cartes de paris */
+    .betting-card {
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
+    
+    .betting-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .betting-card-red {
+        background: linear-gradient(135deg, rgba(229, 57, 53, 0.1) 0%, rgba(229, 57, 53, 0.05) 100%);
+        border: 1px solid rgba(229, 57, 53, 0.2);
+    }
+    
+    .betting-card-blue {
+        background: linear-gradient(135deg, rgba(30, 136, 229, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+        border: 1px solid rgba(30, 136, 229, 0.2);
+    }
+    
+    /* AMÉLIORATION UI: Statuts et indicateurs */
+    .favorable {
+        color: var(--success-color);
+        font-weight: bold;
+    }
+    
+    .neutral {
+        color: var(--warning-color);
+        font-weight: bold;
+    }
+    
+    .unfavorable {
+        color: var(--error-color);
+        font-weight: bold;
+    }
+    
+    /* AMÉLIORATION UI: Boutons d'action modernisés */
+    .action-button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .delete-button {
+        background-color: var(--error-color);
+        color: white;
+    }
+    
+    .update-button {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    /* AMÉLIORATION UI: Gestion de paris améliorée */
+    .bet-management-container {
+        background-color: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Kelly Table */
+    .kelly-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .kelly-table th {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .kelly-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+    }
+    
+    .kelly-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .kelly-table tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .kelly-highlight {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    
+    /* Style pour les événements à venir */
+    .upcoming-event {
+        background: linear-gradient(145deg, rgba(40, 42, 54, 0.8) 0%, rgba(30, 31, 38, 0.8) 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        box-shadow: var(--elevation-1);
+    }
+    
+    .upcoming-fight {
+        background-color: rgba(248, 249, 250, 0.03);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    /* AMÉLIORATION UI: Loading state */
+    .loading-spinner {
+        text-align: center;
+        margin: 25px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .loading-spinner::after {
+        content: "";
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spinner 1s ease-in-out infinite;
+    }
+    
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* AMÉLIORATION UI: Combat cards plus modernes */
+    .fight-card {
+        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: var(--elevation-1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .fight-card:hover {
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .fight-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    /* AMÉLIORATION UI: Sections d'événements */
+    .event-section {
+        background-color: rgba(38, 39, 48, 0.8);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--elevation-2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    
+    .event-title {
+        background: linear-gradient(135deg, var(--primary-red) 0%, #E63946 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 2px 10px rgba(230, 57, 70, 0.3);
+    }
+    
+    /* AMÉLIORATION UI: Combat cards modernisées */
+    .fight-card-improved {
+        background: linear-gradient(145deg, rgba(48, 51, 66, 0.5) 0%, rgba(33, 36, 46, 0.5) 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: var(--elevation-1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
+    }
+    
+    .fight-card-improved:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .fighters-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .fighter-name-red {
+        color: var(--primary-red);
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: left;
+    }
+    
+    .fighter-name-blue {
+        color: var(--primary-blue);
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: right;
+    }
+    
+    .vs-badge {
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        margin: 0 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Suite du CSS amélioré
+st.markdown("""
+<style>
+    /* AMÉLIORATION UI: Barres de probabilité plus intuitives */
+    .probability-container {
+        margin: 15px 0;
+    }
+    
     .probability-bar {
         height: 30px;
         width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
         border-radius: 15px;
         position: relative;
         overflow: hidden;
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="light"] .probability-bar {
-        background-color: rgba(0, 0, 0, 0.1);
-    }
-    
-    [data-testid="stAppViewContainer"][data-theme="dark"] .probability-bar {
-        background-color: rgba(255, 255, 255, 0.1);
     }
     
     .probability-bar-red {
@@ -237,7 +489,7 @@ st.markdown("""
         float: left;
         text-align: center;
         line-height: 30px;
-        color: white !important;
+        color: white;
         font-weight: bold;
         border-radius: 15px 0 0 15px;
     }
@@ -248,95 +500,308 @@ st.markdown("""
         float: right;
         text-align: center;
         line-height: 30px;
-        color: white !important;
+        color: white;
         font-weight: bold;
         border-radius: 0 15px 15px 0;
     }
     
-    /* Adaptations pour les tabs */
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        color: inherit !important;
-    }
-    
-    .stTabs [data-baseweb="tab"], 
-    .stTabs [data-baseweb="tab-list"] button {
-        color: inherit !important;
-    }
-    
-    /* Badges with fixed colors */
-    .ml-badge {
-        background-color: #4CAF50;
-        color: white !important;
+    /* AMÉLIORATION UI: Badges et étiquettes */
+    .prediction-badge {
+        display: inline-block;
         padding: 5px 10px;
         border-radius: 20px;
         font-weight: 600;
-        font-size: 0.75rem;
-        margin-left: 10px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 10px;
     }
     
-    .classic-badge {
-        background-color: #1E88E5;
-        color: white !important;
-        padding: 5px 10px;
+    .prediction-badge-red {
+        background-color: var(--primary-red);
+        color: white;
+    }
+    
+    .prediction-badge-blue {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .prediction-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    .prediction-method {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .confidence-badge {
+        padding: 4px 8px;
         border-radius: 20px;
-        font-weight: 600;
         font-size: 0.75rem;
-        margin-left: 10px;
+        font-weight: 600;
     }
     
-    /* Welcome header with fixed text color */
+    .confidence-high {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #81c784;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+    
+    .confidence-moderate {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffd54f;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    /* AMÉLIORATION UI: Section d'accueil totalement repensée */
     .welcome-header {
         text-align: center;
         padding: 50px 0;
         background: linear-gradient(135deg, rgba(229, 57, 53, 0.8) 0%, rgba(30, 136, 229, 0.8) 100%);
         border-radius: 15px;
         margin-bottom: 40px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: white;
+        box-shadow: var(--elevation-2);
     }
     
-    .welcome-title, .welcome-subtitle {
+    .welcome-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.02em;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* AMÉLIORATION UI: Feature cards plus visuelles */
+    .home-card {
+        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: var(--elevation-1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .home-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .feature-icon {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        text-align: center;
+        color: var(--primary-accent);
+    }
+    
+    .feature-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-align: center;
+        color: white;
+    }
+    
+    .feature-description {
+        text-align: center;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        flex-grow: 1;
+    }
+    
+    /* AMÉLIORATION UI: Stratégie kelly */
+    .kelly-box {
+        background: linear-gradient(145deg, rgba(40, 124, 70, 0.1) 0%, rgba(30, 100, 60, 0.1) 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 3px solid var(--success-color);
+        box-shadow: var(--elevation-1);
+    }
+    
+    .kelly-title {
+        color: var(--success-color);
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+    
+    /* AMÉLIORATION UI: Placement de paris */
+    .bet-placement-box {
+        background: linear-gradient(145deg, rgba(25, 70, 186, 0.1) 0%, rgba(20, 60, 150, 0.1) 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 3px solid var(--primary-blue);
+        box-shadow: var(--elevation-1);
+    }
+    
+    .bet-placement-title {
+        color: var(--primary-blue);
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+    
+    /* AMÉLIORATION UI: Stratégie de paris */
+    .betting-strategy-box {
+        background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
+        border-radius: 12px;
+        padding: 25px;
+        margin: 20px 0;
+        border-left: 3px solid var(--success-color);
+        box-shadow: var(--elevation-1);
+    }
+    
+    .strategy-title {
+        color: var(--success-color);
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+    
+    .strategy-summary {
+        background-color: rgba(76, 175, 80, 0.05);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        border: 1px solid rgba(76, 175, 80, 0.1);
+    }
+    
+    .value-betting-positive {
+        color: var(--success-color);
+        font-weight: bold;
+    }
+    
+    .value-betting-negative {
+        color: var(--error-color);
+        font-weight: bold;
+    }
+
+    /* NOUVELLE SECTION UI: Responsive design */
+    @media (max-width: 768px) {
+        .welcome-title {
+            font-size: 2.5rem;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .feature-icon {
+            font-size: 2.2rem;
+        }
+        
+        .main-title {
+            font-size: 2.2rem;
+        }
+        
+        .fight-card, .prediction-box, .kelly-box, .bet-placement-box {
+            padding: 15px;
+        }
+        
+        .fighter-name-red, .fighter-name-blue {
+            font-size: 1.1rem;
+        }
+        
+        /* Adaptation des tableaux */
+        .kelly-table th, .kelly-table td {
+            padding: 8px 5px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* NOUVELLE SECTION UI: Animations subtiles */
+    .section-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* NOUVELLE SECTION UI: Améliorations des formulaires */
+    input[type="number"], input[type="text"], input[type="date"], select {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
         color: white !important;
+        transition: all 0.2s !important;
     }
     
-    /* Adaptations des expanders */
-    [data-testid="stExpander"] details summary p {
-        color: inherit !important;
+    input[type="number"]:focus, input[type="text"]:focus, 
+    input[type="date"]:focus, select:focus {
+        border-color: var(--primary-blue) !important;
+        box-shadow: 0 0 0 1px var(--primary-blue) !important;
     }
     
-    /* Fighter names */
-    .fighter-name-red {
-        color: #E53935 !important;
-        font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: left;
-    }
-    
-    .fighter-name-blue {
-        color: #1E88E5 !important;
-        font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: right;
-    }
-    
-    /* VS badge in both themes */
-    .vs-badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        margin: 0 10px;
-        font-size: 0.8rem;
+    /* Adaptation des contrôles Streamlit */
+    div.stButton > button {
+        border-radius: 8px;
         font-weight: 600;
+        padding: 0.5em 1em;
+        transition: all 0.2s;
     }
     
-    [data-testid="stAppViewContainer"][data-theme="light"] .vs-badge {
-        background-color: rgba(0, 0, 0, 0.1);
-        color: #262730 !important;
+    div.stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     }
     
-    [data-testid="stAppViewContainer"][data-theme="dark"] .vs-badge {
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white !important;
+    /* Correction des styles pour recommandations */
+    .recommendation-box {
+        margin-top: 15px;
+    }
+    
+    .recommendation-label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .recommendation-value {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .recommendation-favorable {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        border: 1px solid rgba(76, 175, 80, 0.5);
+    }
+    
+    .recommendation-neutral {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #FFC107;
+        border: 1px solid rgba(255, 193, 7, 0.5);
+    }
+    
+    .recommendation-unfavorable {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+        border: 1px solid rgba(244, 67, 54, 0.5);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -3815,6 +4280,8 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
 
 # PARTIE 9 
 
+# ICI
+
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
     
@@ -3859,33 +4326,43 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
-    event_id = event_url.split('/')[-1]
+    
+    # Utiliser 100% de la bankroll par défaut pour le budget total affichable
     with col1:
         total_budget = st.number_input(
             "Budget total (€)",
             min_value=10.0,
             max_value=float(current_bankroll),
-            value=min(300.0, float(current_bankroll)),
+            value=float(current_bankroll),  # 100% de la bankroll par défaut
             step=10.0,
             format="%.2f",
-            key=f"total_budget_{event_id}"
+            key=f"total_budget_{event_url}"
         )
     
     with col2:
+        # MODIFICATION: Ajout de Kelly/6 et modification de l'index par défaut à Kelly/10
         kelly_strategy = st.selectbox(
             "Stratégie Kelly",
-            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly"],
-            index=1,  # Demi-Kelly par défaut (plus prudent)
+            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly", "Kelly/5", "Kelly/6", "Kelly/8", "Kelly/10"],
+            index=6,  # Kelly/10 par défaut (index 6 dans la nouvelle liste)
             key=f"kelly_strategy_{event_url}"
         )
         
-        # Déterminer le diviseur Kelly en fonction de la stratégie
+        # MODIFICATION: Déterminer le diviseur Kelly en fonction de la stratégie
         if kelly_strategy == "Kelly complet":
             kelly_divisor = 1
         elif kelly_strategy == "Demi-Kelly":
             kelly_divisor = 2
-        else:  # "Quart-Kelly"
+        elif kelly_strategy == "Quart-Kelly":
             kelly_divisor = 4
+        elif kelly_strategy == "Kelly/5":
+            kelly_divisor = 5
+        elif kelly_strategy == "Kelly/6":
+            kelly_divisor = 6
+        elif kelly_strategy == "Kelly/8":
+            kelly_divisor = 8
+        else:  # "Kelly/10"
+            kelly_divisor = 10
     
     # AMÉLIORATION UI: Section pour les cotes améliorée
     st.markdown("""
@@ -4039,13 +4516,27 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             # AMÉLIORATION UI: Tableau des recommandations plus moderne
             recommendation_data = []
             for fight in filtered_fights:
+                # Vérifier si les nouveaux attributs existent
+                if 'original_kelly_pct' in fight:
+                    kelly_pct = fight['original_kelly_pct'] * 100
+                    is_capped = fight.get('is_capped', False)
+                    
+                    # Identifier quelle valeur afficher dans la colonne Kelly
+                    display_kelly = f"{kelly_pct:.1f}%"
+                    if is_capped:
+                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                else:
+                    # Compatibilité avec l'ancien format
+                    kelly_pct = fight.get('fractional_kelly', 0) * 100
+                    display_kelly = f"{kelly_pct:.1f}%"
+                
                 recommendation_data.append({
                     "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
                     "Pari sur": fight['winner_name'],
                     "Probabilité": f"{fight['probability']:.0%}",
                     "Cote": f"{fight['odds']:.2f}",
                     "Value": f"{fight['edge']*100:.1f}%",
-                    "Rendement": f"{fight['value']:.2f}",  
+                    "Kelly": display_kelly,
                     "Montant": f"{fight['stake']:.2f} €",
                     "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
                 })
@@ -4062,7 +4553,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     "Probabilité": st.column_config.TextColumn("Probabilité"),
                     "Cote": st.column_config.TextColumn("Cote"),
                     "Value": st.column_config.TextColumn("Value"),
-                    "Rendement": st.column_config.TextColumn("Rendement"),
+                    "Kelly": st.column_config.TextColumn("Kelly"),
                     "Montant": st.column_config.TextColumn("Montant"),
                     "Gain potentiel": st.column_config.TextColumn("Gain potentiel")
                 },
@@ -4076,9 +4567,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             # Afficher les métriques en 3 colonnes
             summary_cols = st.columns(3)
             with summary_cols[0]:
-                st.metric("Budget total", f"{total_budget:.2f}€")
+                st.metric("Bankroll", f"{current_bankroll:.2f}€")
             with summary_cols[1]:
-                st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/total_budget*100:.1f}%")
+                st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/current_bankroll*100:.1f}%")
             with summary_cols[2]:
                 st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
             
@@ -4087,9 +4578,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             <div class="strategy-summary">
                 <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                 <ul>
-                    <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                    <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
+                    <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
                     <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
-                    <li>Utilisation du budget: <b>{total_stake/total_budget*100:.1f}%</b></li>
+                    <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                     <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
                 </ul>
             </div>
@@ -4202,7 +4694,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     if value < 1.15:
                         continue
                         
-                    # Calculer la fraction Kelly
+                    # Calculer la fraction Kelly pure
                     p = fight['probability']
                     q = 1 - p
                     b = fight['odds'] - 1
@@ -4269,33 +4761,45 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         </div>
                         """, unsafe_allow_html=True)
             else:
-                # Calculer la somme totale des fractions Kelly
-                total_kelly = sum(fight['fractional_kelly'] for fight in filtered_fights)
+                # MODIFICATION ICI: Application de la méthode Kelly fixe avec plafond absolu
+                max_kelly_pct = 0.05  # Plafond de 5% de la bankroll par pari
                 
-                # CORRECTION: Ajouter une vérification pour éviter la division par zéro
-                if total_kelly <= 0:
-                    st.warning("Impossible de calculer les mises : la somme des fractions Kelly est nulle ou négative.")
-                    for fight in filtered_fights:
-                        fight['stake'] = 0
-                else:
-                    # Calculer les montants à miser
-                    for fight in filtered_fights:
-                        # Répartir le budget proportionnellement
-                        fight['stake'] = total_budget * (fight['fractional_kelly'] / total_kelly)
-                        
-                        # CORRECTION: Arrondir les mises pour plus de clarté
-                        fight['stake'] = round(fight['stake'], 2)
+                # Appliquer le Kelly fixe avec plafond absolu pour chaque combat
+                for fight in filtered_fights:
+                    # Utiliser directement le pourcentage Kelly calculé (déjà divisé par kelly_divisor)
+                    kelly_pct = fight['fractional_kelly']
+                    
+                    # Plafonner à 5% maximum de la bankroll
+                    capped_kelly = min(kelly_pct, max_kelly_pct)
+                    
+                    # Calculer la mise finale en euros
+                    fight['stake'] = current_bankroll * capped_kelly
+                    
+                    # Stocker les deux valeurs pour l'affichage (original et plafonné)
+                    fight['original_kelly_pct'] = kelly_pct
+                    fight['capped_kelly_pct'] = capped_kelly
+                    fight['is_capped'] = kelly_pct > max_kelly_pct
+                    
+                    # Arrondir pour plus de clarté
+                    fight['stake'] = round(fight['stake'], 2)
                 
                 # AMÉLIORATION UI: Afficher les recommandations dans un tableau moderne
                 recommendation_data = []
                 for fight in filtered_fights:
+                    kelly_pct = fight['original_kelly_pct'] * 100  # Convertir en pourcentage pour l'affichage
+                    
+                    # Identifier quelle valeur afficher dans la colonne Kelly
+                    display_kelly = f"{kelly_pct:.1f}%"
+                    if fight['is_capped']:
+                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                    
                     recommendation_data.append({
                         "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
                         "Pari sur": fight['winner_name'],
                         "Probabilité": f"{fight['probability']:.0%}",
                         "Cote": f"{fight['odds']:.2f}",
                         "Value": f"{fight['edge']*100:.1f}%",
-                        "Rendement": f"{fight['value']:.2f}",  
+                        "Kelly": display_kelly,
                         "Montant": f"{fight['stake']:.2f} €",
                         "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
                     })
@@ -4313,12 +4817,34 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             "Probabilité": st.column_config.TextColumn("Probabilité"),
                             "Cote": st.column_config.TextColumn("Cote"),
                             "Value": st.column_config.TextColumn("Value"),
-                            "Rendement": st.column_config.TextColumn("Rendement"),
+                            "Kelly": st.column_config.TextColumn("Kelly"),
                             "Montant": st.column_config.TextColumn("Montant"),
                             "Gain potentiel": st.column_config.TextColumn("Gain potentiel")
                         },
                         hide_index=True
                     )
+                    
+                    # MODIFICATION ICI: Message pour les paris plafonnés
+                    capped_fights = [f for f in filtered_fights if f.get('is_capped', False)]
+                    if capped_fights:
+                        st.markdown("""
+                        <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
+                                     border-left: 3px solid #FFC107; margin-top: 15px;">
+                            <h4 style="color: #FFC107; margin-top: 0;">⚠️ Information importante</h4>
+                            <p>Certaines mises ont été plafonnées à 5% de votre bankroll (règle de gestion du risque):</p>
+                            <ul>
+                        """, unsafe_allow_html=True)
+                        
+                        for fight in capped_fights:
+                            original_stake = current_bankroll * fight['original_kelly_pct']
+                            st.markdown(f"""
+                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.1f}% (plafonné à 5%)</li>
+                            """, unsafe_allow_html=True)
+                        
+                        st.markdown("""
+                            </ul>
+                        </div>
+                        """, unsafe_allow_html=True)
                     
                     # AMÉLIORATION UI: Résumé de la stratégie avec des métriques
                     total_stake = sum(fight['stake'] for fight in filtered_fights)
@@ -4327,9 +4853,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     # Afficher les métriques en 3 colonnes
                     summary_cols = st.columns(3)
                     with summary_cols[0]:
-                        st.metric("Budget total", f"{total_budget:.2f}€")
+                        st.metric("Bankroll", f"{current_bankroll:.2f}€")
                     with summary_cols[1]:
-                        st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/total_budget*100:.1f}%")
+                        st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/current_bankroll*100:.1f}%")
                     with summary_cols[2]:
                         st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
                     
@@ -4338,9 +4864,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     <div class="strategy-summary">
                         <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                         <ul>
-                            <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                            <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
+                            <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
                             <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
-                            <li>Utilisation du budget: <b>{total_stake/total_budget*100:.1f}%</b></li>
+                            <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                             <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
                         </ul>
                     </div>
@@ -4402,6 +4929,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
+
     
     # Fonction de débogage
     def debug_betting_strategy(event_url, bettable_fights, filtered_fights):
@@ -4442,7 +4970,7 @@ def show_upcoming_events_page():
         if st.button("🔍 Récupérer les événements", key="load_events_btn", type="primary", use_container_width=True):
             # AMÉLIORATION UI: Animation de chargement
             with st.spinner("Récupération des événements en cours..."):
-                events_result = get_upcoming_events(max_events=10)
+                events_result = get_upcoming_events(max_events=8)
                 st.session_state.upcoming_events = events_result['events'] if events_result['status'] == 'success' else []
                 st.session_state.upcoming_events_timestamp = datetime.datetime.now()
                 

@@ -4280,6 +4280,8 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
 
 # PARTIE 9 
 
+# ICI
+
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
     
@@ -4325,32 +4327,42 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     
     col1, col2 = st.columns(2)
     
+    # Utiliser 100% de la bankroll par défaut pour le budget total affichable
     with col1:
         total_budget = st.number_input(
             "Budget total (€)",
             min_value=10.0,
             max_value=float(current_bankroll),
-            value=min(300.0, float(current_bankroll)),
+            value=float(current_bankroll),  # 100% de la bankroll par défaut
             step=10.0,
             format="%.2f",
             key=f"total_budget_{event_url}"
         )
     
     with col2:
+        # MODIFICATION: Ajout de Kelly/6 et modification de l'index par défaut à Kelly/10
         kelly_strategy = st.selectbox(
             "Stratégie Kelly",
-            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly"],
-            index=1,  # Demi-Kelly par défaut (plus prudent)
+            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly", "Kelly/5", "Kelly/6", "Kelly/8", "Kelly/10"],
+            index=6,  # Kelly/10 par défaut (index 6 dans la nouvelle liste)
             key=f"kelly_strategy_{event_url}"
         )
         
-        # Déterminer le diviseur Kelly en fonction de la stratégie
+        # MODIFICATION: Déterminer le diviseur Kelly en fonction de la stratégie
         if kelly_strategy == "Kelly complet":
             kelly_divisor = 1
         elif kelly_strategy == "Demi-Kelly":
             kelly_divisor = 2
-        else:  # "Quart-Kelly"
+        elif kelly_strategy == "Quart-Kelly":
             kelly_divisor = 4
+        elif kelly_strategy == "Kelly/5":
+            kelly_divisor = 5
+        elif kelly_strategy == "Kelly/6":
+            kelly_divisor = 6
+        elif kelly_strategy == "Kelly/8":
+            kelly_divisor = 8
+        else:  # "Kelly/10"
+            kelly_divisor = 10
     
     # AMÉLIORATION UI: Section pour les cotes améliorée
     st.markdown("""
@@ -4504,13 +4516,27 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             # AMÉLIORATION UI: Tableau des recommandations plus moderne
             recommendation_data = []
             for fight in filtered_fights:
+                # Vérifier si les nouveaux attributs existent
+                if 'original_kelly_pct' in fight:
+                    kelly_pct = fight['original_kelly_pct'] * 100
+                    is_capped = fight.get('is_capped', False)
+                    
+                    # Identifier quelle valeur afficher dans la colonne Kelly
+                    display_kelly = f"{kelly_pct:.1f}%"
+                    if is_capped:
+                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                else:
+                    # Compatibilité avec l'ancien format
+                    kelly_pct = fight.get('fractional_kelly', 0) * 100
+                    display_kelly = f"{kelly_pct:.1f}%"
+                
                 recommendation_data.append({
                     "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
                     "Pari sur": fight['winner_name'],
                     "Probabilité": f"{fight['probability']:.0%}",
                     "Cote": f"{fight['odds']:.2f}",
                     "Value": f"{fight['edge']*100:.1f}%",
-                    "Rendement": f"{fight['value']:.2f}",  
+                    "Kelly": display_kelly,
                     "Montant": f"{fight['stake']:.2f} €",
                     "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
                 })
@@ -4527,7 +4553,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     "Probabilité": st.column_config.TextColumn("Probabilité"),
                     "Cote": st.column_config.TextColumn("Cote"),
                     "Value": st.column_config.TextColumn("Value"),
-                    "Rendement": st.column_config.TextColumn("Rendement"),
+                    "Kelly": st.column_config.TextColumn("Kelly"),
                     "Montant": st.column_config.TextColumn("Montant"),
                     "Gain potentiel": st.column_config.TextColumn("Gain potentiel")
                 },
@@ -4541,9 +4567,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             # Afficher les métriques en 3 colonnes
             summary_cols = st.columns(3)
             with summary_cols[0]:
-                st.metric("Budget total", f"{total_budget:.2f}€")
+                st.metric("Bankroll", f"{current_bankroll:.2f}€")
             with summary_cols[1]:
-                st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/total_budget*100:.1f}%")
+                st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/current_bankroll*100:.1f}%")
             with summary_cols[2]:
                 st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
             
@@ -4552,9 +4578,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             <div class="strategy-summary">
                 <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                 <ul>
-                    <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                    <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
+                    <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
                     <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
-                    <li>Utilisation du budget: <b>{total_stake/total_budget*100:.1f}%</b></li>
+                    <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                     <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
                 </ul>
             </div>
@@ -4667,7 +4694,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     if value < 1.15:
                         continue
                         
-                    # Calculer la fraction Kelly
+                    # Calculer la fraction Kelly pure
                     p = fight['probability']
                     q = 1 - p
                     b = fight['odds'] - 1
@@ -4734,33 +4761,45 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         </div>
                         """, unsafe_allow_html=True)
             else:
-                # Calculer la somme totale des fractions Kelly
-                total_kelly = sum(fight['fractional_kelly'] for fight in filtered_fights)
+                # MODIFICATION ICI: Application de la méthode Kelly fixe avec plafond absolu
+                max_kelly_pct = 0.05  # Plafond de 5% de la bankroll par pari
                 
-                # CORRECTION: Ajouter une vérification pour éviter la division par zéro
-                if total_kelly <= 0:
-                    st.warning("Impossible de calculer les mises : la somme des fractions Kelly est nulle ou négative.")
-                    for fight in filtered_fights:
-                        fight['stake'] = 0
-                else:
-                    # Calculer les montants à miser
-                    for fight in filtered_fights:
-                        # Répartir le budget proportionnellement
-                        fight['stake'] = total_budget * (fight['fractional_kelly'] / total_kelly)
-                        
-                        # CORRECTION: Arrondir les mises pour plus de clarté
-                        fight['stake'] = round(fight['stake'], 2)
+                # Appliquer le Kelly fixe avec plafond absolu pour chaque combat
+                for fight in filtered_fights:
+                    # Utiliser directement le pourcentage Kelly calculé (déjà divisé par kelly_divisor)
+                    kelly_pct = fight['fractional_kelly']
+                    
+                    # Plafonner à 5% maximum de la bankroll
+                    capped_kelly = min(kelly_pct, max_kelly_pct)
+                    
+                    # Calculer la mise finale en euros
+                    fight['stake'] = current_bankroll * capped_kelly
+                    
+                    # Stocker les deux valeurs pour l'affichage (original et plafonné)
+                    fight['original_kelly_pct'] = kelly_pct
+                    fight['capped_kelly_pct'] = capped_kelly
+                    fight['is_capped'] = kelly_pct > max_kelly_pct
+                    
+                    # Arrondir pour plus de clarté
+                    fight['stake'] = round(fight['stake'], 2)
                 
                 # AMÉLIORATION UI: Afficher les recommandations dans un tableau moderne
                 recommendation_data = []
                 for fight in filtered_fights:
+                    kelly_pct = fight['original_kelly_pct'] * 100  # Convertir en pourcentage pour l'affichage
+                    
+                    # Identifier quelle valeur afficher dans la colonne Kelly
+                    display_kelly = f"{kelly_pct:.1f}%"
+                    if fight['is_capped']:
+                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                    
                     recommendation_data.append({
                         "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
                         "Pari sur": fight['winner_name'],
                         "Probabilité": f"{fight['probability']:.0%}",
                         "Cote": f"{fight['odds']:.2f}",
                         "Value": f"{fight['edge']*100:.1f}%",
-                        "Rendement": f"{fight['value']:.2f}",  
+                        "Kelly": display_kelly,
                         "Montant": f"{fight['stake']:.2f} €",
                         "Gain potentiel": f"{fight['stake'] * (fight['odds']-1):.2f} €"
                     })
@@ -4778,12 +4817,34 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             "Probabilité": st.column_config.TextColumn("Probabilité"),
                             "Cote": st.column_config.TextColumn("Cote"),
                             "Value": st.column_config.TextColumn("Value"),
-                            "Rendement": st.column_config.TextColumn("Rendement"),
+                            "Kelly": st.column_config.TextColumn("Kelly"),
                             "Montant": st.column_config.TextColumn("Montant"),
                             "Gain potentiel": st.column_config.TextColumn("Gain potentiel")
                         },
                         hide_index=True
                     )
+                    
+                    # MODIFICATION ICI: Message pour les paris plafonnés
+                    capped_fights = [f for f in filtered_fights if f.get('is_capped', False)]
+                    if capped_fights:
+                        st.markdown("""
+                        <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
+                                     border-left: 3px solid #FFC107; margin-top: 15px;">
+                            <h4 style="color: #FFC107; margin-top: 0;">⚠️ Information importante</h4>
+                            <p>Certaines mises ont été plafonnées à 5% de votre bankroll (règle de gestion du risque):</p>
+                            <ul>
+                        """, unsafe_allow_html=True)
+                        
+                        for fight in capped_fights:
+                            original_stake = current_bankroll * fight['original_kelly_pct']
+                            st.markdown(f"""
+                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.1f}% (plafonné à 5%)</li>
+                            """, unsafe_allow_html=True)
+                        
+                        st.markdown("""
+                            </ul>
+                        </div>
+                        """, unsafe_allow_html=True)
                     
                     # AMÉLIORATION UI: Résumé de la stratégie avec des métriques
                     total_stake = sum(fight['stake'] for fight in filtered_fights)
@@ -4792,9 +4853,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     # Afficher les métriques en 3 colonnes
                     summary_cols = st.columns(3)
                     with summary_cols[0]:
-                        st.metric("Budget total", f"{total_budget:.2f}€")
+                        st.metric("Bankroll", f"{current_bankroll:.2f}€")
                     with summary_cols[1]:
-                        st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/total_budget*100:.1f}%")
+                        st.metric("Montant misé", f"{total_stake:.2f}€", f"{total_stake/current_bankroll*100:.1f}%")
                     with summary_cols[2]:
                         st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
                     
@@ -4803,9 +4864,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     <div class="strategy-summary">
                         <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                         <ul>
-                            <li>Stratégie Kelly utilisée: <b>{kelly_strategy}</b></li>
+                            <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
+                            <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
                             <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
-                            <li>Utilisation du budget: <b>{total_stake/total_budget*100:.1f}%</b></li>
+                            <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                             <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
                         </ul>
                     </div>
@@ -4867,6 +4929,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
+
     
     # Fonction de débogage
     def debug_betting_strategy(event_url, bettable_fights, filtered_fights):
