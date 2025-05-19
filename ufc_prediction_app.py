@@ -4340,11 +4340,11 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         )
     
     with col2:
-        # MODIFICATION: Ajout de Kelly/6 et modification de l'index par défaut à Kelly/10
+        # MODIFICATION: Ajout de Kelly/12, Kelly/14, Kelly/16 et définir Kelly/14 par défaut
         kelly_strategy = st.selectbox(
             "Stratégie Kelly",
-            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly", "Kelly/5", "Kelly/6", "Kelly/8", "Kelly/10"],
-            index=6,  # Kelly/10 par défaut (index 6 dans la nouvelle liste)
+            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly", "Kelly/5", "Kelly/6", "Kelly/8", "Kelly/10", "Kelly/12", "Kelly/14", "Kelly/16"],
+            index=8,  # Kelly/14 par défaut (index 8 dans la nouvelle liste)
             key=f"kelly_strategy_{event_url}"
         )
         
@@ -4361,8 +4361,14 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             kelly_divisor = 6
         elif kelly_strategy == "Kelly/8":
             kelly_divisor = 8
-        else:  # "Kelly/10"
+        elif kelly_strategy == "Kelly/10":
             kelly_divisor = 10
+        elif kelly_strategy == "Kelly/12":
+            kelly_divisor = 12
+        elif kelly_strategy == "Kelly/14":
+            kelly_divisor = 14
+        else:  # "Kelly/16"
+            kelly_divisor = 16
     
     # AMÉLIORATION UI: Section pour les cotes améliorée
     st.markdown("""
@@ -4371,6 +4377,19 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         <p style="color: #aaa; margin-bottom: 15px;">Ces cotes seront utilisées pour calculer la valeur de chaque pari</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # NOUVEAU: Edge minimum réglable entre 3% et 10%
+    edge_minimum = st.slider(
+        "Edge minimum (%) - Différence minimum entre probabilité modèle et probabilité implicite",
+        min_value=3.0,
+        max_value=10.0,
+        value=5.0,
+        step=0.5,
+        key=f"min_edge_{event_url}"
+    )
+    
+    # Convertir le pourcentage en fraction
+    edge_minimum_fraction = edge_minimum / 100.0
     
     # Initialiser ou récupérer le dictionnaire pour stocker les cotes entrées
     if f"odds_dict_{event_url}" not in st.session_state:
@@ -4580,6 +4599,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                 <ul>
                     <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
                     <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
+                    <li>Edge minimum: <b>{edge_minimum:.1f}%</b></li>
                     <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
                     <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                     <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
@@ -4687,7 +4707,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         
                     # Vérifier le value betting
                     implicit_prob = 1 / fight['odds']
-                    if implicit_prob >= fight['probability']:
+                    
+                    # NOUVEAU: Calculer l'edge et vérifier qu'il est supérieur au minimum défini
+                    edge = fight['probability'] - implicit_prob
+                    if edge < edge_minimum_fraction:  # Edge minimum (exprimé en fraction décimale)
                         continue
                     
                     value = fight['probability'] * fight['odds']
@@ -4709,7 +4732,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             **fight,
                             'kelly': kelly,
                             'fractional_kelly': fractional_kelly,
-                            'edge': p - implicit_prob,
+                            'edge': edge,
                             'value': value
                         })
                 
@@ -4728,12 +4751,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             # Afficher les résultats
             if not filtered_fights:
                 # AMÉLIORATION UI: Message d'avertissement plus visuel
-                st.markdown("""
+                st.markdown(f"""
                 <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
                                          border: 1px solid rgba(255, 193, 7, 0.3); text-align: center; padding: 20px;">
                     <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
                     <h3 style="color: #FFC107; margin-bottom: 10px;">Aucun combat intéressant</h3>
-                    <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).</p>
+                    <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ 65%, edge ≥ {edge_minimum:.1f}% et value positive).</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -4741,23 +4764,27 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                 debug_info = st.expander("🔍 Détails des combats évalués", expanded=False)
                 with debug_info:
                     for fight in bettable_fights:
-                        odds_key = f"odds_{fight['fight_key']}"
+                        odds_key = f"odds_{fight_key}"
                         odds_value = st.session_state[f"odds_dict_{event_url}"].get(odds_key, "Non définie")
                         implicit_prob = 1 / float(odds_value) if isinstance(odds_value, (int, float)) and odds_value > 0 else "N/A"
                         edge = fight['probability'] - implicit_prob if isinstance(implicit_prob, float) else "N/A"
+                        
+                        # MODIFICATION: Affichage des raisons adaptées à la nouvelle stratégie
+                        if isinstance(edge, float):
+                            reason = "Confiance < 65%" if fight['probability'] < 0.65 else \
+                                    f"Edge insuffisant ({edge*100:.1f}% < {edge_minimum:.1f}%)" if edge < edge_minimum_fraction else \
+                                    "Value insuffisante" if fight['probability'] * float(odds_value) < 1.15 else \
+                                    "Raison inconnue"
+                        else:
+                            reason = "Erreur dans les données de cote"
                         
                         st.markdown(f"""
                         <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                             <div><b>{fight['red_fighter']} vs {fight['blue_fighter']}</b></div>
                             <div>Vainqueur prédit: <b>{fight['winner_name']}</b> ({fight['probability']:.0%})</div>
                             <div>Cote: <b>{odds_value}</b> (Probabilité implicite: {implicit_prob if isinstance(implicit_prob, float) else implicit_prob})</div>
-                            <div>Edge: <b>{edge if isinstance(edge, float) else edge}</b></div>
-                            <div>Raison: {
-                                "Confiance < 65%" if fight['probability'] < 0.65 
-                                else "Cote trop basse (probabilité implicite trop élevée)" if isinstance(implicit_prob, float) and implicit_prob >= fight['probability']
-                                else "Value insuffisante" if isinstance(implicit_prob, float) and fight['probability'] * float(odds_value) < 1.15
-                                else "Raison inconnue"
-                            }</div>
+                            <div>Edge: <b>{edge*100:.1f}% </b> si edge est un nombre à virgule flottante else edge</div>
+                            <div>Raison: {reason}</div>
                         </div>
                         """, unsafe_allow_html=True)
             else:
@@ -4859,13 +4886,14 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     with summary_cols[2]:
                         st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
                     
-                    # Résumé détaillé
+                    # Résumé détaillé avec edge minimum inclus
                     st.markdown(f"""
                     <div class="strategy-summary">
                         <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                         <ul>
                             <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
                             <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
+                            <li>Edge minimum: <b>{edge_minimum:.1f}%</b></li>
                             <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
                             <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                             <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
