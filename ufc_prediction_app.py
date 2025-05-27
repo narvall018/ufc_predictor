@@ -3547,9 +3547,8 @@ def show_prediction_page():
                     hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
                 ))
                 
-                # Configurer la mise en page
+                # Configurer la mise en page - FIXED: Remove the undefined legend entry
                 fig.update_layout(
-                    title=None,
                     xaxis_title=None,
                     yaxis_title="Probabilité de victoire",
                     yaxis=dict(
@@ -3576,7 +3575,8 @@ def show_prediction_page():
                         xanchor="center",
                         x=0.5
                     ),
-                    margin=dict(t=50, b=50)
+                    margin=dict(t=50, b=50),
+                    showlegend=True
                 )
                 
                 st.plotly_chart(fig, use_container_width=True)
@@ -3590,11 +3590,11 @@ def show_prediction_page():
                     marker_color=['#E53935', '#1E88E5'],
                     text=[f"{classic_prediction['red_probability']:.0%}", f"{classic_prediction['blue_probability']:.0%}"],
                     textposition='auto',
-                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>',
+                    showlegend=False
                 ))
                 
                 fig.update_layout(
-                    title=None,
                     xaxis_title=None,
                     yaxis_title="Probabilité de victoire",
                     yaxis=dict(
