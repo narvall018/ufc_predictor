@@ -26,46 +26,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Fonction pour détecter le thème actuel
-def get_theme_colors():
-    """Retourne les couleurs adaptées au thème actuel"""
-    # Détection basique du thème via les paramètres Streamlit
-    try:
-        theme_base = st.get_option("theme.base")
-        is_dark = theme_base == "dark"
-    except:
-        # Par défaut, assume le thème sombre si pas de détection
-        is_dark = True
-    
-    if is_dark:
-        return {
-            'text_primary': 'white',
-            'text_secondary': 'rgba(255, 255, 255, 0.8)',
-            'text_muted': 'rgba(255, 255, 255, 0.6)',
-            'bg_transparent': 'rgba(0,0,0,0)',
-            'border_color': 'rgba(255, 255, 255, 0.1)',
-            'card_bg': 'rgba(255, 255, 255, 0.08)',
-            'grid_color': 'rgba(255, 255, 255, 0.1)'
-        }
-    else:
-        return {
-            'text_primary': 'rgb(49, 51, 63)',
-            'text_secondary': 'rgb(49, 51, 63)',
-            'text_muted': 'rgb(132, 132, 132)',
-            'bg_transparent': 'transparent',
-            'border_color': 'rgba(49, 51, 63, 0.2)',
-            'card_bg': 'rgba(49, 51, 63, 0.05)',
-            'grid_color': 'rgba(49, 51, 63, 0.1)'
-        }
-
-# Obtenir les couleurs du thème
-theme_colors = get_theme_colors()
-
-# CSS adaptatif optimisé
-st.markdown(f"""
+# CSS personnalisé amélioré avec une palette de couleurs cohérente
+# AMÉLIORATION UI: Palette de couleurs harmonisée et variables CSS pour faciliter la modification
+st.markdown("""
 <style>
     /* Variables CSS pour une palette de couleurs cohérente */
-    :root {{
+    :root {
         --primary-red: #E53935;
         --primary-blue: #1E88E5;
         --primary-dark: #212121;
@@ -74,147 +40,134 @@ st.markdown(f"""
         --success-color: #4CAF50;
         --warning-color: #FFC107;
         --error-color: #F44336;
-        --text-primary: {theme_colors['text_primary']};
-        --text-secondary: {theme_colors['text_secondary']};
-        --text-muted: {theme_colors['text_muted']};
-        --card-bg: {theme_colors['card_bg']};
-        --border-color: {theme_colors['border_color']};
-        --grid-color: {theme_colors['grid_color']};
+        --card-bg: rgba(255, 255, 255, 0.08);
+        --card-border: rgba(255, 255, 255, 0.1);
         --elevation-1: 0 2px 5px rgba(0, 0, 0, 0.1);
         --elevation-2: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }}
+    }
 
     /* Styles globaux et typographie améliorés */
-    body {{
+    body {
         font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
         line-height: 1.6;
-    }}
+    }
     
-    h1, h2, h3, h4, h5 {{
+    h1, h2, h3, h4, h5 {
         font-weight: 600;
         letter-spacing: -0.02em;
-        color: var(--text-primary) !important;
-    }}
-    
-    p, div, span {{
-        color: var(--text-primary);
-    }}
+    }
     
     /* Composants de base */
-    .main-title {{
+    .main-title {
         text-align: center;
         font-size: 2.8rem;
         font-weight: 800;
-        color: var(--primary-red) !important;
+        color: var(--primary-red);
         margin-bottom: 10px;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-    }}
+    }
     
-    .sub-title {{
+    .sub-title {
         text-align: center;
         font-size: 1.3rem;
         margin-bottom: 30px;
-        color: var(--text-secondary) !important;
-    }}
+        color: #C0C0C0;
+    }
     
     /* AMÉLIORATION UI: Design système de cartes */
-    .card {{
+    .card {
         background-color: var(--card-bg);
         border-radius: 12px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--card-border);
         padding: 20px;
         margin-bottom: 20px;
         box-shadow: var(--elevation-1);
         transition: all 0.2s ease;
-    }}
+    }
     
-    .card:hover {{
+    .card:hover {
         box-shadow: var(--elevation-2);
-        border-color: var(--border-color);
-    }}
+        border-color: rgba(255, 255, 255, 0.2);
+    }
     
-    .card-title {{
+    .card-title {
         font-size: 1.3rem;
         font-weight: 600;
         margin-bottom: 15px;
-        color: var(--text-primary) !important;
-    }}
+        color: white;
+    }
     
     /* Prédiction */
-    .prediction-box {{
+    .prediction-box {
         background-color: var(--card-bg);
         padding: 25px;
         border-radius: 12px;
         box-shadow: var(--elevation-1);
         margin-bottom: 20px;
-        border: 1px solid var(--border-color);
-    }}
+        border: 1px solid var(--card-border);
+    }
     
-    .red-fighter {{
-        color: var(--primary-red) !important;
+    .red-fighter {
+        color: var(--primary-red);
         font-weight: bold;
-    }}
+    }
     
-    .blue-fighter {{
-        color: var(--primary-blue) !important;
+    .blue-fighter {
+        color: var(--primary-blue);
         font-weight: bold;
-    }}
+    }
     
-    .winner {{
+    .winner {
         font-size: 1.5rem;
         font-weight: bold;
-    }}
+    }
     
     /* AMÉLIORATION UI: Métriques et KPIs */
-    [data-testid="stMetric"] {{
-        background-color: var(--card-bg);
+    [data-testid="stMetric"] {
+        background-color: rgba(255, 255, 255, 0.05);
         padding: 16px;
         border-radius: 10px;
         transition: all 0.2s ease;
-        border: 1px solid var(--border-color);
-    }}
+    }
     
-    [data-testid="stMetric"]:hover {{
-        background-color: var(--card-bg);
-        transform: translateY(-2px);
-    }}
+    [data-testid="stMetric"]:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
     
-    [data-testid="stMetric"] > div {{
+    [data-testid="stMetric"] > div {
         width: 100%;
-    }}
+    }
     
-    [data-testid="stMetricLabel"] {{
+    [data-testid="stMetricLabel"] {
         display: flex;
         justify-content: center;
         font-weight: 500;
         font-size: 0.9rem;
-        color: var(--text-muted) !important;
-    }}
+        color: gray !important;
+    }
     
-    [data-testid="stMetricValue"] {{
+    [data-testid="stMetricValue"] {
         display: flex;
         justify-content: center;
         font-weight: 700;
         font-size: 1.5rem;
-        color: var(--text-primary) !important;
-    }}
+    }
     
-    [data-testid="stMetricDelta"] {{
+    [data-testid="stMetricDelta"] {
         display: flex;
         justify-content: center;
-        color: var(--text-secondary) !important;
-    }}
+    }
     
-    /* Compatibilité thème pour les cartes */
-    .stTabs [data-baseweb="tab-panel"] {{
-        background-color: var(--card-bg);
+    /* Compatibilité thème sombre pour les cartes */
+    .stTabs [data-baseweb="tab-panel"] {
+        background-color: rgba(255, 255, 255, 0.03);
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid var(--border-color);
-    }}
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
     
     /* AMÉLIORATION UI: Badges et labels plus modernes */
-    .badge {{
+    .badge {
         display: inline-block;
         padding: 4px 10px;
         border-radius: 20px;
@@ -222,9 +175,9 @@ st.markdown(f"""
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.03em;
-    }}
+    }
     
-    .ml-badge {{
+    .ml-badge {
         background-color: var(--success-color);
         color: white;
         padding: 5px 10px;
@@ -232,9 +185,9 @@ st.markdown(f"""
         font-weight: 600;
         font-size: 0.75rem;
         margin-left: 10px;
-    }}
+    }
     
-    .classic-badge {{
+    .classic-badge {
         background-color: var(--primary-blue);
         color: white;
         padding: 5px 10px;
@@ -242,35 +195,371 @@ st.markdown(f"""
         font-weight: 600;
         font-size: 0.75rem;
         margin-left: 10px;
-    }}
+    }
     
     /* AMÉLIORATION UI: Boîtes d'information */
-    .info-box {{
+    .info-box {
         background-color: rgba(255, 193, 7, 0.1);
         padding: 15px;
         border-radius: 8px;
         margin: 15px 0;
         border-left: 3px solid var(--warning-color);
-    }}
-    
-    .info-box h4 {{
-        color: var(--warning-color) !important;
-        margin-top: 0;
-    }}
-    
-    .info-box p {{
-        color: var(--text-primary) !important;
-        margin-bottom: 8px !important;
-    }}
+    }
     
     /* Divider pour les sections */
-    .divider {{
-        border-top: 1px solid var(--border-color);
+    .divider {
+        border-top: 1px solid rgba(200, 200, 200, 0.15);
         margin: 25px 0;
-    }}
+    }
+    
+    /* AMÉLIORATION UI: Cartes de paris */
+    .betting-card {
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
+    
+    .betting-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .betting-card-red {
+        background: linear-gradient(135deg, rgba(229, 57, 53, 0.1) 0%, rgba(229, 57, 53, 0.05) 100%);
+        border: 1px solid rgba(229, 57, 53, 0.2);
+    }
+    
+    .betting-card-blue {
+        background: linear-gradient(135deg, rgba(30, 136, 229, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+        border: 1px solid rgba(30, 136, 229, 0.2);
+    }
+    
+    /* AMÉLIORATION UI: Statuts et indicateurs */
+    .favorable {
+        color: var(--success-color);
+        font-weight: bold;
+    }
+    
+    .neutral {
+        color: var(--warning-color);
+        font-weight: bold;
+    }
+    
+    .unfavorable {
+        color: var(--error-color);
+        font-weight: bold;
+    }
+    
+    /* AMÉLIORATION UI: Boutons d'action modernisés */
+    .action-button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .delete-button {
+        background-color: var(--error-color);
+        color: white;
+    }
+    
+    .update-button {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    /* AMÉLIORATION UI: Gestion de paris améliorée */
+    .bet-management-container {
+        background-color: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Kelly Table */
+    .kelly-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .kelly-table th {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .kelly-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+    }
+    
+    .kelly-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .kelly-table tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .kelly-highlight {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    
+    /* Style pour les événements à venir */
+    .upcoming-event {
+        background: linear-gradient(145deg, rgba(40, 42, 54, 0.8) 0%, rgba(30, 31, 38, 0.8) 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        box-shadow: var(--elevation-1);
+    }
+    
+    .upcoming-fight {
+        background-color: rgba(248, 249, 250, 0.03);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    /* AMÉLIORATION UI: Loading state */
+    .loading-spinner {
+        text-align: center;
+        margin: 25px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .loading-spinner::after {
+        content: "";
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spinner 1s ease-in-out infinite;
+    }
+    
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* AMÉLIORATION UI: Combat cards plus modernes */
+    .fight-card {
+        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: var(--elevation-1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .fight-card:hover {
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .fight-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    /* AMÉLIORATION UI: Sections d'événements */
+    .event-section {
+        background-color: rgba(38, 39, 48, 0.8);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--elevation-2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    
+    .event-title {
+        background: linear-gradient(135deg, var(--primary-red) 0%, #E63946 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 2px 10px rgba(230, 57, 70, 0.3);
+    }
+    
+    /* AMÉLIORATION UI: Combat cards modernisées */
+    .fight-card-improved {
+        background-color: rgba(200, 200, 200, 0.15);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: var(--elevation-1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
+    }
+    
+    .fight-card-improved:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--elevation-2);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .fighters-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .fighter-name-red {
+        color: var(--primary-red);
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: left;
+    }
+    
+    .fighter-name-blue {
+        color: var(--primary-blue);
+        font-weight: bold;
+        font-size: 1.3rem;
+        flex: 1;
+        text-align: right;
+    }
+    
+    .vs-badge {
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        margin: 0 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Suite du CSS amélioré
+st.markdown("""
+<style>
+    /* AMÉLIORATION UI: Barres de probabilité plus intuitives */
+    .probability-container {
+        margin: 15px 0;
+    }
+    
+    .probability-bar {
+        height: 30px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    
+    .probability-bar-red {
+        height: 100%;
+        background: linear-gradient(90deg, #E53935 0%, #F44336 100%);
+        float: left;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+        font-weight: bold;
+        border-radius: 15px 0 0 15px;
+    }
+    
+    .probability-bar-blue {
+        height: 100%;
+        background: linear-gradient(90deg, #1E88E5 0%, #2196F3 100%);
+        float: right;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+        font-weight: bold;
+        border-radius: 0 15px 15px 0;
+    }
+    
+    /* AMÉLIORATION UI: Badges et étiquettes */
+    .prediction-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 10px;
+    }
+    
+    .prediction-badge-red {
+        background-color: var(--primary-red);
+        color: white;
+    }
+    
+    .prediction-badge-blue {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .prediction-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    .prediction-method {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .confidence-badge {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .confidence-high {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #81c784;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+    
+    .confidence-moderate {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffd54f;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
     
     /* AMÉLIORATION UI: Section d'accueil totalement repensée */
-    .welcome-header {{
+    .welcome-header {
         text-align: center;
         padding: 50px 0;
         background: linear-gradient(135deg, rgba(229, 57, 53, 0.8) 0%, rgba(30, 136, 229, 0.8) 100%);
@@ -278,256 +567,243 @@ st.markdown(f"""
         margin-bottom: 40px;
         color: white;
         box-shadow: var(--elevation-2);
-    }}
+    }
     
-    .welcome-title {{
+    .welcome-title {
         font-size: 3.5rem;
         font-weight: 800;
         margin-bottom: 15px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         letter-spacing: -0.02em;
-        color: white !important;
-    }}
+    }
     
-    .welcome-subtitle {{
+    .welcome-subtitle {
         font-size: 1.5rem;
         margin-bottom: 20px;
         max-width: 700px;
         margin-left: auto;
         margin-right: auto;
-        color: rgba(255, 255, 255, 0.9) !important;
-    }}
+        color: rgba(255, 255, 255, 0.9);
+    }
     
     /* AMÉLIORATION UI: Feature cards plus visuelles */
-    .home-card {{
-        background-color: var(--card-bg);
+    .home-card {
+        background: linear-gradient(145deg, rgba(48, 51, 66, 0.7) 0%, rgba(33, 36, 46, 0.7) 100%);
         border-radius: 12px;
         padding: 30px;
         margin-bottom: 25px;
         box-shadow: var(--elevation-1);
-        border: 1px solid var(--border-color);
+        border: 1px solid rgba(255, 255, 255, 0.05);
         transition: all 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
-    }}
+    }
     
-    .home-card:hover {{
+    .home-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--elevation-2);
-    }}
+        border-color: rgba(255, 255, 255, 0.1);
+    }
     
-    .feature-icon {{
+    .feature-icon {
         font-size: 2.8rem;
         margin-bottom: 20px;
         text-align: center;
         color: var(--primary-accent);
-    }}
+    }
     
-    .feature-title {{
+    .feature-title {
         font-size: 1.4rem;
         font-weight: 700;
         margin-bottom: 15px;
         text-align: center;
-        color: var(--text-primary) !important;
-    }}
+        color: white;
+    }
     
-    .feature-description {{
+    .feature-description {
         text-align: center;
         font-size: 1rem;
-        color: var(--text-secondary) !important;
+        color: rgba(255, 255, 255, 0.8);
         flex-grow: 1;
-    }}
+    }
     
     /* AMÉLIORATION UI: Stratégie kelly */
-    .kelly-box {{
-        background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(30, 100, 60, 0.1) 100%);
+    .kelly-box {
+        background: linear-gradient(145deg, rgba(40, 124, 70, 0.1) 0%, rgba(30, 100, 60, 0.1) 100%);
         border-radius: 12px;
         padding: 20px;
         margin: 20px 0;
         border-left: 3px solid var(--success-color);
         box-shadow: var(--elevation-1);
-    }}
+    }
     
-    .kelly-title {{
-        color: var(--success-color) !important;
+    .kelly-title {
+        color: var(--success-color);
         font-weight: bold;
         margin-bottom: 15px;
         font-size: 1.2rem;
-    }}
+    }
     
     /* AMÉLIORATION UI: Placement de paris */
-    .bet-placement-box {{
-        background: linear-gradient(145deg, rgba(30, 136, 229, 0.1) 0%, rgba(20, 60, 150, 0.1) 100%);
+    .bet-placement-box {
+        background: linear-gradient(145deg, rgba(25, 70, 186, 0.1) 0%, rgba(20, 60, 150, 0.1) 100%);
         border-radius: 12px;
         padding: 20px;
         margin: 20px 0;
         border-left: 3px solid var(--primary-blue);
         box-shadow: var(--elevation-1);
-    }}
+    }
     
-    .bet-placement-title {{
-        color: var(--primary-blue) !important;
+    .bet-placement-title {
+        color: var(--primary-blue);
         font-weight: bold;
         margin-bottom: 15px;
         font-size: 1.2rem;
-    }}
+    }
     
     /* AMÉLIORATION UI: Stratégie de paris */
-    .betting-strategy-box {{
+    .betting-strategy-box {
         background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
         border-radius: 12px;
         padding: 25px;
         margin: 20px 0;
         border-left: 3px solid var(--success-color);
         box-shadow: var(--elevation-1);
-    }}
+    }
     
-    .strategy-title {{
-        color: var(--success-color) !important;
+    .strategy-title {
+        color: var(--success-color);
         font-weight: bold;
         margin-bottom: 15px;
         font-size: 1.3rem;
-    }}
+    }
     
-    .strategy-summary {{
+    .strategy-summary {
         background-color: rgba(76, 175, 80, 0.05);
         padding: 15px;
         border-radius: 10px;
         margin-top: 15px;
         border: 1px solid rgba(76, 175, 80, 0.1);
-    }}
+    }
     
-    .strategy-summary ul {{
-        color: var(--text-primary) !important;
-    }}
-    
-    .strategy-summary li {{
-        color: var(--text-primary) !important;
-        margin-bottom: 5px;
-    }}
-    
-    /* Combat cards modernisées */
-    .fight-card-improved {{
-        background-color: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: var(--elevation-1);
-        border: 1px solid var(--border-color);
-        transition: all 0.2s ease;
-    }}
-    
-    .fight-card-improved:hover {{
-        transform: translateY(-2px);
-        box-shadow: var(--elevation-2);
-    }}
-    
-    .fighters-banner {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }}
-    
-    .fighter-name-red {{
-        color: var(--primary-red) !important;
+    .value-betting-positive {
+        color: var(--success-color);
         font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: left;
-    }}
+    }
     
-    .fighter-name-blue {{
-        color: var(--primary-blue) !important;
+    .value-betting-negative {
+        color: var(--error-color);
         font-weight: bold;
-        font-size: 1.3rem;
-        flex: 1;
-        text-align: right;
-    }}
-    
-    .vs-badge {{
-        background-color: var(--card-bg);
-        color: var(--text-primary) !important;
-        padding: 6px 12px;
-        border-radius: 20px;
-        margin: 0 10px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        border: 1px solid var(--border-color);
-    }}
-    
-    /* Animations */
-    .section-fade-in {{
-        animation: fadeIn 0.5s ease-in-out;
-    }}
-    
-    @keyframes fadeIn {{
-        from {{ opacity: 0; transform: translateY(10px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
-    }}
-    
-    /* Formulaires adaptatifs */
-    .stTextInput > div > div > input,
-    .stNumberInput > div > div > input,
-    .stSelectbox > div > div > div,
-    .stSlider > div > div > div > div {{
-        color: var(--text-primary) !important;
-    }}
-    
-    /* Tableaux adaptatifs */
-    .dataframe {{
-        color: var(--text-primary) !important;
-    }}
-    
-    .dataframe th {{
-        color: var(--text-primary) !important;
-        background-color: var(--card-bg) !important;
-    }}
-    
-    .dataframe td {{
-        color: var(--text-primary) !important;
-    }}
-    
-    /* Success/Warning/Error messages universels */
-    .success-message {{
-        color: var(--success-color) !important;
-    }}
-    
-    .warning-message {{
-        color: var(--warning-color) !important;
-    }}
-    
-    .error-message {{
-        color: var(--error-color) !important;
-    }}
-    
-    /* Responsive design */
-    @media (max-width: 768px) {{
-        .welcome-title {{
+    }
+
+    /* NOUVELLE SECTION UI: Responsive design */
+    @media (max-width: 768px) {
+        .welcome-title {
             font-size: 2.5rem;
-        }}
+        }
         
-        .welcome-subtitle {{
+        .welcome-subtitle {
             font-size: 1.2rem;
-        }}
+        }
         
-        .feature-icon {{
+        .feature-icon {
             font-size: 2.2rem;
-        }}
+        }
         
-        .main-title {{
+        .main-title {
             font-size: 2.2rem;
-        }}
+        }
         
-        .fight-card-improved, .prediction-box, .kelly-box, .bet-placement-box {{
+        .fight-card, .prediction-box, .kelly-box, .bet-placement-box {
             padding: 15px;
-        }}
+        }
         
-        .fighter-name-red, .fighter-name-blue {{
+        .fighter-name-red, .fighter-name-blue {
             font-size: 1.1rem;
-        }}
-    }}
+        }
+        
+        /* Adaptation des tableaux */
+        .kelly-table th, .kelly-table td {
+            padding: 8px 5px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* NOUVELLE SECTION UI: Animations subtiles */
+    .section-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* NOUVELLE SECTION UI: Améliorations des formulaires */
+input[type="number"], input[type="text"], input[type="date"], select {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;https://www.perplexity.ai/
+    color: gray !important;
+    transition: all 0.2s !important;
+}
+
+    
+    input[type="number"]:focus, input[type="text"]:focus, 
+    input[type="date"]:focus, select:focus {
+        border-color: var(--primary-blue) !important;
+        box-shadow: 0 0 0 1px var(--primary-blue) !important;
+    }
+    
+    /* Adaptation des contrôles Streamlit */
+    div.stButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5em 1em;
+        transition: all 0.2s;
+    }
+    
+    div.stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Correction des styles pour recommandations */
+    .recommendation-box {
+        margin-top: 15px;
+    }
+    
+    .recommendation-label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .recommendation-value {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .recommendation-favorable {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        border: 1px solid rgba(76, 175, 80, 0.5);
+    }
+    
+    .recommendation-neutral {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #FFC107;
+        border: 1px solid rgba(255, 193, 7, 0.5);
+    }
+    
+    .recommendation-unfavorable {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+        border: 1px solid rgba(244, 67, 54, 0.5);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -541,17 +817,7 @@ HEADERS = {
 # Cache pour les requêtes
 request_cache = {}
 
-# Fonction pour obtenir des couleurs adaptatives pour Plotly
-def get_plotly_theme():
-    """Retourne les paramètres de thème pour Plotly selon le thème Streamlit"""
-    colors = get_theme_colors()
-    
-    return {
-        'paper_bgcolor': 'rgba(0,0,0,0)',
-        'plot_bgcolor': 'rgba(0,0,0,0)',
-        'font_color': colors['text_primary'],
-        'grid_color': colors['grid_color']
-    }
+
 
 @st.cache_resource(ttl=3600*24)
 def load_app_data():
@@ -1351,9 +1617,6 @@ def create_radar_chart(fighter_a, fighter_b):
     # AMÉLIORATION UI: Utiliser Plotly avec des couleurs et un design moderne
     fig = go.Figure()
     
-    # Obtenir le thème pour Plotly
-    plotly_theme = get_plotly_theme()
-    
     # Ajouter les traces pour chaque combattant avec des couleurs améliorées et plus de transparence
     fig.add_trace(go.Scatterpolar(
         r=a_values_norm + [a_values_norm[0]],  # Fermer le polygone
@@ -1375,19 +1638,19 @@ def create_radar_chart(fighter_a, fighter_b):
         line=dict(width=2)
     ))
     
-    # Configurer la mise en page moderne avec thème adaptatif
+    # Configurer la mise en page moderne
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
                 range=[0, 1.2],
                 showticklabels=False,
-                gridcolor=plotly_theme['grid_color'],
-                linecolor=plotly_theme['grid_color']
+                gridcolor='rgba(255, 255, 255, 0.1)',
+                linecolor='rgba(255, 255, 255, 0.1)'
             ),
             angularaxis=dict(
-                gridcolor=plotly_theme['grid_color'],
-                linecolor=plotly_theme['grid_color']
+                gridcolor='rgba(255, 255, 255, 0.1)',
+                linecolor='rgba(255, 255, 255, 0.1)'
             ),
             bgcolor='rgba(0, 0, 0, 0)'
         ),
@@ -1397,13 +1660,13 @@ def create_radar_chart(fighter_a, fighter_b):
             'x':0.5,
             'xanchor': 'center',
             'yanchor': 'top',
-            'font': dict(size=18, color=plotly_theme['font_color'])
+            'font': dict(size=18, color='white')
         },
         height=500,
         margin=dict(l=80, r=80, t=100, b=80),
-        paper_bgcolor=plotly_theme['paper_bgcolor'],
-        plot_bgcolor=plotly_theme['plot_bgcolor'],
-        font=dict(color=plotly_theme['font_color']),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='gray'),
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -1449,8 +1712,6 @@ def create_strengths_weaknesses_chart(fighter_a, fighter_b):
     })
     
     # AMÉLIORATION UI: Graphique avec des couleurs et styles modernes
-    plotly_theme = get_plotly_theme()
-    
     fig = px.bar(
         df, 
         x='Attribute', 
@@ -1466,17 +1727,17 @@ def create_strengths_weaknesses_chart(fighter_a, fighter_b):
         xaxis_title="",
         legend_title="Combattant",
         height=500,
-        paper_bgcolor=plotly_theme['paper_bgcolor'],
-        plot_bgcolor=plotly_theme['plot_bgcolor'],
-        font=dict(color=plotly_theme['font_color']),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
         xaxis=dict(
             showgrid=True,
-            gridcolor=plotly_theme['grid_color'],
+            gridcolor='rgba(255, 255, 255, 0.1)',
             zeroline=False
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor=plotly_theme['grid_color'],
+            gridcolor='rgba(255, 255, 255, 0.1)',
             zeroline=False,
             range=[0, 1.05]
         ),
@@ -1524,28 +1785,27 @@ def create_style_analysis_chart(fighter_a, fighter_b):
     b_sg_norm = b_striker_grappler / max_sg if max_sg > 0 else 0
     b_ad_norm = b_aggressive_defensive / max_ad if max_ad > 0 else 0
     
-    # AMÉLIORATION UI: Graphique modernisé avec thème adaptatif
+    # AMÉLIORATION UI: Graphique modernisé
     fig = go.Figure()
-    plotly_theme = get_plotly_theme()
     
-    # Ajouter un arrière-plan de quadrant
+    # Ajouter un arrière-plan de quadrant avec contour gris
     fig.add_shape(
         type="rect", xref="paper", yref="paper",
         x0=0, y0=0, x1=1, y1=1,
-        line=dict(color=plotly_theme['grid_color'], width=1)
+        line=dict(color="rgba(128, 128, 128, 0.3)", width=1)
     )
     
-    # Ajouter des lignes de quadrant avec style amélioré
+    # Ajouter des lignes de quadrant avec style amélioré en gris
     fig.add_shape(
         type="line", xref="paper", yref="paper",
         x0=0.5, y0=0, x1=0.5, y1=1,
-        line=dict(color=plotly_theme['grid_color'], width=1, dash="dot")
+        line=dict(color="rgba(128, 128, 128, 0.4)", width=1, dash="dot")
     )
     
     fig.add_shape(
         type="line", xref="paper", yref="paper",
         x0=0, y0=0.5, x1=1, y1=0.5,
-        line=dict(color=plotly_theme['grid_color'], width=1, dash="dot")
+        line=dict(color="rgba(128, 128, 128, 0.4)", width=1, dash="dot")
     )
     
     # Ajouter les points pour chaque combattant avec style amélioré
@@ -1556,7 +1816,7 @@ def create_style_analysis_chart(fighter_a, fighter_b):
         marker=dict(
             size=20, 
             color='#E53935',
-            line=dict(width=2, color=plotly_theme['font_color'])
+            line=dict(width=2, color='white')
         ),
         text=fighter_a['name'],
         textposition="top center",
@@ -1571,7 +1831,7 @@ def create_style_analysis_chart(fighter_a, fighter_b):
         marker=dict(
             size=20, 
             color='#1E88E5',
-            line=dict(width=2, color=plotly_theme['font_color'])
+            line=dict(width=2, color='white')
         ),
         text=fighter_b['name'],
         textposition="top center",
@@ -1580,32 +1840,31 @@ def create_style_analysis_chart(fighter_a, fighter_b):
     ))
     
     # Ajouter des annotations pour les quadrants avec style amélioré
-    annotation_color = plotly_theme['font_color']
-    
     fig.add_annotation(
         x=0.25, y=0.75, 
         text="Grappler Agressif",
         showarrow=False,
-        font=dict(color=annotation_color, size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.75, y=0.75, 
         text="Striker Agressif",
         showarrow=False,
-        font=dict(color=annotation_color, size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.25, y=0.25, 
         text="Grappler Défensif",
         showarrow=False,
-        font=dict(color=annotation_color, size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.75, y=0.25, 
         text="Striker Défensif",
         showarrow=False,
-        font=dict(color=annotation_color, size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
+
     
     # Configurer la mise en page moderne
     fig.update_layout(
@@ -1615,7 +1874,7 @@ def create_style_analysis_chart(fighter_a, fighter_b):
             'x': 0.5,
             'xanchor': 'center',
             'yanchor': 'top',
-            'font': dict(size=18, color=plotly_theme['font_color'])
+            'font': dict(size=18, color='white')
         },
         xaxis_title="Style de combat (Grappler ← → Striker)",
         yaxis_title="Approche (Défensif ← → Agressif)",
@@ -1632,9 +1891,9 @@ def create_style_analysis_chart(fighter_a, fighter_b):
             showticklabels=False
         ),
         height=600,
-        paper_bgcolor=plotly_theme['paper_bgcolor'],
-        plot_bgcolor=plotly_theme['plot_bgcolor'],
-        font=dict(color=plotly_theme['font_color']),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -1646,6 +1905,7 @@ def create_style_analysis_chart(fighter_a, fighter_b):
     )
     
     return fig
+
 
 # Fonction pour créer un DataFrame des statistiques comparatives
 def create_stats_comparison_df(fighter_a, fighter_b):
@@ -2210,6 +2470,7 @@ if 'betting_recommendations' not in st.session_state:
 with st.spinner("Chargement des données de l'application..."):
     app_data = load_app_data()
     if st.session_state.show_loading_welcome:
+        # st.balloons()
         st.session_state.show_loading_welcome = False
 
 # FONCTION PRINCIPALE
@@ -2368,15 +2629,17 @@ def show_welcome_page():
     for update in updates:
         st.markdown(f"""
         <div style="display: flex; margin-bottom: 15px; align-items: flex-start;">
-            <div style="min-width: 100px; font-weight: 500; color: var(--text-muted);">{update['date']}</div>
+            <div style="min-width: 100px; font-weight: 500; color: #888;">{update['date']}</div>
             <div>
-                <div style="font-weight: 600; margin-bottom: 5px; color: var(--text-primary);">{update['title']}</div>
-                <div style="color: var(--text-secondary); font-size: 0.9rem;">{update['desc']}</div>
+                <div style="font-weight: 600; margin-bottom: 5px;">{update['title']}</div>
+                <div style="color: #aaa; font-size: 0.9rem;">{update['desc']}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
-
 # PARTIE 6
+
+
+
 
 def show_prediction_page():
     """Interface de prédiction améliorée avec une meilleure organisation"""
@@ -2513,9 +2776,6 @@ def show_prediction_page():
             # Afficher les résultats des deux prédictions
             st.subheader("🔮 Prédictions du combat")
             
-            # Obtenir le thème pour les graphiques
-            plotly_theme = get_plotly_theme()
-            
             # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
             if ml_prediction:
                 # Créer un DataFrame pour le graphique comparatif
@@ -2525,7 +2785,7 @@ def show_prediction_page():
                     'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
                 })
                 
-                # Graphique modernisé avec thème adaptatif
+                # Graphique modernisé
                 fig = go.Figure()
                 
                 # Ajouter les barres pour chaque méthode avec un style amélioré
@@ -2549,7 +2809,7 @@ def show_prediction_page():
                     hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
                 ))
                 
-                # Configurer la mise en page avec thème adaptatif
+                # Configurer la mise en page
                 fig.update_layout(
                     title=None,
                     xaxis_title=None,
@@ -2557,20 +2817,20 @@ def show_prediction_page():
                     yaxis=dict(
                         range=[0, 1],
                         tickformat='.0%',
-                        gridcolor=plotly_theme['grid_color'],
+                        gridcolor='rgba(255,255,255,0.1)',
                         showgrid=True
                     ),
                     xaxis=dict(
-                        gridcolor=plotly_theme['grid_color'],
+                        gridcolor='rgba(255,255,255,0.1)',
                     ),
                     legend_title=None,
                     height=400,
                     barmode='group',
                     bargap=0.30,
                     bargroupgap=0.1,
-                    paper_bgcolor=plotly_theme['paper_bgcolor'],
-                    plot_bgcolor=plotly_theme['plot_bgcolor'],
-                    font=dict(color=plotly_theme['font_color']),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
                     legend=dict(
                         orientation="h",
                         yanchor="bottom",
@@ -2584,7 +2844,7 @@ def show_prediction_page():
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 # Si seulement la méthode statistique est disponible
-                # Graphique modernisé pour la méthode unique avec thème adaptatif
+                # Graphique modernisé pour la méthode unique
                 fig = go.Figure()
                 fig.add_trace(go.Bar(
                     x=[fighter_a['name'], fighter_b['name']],
@@ -2602,16 +2862,754 @@ def show_prediction_page():
                     yaxis=dict(
                         range=[0, 1],
                         tickformat='.0%',
-                        gridcolor=plotly_theme['grid_color'],
+                        gridcolor='rgba(255,255,255,0.1)',
                         showgrid=True
                     ),
                     xaxis=dict(
-                        gridcolor=plotly_theme['grid_color'],
+                        gridcolor='rgba(255,255,255,0.1)',
                     ),
                     height=400,
-                    paper_bgcolor=plotly_theme['paper_bgcolor'],
-                    plot_bgcolor=plotly_theme['plot_bgcolor'],
-                    font=dict(color=plotly_theme['font_color']),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
+                    margin=dict(t=50, b=50)
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # NOUVELLE SECTION: Affichage amélioré des prédictions
+            st.subheader("📊 Résultats des prédictions")
+            
+            # Conteneurs pour les prédictions
+            pred_cols = st.columns(2 if ml_prediction else 1)
+            
+            # Afficher la prédiction statistique
+            with pred_cols[0]:
+                # Créer un conteneur avec bordure pour la prédiction statistique
+                stat_container = st.container()
+                
+                with stat_container:
+                    st.subheader("Prédiction Statistique")
+                    
+                    # Métriques pour une meilleure visualisation
+                    red_prob = classic_prediction['red_probability']
+                    blue_prob = classic_prediction['blue_probability']
+                    
+                    # Afficher le vainqueur prédit en grand
+                    winner_name = classic_prediction['winner_name']
+                    st.markdown(f"### Vainqueur prédit: {winner_name}")
+                    
+                    # Créer deux colonnes pour les probabilités
+                    prob_cols = st.columns(2)
+                    
+                    with prob_cols[0]:
+                        # Métrique pour le combattant rouge
+                        st.metric(
+                            f"🔴 {fighter_a['name']}",
+                            f"{red_prob:.0%}",
+                            delta=None
+                        )
+                        
+                    with prob_cols[1]:
+                        # Métrique pour le combattant bleu
+                        st.metric(
+                            f"🔵 {fighter_b['name']}",
+                            f"{blue_prob:.0%}",
+                            delta=None
+                        )
+                    
+                    # Barre de progression pour visualiser les probabilités
+                    st.progress(red_prob)
+                    
+                    # Afficher la confiance
+                    confidence = classic_prediction['confidence']
+                    if confidence == "Élevé":
+                        st.success(f"Confiance: {confidence}")
+                    else:
+                        st.warning(f"Confiance: {confidence}")
+
+            # Afficher la prédiction ML si disponible
+            if ml_prediction:
+                with pred_cols[1]:
+                    # Créer un conteneur avec bordure pour la prédiction ML
+                    ml_container = st.container()
+                    
+                    with ml_container:
+                        st.subheader("Prédiction Machine Learning")
+                        
+                        # Métriques pour une meilleure visualisation
+                        red_prob_ml = ml_prediction['red_probability']
+                        blue_prob_ml = ml_prediction['blue_probability']
+                        
+                        # Afficher le vainqueur prédit en grand
+                        winner_name_ml = ml_prediction['winner_name']
+                        st.markdown(f"### Vainqueur prédit: {winner_name_ml}")
+                        
+                        # Créer deux colonnes pour les probabilités
+                        prob_cols_ml = st.columns(2)
+                        
+                        with prob_cols_ml[0]:
+                            # Métrique pour le combattant rouge
+                            st.metric(
+                                f"🔴 {fighter_a['name']}",
+                                f"{red_prob_ml:.0%}",
+                                delta=None
+                            )
+                            
+                        with prob_cols_ml[1]:
+                            # Métrique pour le combattant bleu
+                            st.metric(
+                                f"🔵 {fighter_b['name']}",
+                                f"{blue_prob_ml:.0%}",
+                                delta=None
+                            )
+                        
+                        # Barre de progression pour visualiser les probabilités
+                        st.progress(red_prob_ml)
+                        
+                        # Afficher la confiance
+                        confidence_ml = ml_prediction['confidence']
+                        if confidence_ml == "Élevé":
+                            st.success(f"Confiance: {confidence_ml}")
+                        else:
+                            st.warning(f"Confiance: {confidence_ml}")
+
+            # Message de convergence/divergence si les deux méthodes sont disponibles
+            if ml_prediction:
+                same_prediction = classic_prediction['prediction'] == ml_prediction['prediction']
+                if same_prediction:
+                    st.success("✅ Les deux méthodes prédisent le même vainqueur!")
+                else:
+                    st.warning("⚠️ Les méthodes prédisent des vainqueurs différents!")
+                
+            # PARTIE 7: Analyse Kelly et recommandations de paris
+            if ml_prediction:
+                st.divider()
+                st.subheader("📊 Analyse Kelly et recommandations de paris")
+                
+                # Obtenir la fraction Kelly sélectionnée
+                kelly_fractions = {
+                    "Kelly pur": 1,
+                    "Kelly/2": 2,
+                    "Kelly/3": 3, 
+                    "Kelly/4": 4,
+                    "Kelly/5": 5,
+                    "Kelly/10": 10
+                }
+                selected_fraction = kelly_fractions[st.session_state.kelly_strategy]
+                
+                # Détermine le combattant qui a la plus forte valeur attendue
+                if ml_prediction['prediction'] == 'Red':
+                    best_fighter = fighter_a['name']
+                    best_odds = odds_a
+                    best_prob = ml_prediction['red_probability']
+                else:
+                    best_fighter = fighter_b['name']
+                    best_odds = odds_b
+                    best_prob = ml_prediction['blue_probability']
+                
+                # Calculer les recommandations Kelly pour le combattant favori selon le ML
+                kelly_amount = calculate_kelly(best_prob, best_odds, app_data["current_bankroll"], selected_fraction)
+                
+                # Section Kelly modernisée avec composants Streamlit natifs
+                st.write("### Recommandation de mise avec la méthode " + st.session_state.kelly_strategy)
+                st.write("Pour maximiser votre ROI sur le long terme, la méthode Kelly recommande:")
+                
+                # Créer un DataFrame au lieu d'une table HTML
+                kelly_data = pd.DataFrame({
+                    "Combattant": [best_fighter],
+                    "Probabilité ML": [f"{best_prob:.0%}"],
+                    "Cote": [f"{best_odds:.2f}"],
+                    "Mise recommandée": [f"{kelly_amount:.2f} €"],
+                    "% de bankroll": [f"{(kelly_amount/app_data['current_bankroll']*100):.1f}%"],
+                    "Gain potentiel": [f"{kelly_amount * (best_odds-1):.2f} €"]
+                })
+                
+                # Afficher le DataFrame avec style
+                st.dataframe(kelly_data, use_container_width=True, hide_index=True)
+                
+                st.caption("Le critère de Kelly détermine la mise optimale en fonction de votre avantage et de votre bankroll totale.")
+                
+                # Section pour placer un pari modernisée
+                st.subheader(f"Placer un pari sur {best_fighter}")
+                
+                # Colonnes pour les informations du pari
+                bet_cols = st.columns(2)
+                
+                with bet_cols[0]:
+                    # Nom de l'événement
+                    event_name = st.text_input("Nom de l'événement", value="UFC Fight Night", key="event_name_input")
+                    
+                    # Date de l'événement
+                    event_date = st.date_input("Date de l'événement", value=datetime.datetime.now(), key="event_date_input")
+                
+                with bet_cols[1]:
+                    # Montant à miser
+                    bet_amount = st.number_input(
+                        "Montant à miser (€)",
+                        min_value=0.0,
+                        max_value=float(app_data["current_bankroll"]),
+                        value=float(kelly_amount),
+                        step=5.0,
+                        format="%.2f",
+                        key="bet_amount_input"
+                    )
+                    
+                    # Utiliser la mise Kelly recommandée
+                    use_kelly = st.checkbox("Utiliser la mise Kelly recommandée", value=True, key="use_kelly_checkbox")
+                    if use_kelly:
+                        bet_amount = kelly_amount
+                
+                # Afficher les détails du pari avec un design attractif
+                pot_gain = bet_amount * (best_odds-1)
+                roi_pct = (pot_gain / bet_amount) * 100 if bet_amount > 0 else 0
+                
+                # Créer 3 colonnes pour les métriques
+                bet_metrics_cols = st.columns(3)
+                with bet_metrics_cols[0]:
+                    st.metric("Mise", f"{bet_amount:.2f}€")
+                with bet_metrics_cols[1]:
+                    st.metric("Gain potentiel", f"{pot_gain:.2f}€")
+                with bet_metrics_cols[2]:
+                    st.metric("ROI", f"{roi_pct:.1f}%")
+                
+                # Bouton pour placer le pari
+                if st.button("💰 Placer ce pari", type="primary", key="place_bet_btn", use_container_width=True):
+                    if bet_amount > app_data["current_bankroll"]:
+                        st.error(f"Montant du pari ({bet_amount:.2f}€) supérieur à votre bankroll actuelle ({app_data['current_bankroll']:.2f}€)")
+                    elif bet_amount <= 0:
+                        st.error("Le montant du pari doit être supérieur à 0€")
+                    else:
+                        # Animation de chargement
+                        with st.spinner("Enregistrement du pari..."):
+                            # Ajouter le pari à l'historique
+                            if add_manual_bet(
+                                event_name=event_name,
+                                event_date=event_date,
+                                fighter_red=fighter_a['name'],
+                                fighter_blue=fighter_b['name'],
+                                pick=best_fighter,
+                                odds=best_odds,
+                                stake=bet_amount,
+                                model_probability=best_prob,
+                                kelly_fraction=selected_fraction
+                            ):
+                                # Message de succès avec détails
+                                st.success(f"Pari enregistré avec succès! {bet_amount:.2f}€ sur {best_fighter} @ {best_odds:.2f}")
+                                
+                                # Ajouter un petit délai pour l'animation
+                                time.sleep(0.5)
+                                
+                                # Afficher une confirmation
+                                st.info(f"Vous avez parié {bet_amount:.2f}€ sur {best_fighter}. Gain potentiel: {pot_gain:.2f}€ (ROI: {roi_pct:.1f}%)")
+                                st.write("Vous pouvez suivre ce pari dans l'onglet 'Gestion de Bankroll'")
+                            else:
+                                st.error("Erreur lors de l'enregistrement du pari.")
+            
+            # Analyse des paris (utiliser les deux méthodes si disponibles)
+            if 'betting' in classic_prediction:
+                st.divider()
+                st.subheader("💰 Analyse des paris")
+                st.write("Comparaison des cotes du marché avec nos probabilités prédites")
+                
+                # Analyse des paris pour les deux combattants avec un design modernisé
+                col1, col2 = st.columns(2)
+                
+                # Combattant Rouge
+                with col1:
+                    st.write(f"### 🔴 {fighter_a['name']}")
+                    
+                    # Données de paris
+                    betting_classic = classic_prediction['betting']
+                    betting_ml = ml_prediction.get('betting') if ml_prediction else None
+                    
+                    # Créer une table pour les données du combattant rouge
+                    st.write("**Données de paris:**")
+                    red_data = [
+                        ["Cote du marché", f"{betting_classic['odds_red']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_red']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['red_probability']:.0%}"]
+                    ]
+                    
+                    if betting_ml:
+                        red_data.append(["Probabilité ML", f"{ml_prediction['red_probability']:.0%}"])
+                    
+                    red_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_red']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_red']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    red_df = pd.DataFrame(red_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(red_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_red'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_red'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_red'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_red'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant rouge
+                    if st.button(f"Parier sur {fighter_a['name']}", key="bet_on_red_btn", use_container_width=True):
+                        # Calculer le montant Kelly pour ce combattant
+                        red_kelly = calculate_kelly(
+                            ml_prediction['red_probability'] if ml_prediction else classic_prediction['red_probability'],
+                            odds_a,
+                            app_data["current_bankroll"],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+                        # Stocker dans la session pour précharger le formulaire
+                        st.session_state.temp_bet = {
+                            "fighter": fighter_a['name'],
+                            "odds": odds_a,
+                            "kelly_amount": red_kelly,
+                            "probability": ml_prediction['red_probability'] if ml_prediction else classic_prediction['red_probability']
+                        }
+                        
+                        # Afficher le formulaire pour parier
+                        show_bet_form(
+                            fighter_a['name'], 
+                            fighter_b['name'], 
+                            fighter_a['name'], 
+                            odds_a, 
+                            red_kelly,
+                            ml_prediction['red_probability'] if ml_prediction else classic_prediction['red_probability'],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                
+                # Combattant Bleu
+                with col2:
+                    st.write(f"### 🔵 {fighter_b['name']}")
+                    
+                    # Créer une table pour les données du combattant bleu
+                    st.write("**Données de paris:**")
+                    blue_data = [
+                        ["Cote du marché", f"{betting_classic['odds_blue']:.2f}"],
+                        ["Probabilité implicite", f"{betting_classic['implied_prob_blue']:.0%}"],
+                        ["Probabilité statistique", f"{classic_prediction['blue_probability']:.0%}"]
+                    ]
+                    
+                    if betting_ml:
+                        blue_data.append(["Probabilité ML", f"{ml_prediction['blue_probability']:.0%}"])
+                    
+                    blue_data.extend([
+                        ["Avantage statistique", f"{betting_classic['edge_blue']*100:.1f}%"],
+                        ["Valeur espérée", f"{betting_classic['ev_blue']*100:.1f}%"]
+                    ])
+                    
+                    # Afficher les données sous forme de tableau
+                    blue_df = pd.DataFrame(blue_data, columns=["Métrique", "Valeur"])
+                    st.dataframe(blue_df, hide_index=True, use_container_width=True)
+                    
+                    # Afficher les recommandations avec des composants Streamlit natifs
+                    st.write("**Recommandation statistique:**")
+                    if betting_classic['recommendation_blue'] == "Favorable":
+                        st.success("Favorable")
+                    elif betting_classic['recommendation_blue'] == "Neutre":
+                        st.info("Neutre")
+                    else:
+                        st.error("Défavorable")
+                    
+                    if betting_ml:
+                        st.write("**Recommandation ML:**")
+                        if betting_ml['recommendation_blue'] == "Favorable":
+                            st.success("Favorable")
+                        elif betting_ml['recommendation_blue'] == "Neutre":
+                            st.info("Neutre")
+                        else:
+                            st.error("Défavorable")
+                    
+                    # Bouton pour parier sur le combattant bleu
+                    if st.button(f"Parier sur {fighter_b['name']}", key="bet_on_blue_btn", use_container_width=True):
+                        # Calculer le montant Kelly pour ce combattant
+                        blue_kelly = calculate_kelly(
+                            ml_prediction['blue_probability'] if ml_prediction else classic_prediction['blue_probability'],
+                            odds_b,
+                            app_data["current_bankroll"],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+                        # Stocker dans la session pour précharger le formulaire
+                        st.session_state.temp_bet = {
+                            "fighter": fighter_b['name'],
+                            "odds": odds_b,
+                            "kelly_amount": blue_kelly,
+                            "probability": ml_prediction['blue_probability'] if ml_prediction else classic_prediction['blue_probability']
+                        }
+                        
+                        # Afficher le formulaire pour parier
+                        show_bet_form(
+                            fighter_a['name'], 
+                            fighter_b['name'], 
+                            fighter_b['name'], 
+                            odds_b, 
+                            blue_kelly,
+                            ml_prediction['blue_probability'] if ml_prediction else classic_prediction['blue_probability'],
+                            kelly_fractions[st.session_state.kelly_strategy]
+                        )
+                        
+            # PARTIE 8: Nouvel onglet avec les statistiques et graphiques
+            stats_tabs = st.tabs(["🔍 Statistiques", "📊 Graphiques", "📝 Notes"])
+            
+            # Onglet des statistiques
+            with stats_tabs[0]:
+                # Afficher les statistiques comparatives
+                st.subheader("📊 Statistiques comparatives")
+                
+                # Création du DataFrame des statistiques comparatives
+                stats_df = create_stats_comparison_df(fighter_a, fighter_b)
+                
+                # Appliquer un style conditionnel pour mettre en évidence les avantages
+                def highlight_advantage(row):
+                    styles = [''] * len(row)
+                    advantage = row['Avantage']
+                    
+                    if advantage == fighter_a['name']:
+                        styles[1] = 'background-color: rgba(229, 57, 53, 0.2); font-weight: bold;'
+                    elif advantage == fighter_b['name']:
+                        styles[2] = 'background-color: rgba(30, 136, 229, 0.2); font-weight: bold;'
+                    
+                    return styles
+                
+                # Appliquer le style et afficher avec un design plus moderne
+                styled_df = stats_df.style.apply(highlight_advantage, axis=1)
+                st.dataframe(
+                    styled_df, 
+                    use_container_width=True, 
+                    height=500,
+                    hide_index=True,
+                )
+            
+            # Onglet des visualisations
+            with stats_tabs[1]:
+                st.subheader("📈 Visualisations des performances")
+                
+                # Disposer les graphiques en deux colonnes
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Graphique radar
+                    radar_fig = create_radar_chart(fighter_a, fighter_b)
+                    st.plotly_chart(radar_fig, use_container_width=True, height=400)
+                
+                with col2:
+                    # Graphique des forces et faiblesses
+                    strengths_fig = create_strengths_weaknesses_chart(fighter_a, fighter_b)
+                    st.plotly_chart(strengths_fig, use_container_width=True, height=400)
+                
+                # Style de combat
+                style_fig = create_style_analysis_chart(fighter_a, fighter_b)
+                st.plotly_chart(style_fig, use_container_width=True)
+            
+            # Onglet des notes
+            with stats_tabs[2]:
+                st.subheader("📝 Notes d'analyse")
+                
+                # Analyse textuelle générée
+                # Déterminer les styles de combat
+                a_striking = fighter_a['SLpM'] * fighter_a['sig_str_acc']
+                a_ground = fighter_a['td_avg'] * fighter_a['td_acc'] + fighter_a['sub_avg']
+                a_style = "striker" if a_striking > a_ground * 1.5 else "grappler" if a_ground > a_striking * 1.5 else "équilibré"
+                
+                b_striking = fighter_b['SLpM'] * fighter_b['sig_str_acc']
+                b_ground = fighter_b['td_avg'] * fighter_b['td_acc'] + fighter_b['sub_avg']
+                b_style = "striker" if b_striking > b_ground * 1.5 else "grappler" if b_ground > b_striking * 1.5 else "équilibré"
+                
+                # Expérience
+                a_exp = fighter_a['wins'] + fighter_a['losses']
+                b_exp = fighter_b['wins'] + fighter_b['losses']
+                exp_diff = abs(a_exp - b_exp)
+                exp_advantage = f"{fighter_a['name']} a {exp_diff} combats de plus" if a_exp > b_exp else f"{fighter_b['name']} a {exp_diff} combats de plus" if b_exp > a_exp else "Les deux combattants ont le même niveau d'expérience"
+                
+                # Forme récente (à calculer à partir du record)
+                a_winrate = fighter_a['wins'] / max(a_exp, 1)
+                b_winrate = fighter_b['wins'] / max(b_exp, 1)
+                
+                # Stats physiques
+                height_diff = abs(fighter_a['height'] - fighter_b['height'])
+                reach_diff = abs(fighter_a['reach'] - fighter_b['reach'])
+                
+                physical_advantage = ""
+                if fighter_a['height'] > fighter_b['height'] and fighter_a['reach'] > fighter_b['reach']:
+                    physical_advantage = f"{fighter_a['name']} a un avantage de taille ({height_diff:.1f} cm) et d'allonge ({reach_diff:.1f} cm)"
+                elif fighter_b['height'] > fighter_a['height'] and fighter_b['reach'] > fighter_a['reach']:
+                    physical_advantage = f"{fighter_b['name']} a un avantage de taille ({height_diff:.1f} cm) et d'allonge ({reach_diff:.1f} cm)"
+                else:
+                    physical_advantage = "Les avantages physiques sont partagés entre les deux combattants"
+                
+                # Profil des combattants
+                st.write("#### Profil des combattants")
+                st.write(f"**{fighter_a['name']}** est un combattant de style **{a_style}** avec un taux de victoires de **{a_winrate:.0%}** sur {a_exp} combats.")
+                st.write(f"**{fighter_b['name']}** est un combattant de style **{b_style}** avec un taux de victoires de **{b_winrate:.0%}** sur {b_exp} combats.")
+                
+                # Facteurs clés
+                st.write("#### Facteurs clés du combat")
+                st.write(f"* **Expérience:** {exp_advantage}.")
+                st.write(f"* **Avantage physique:** {physical_advantage}.")
+                st.write(f"* **Dynamique du combat:** {fighter_a['name']} donne {fighter_a['SLpM']:.1f} coups par minute contre {fighter_b['SLpM']:.1f} pour {fighter_b['name']}.")
+                st.write(f"* **Facteur sol:** {fighter_a['name']} tente {fighter_a['td_avg']:.1f} takedowns par combat contre {fighter_b['td_avg']:.1f} pour {fighter_b['name']}.")
+                
+                # Points à surveiller
+                st.write("#### Points à surveiller")
+                st.write(f"Ce combat présente un affrontement de styles {a_style if a_style != b_style else 'similaires'}, où {fighter_a['name'] if a_winrate > b_winrate else fighter_b['name']} a l'avantage en termes d'historique de victoires.")
+                
+                if a_style != b_style:
+                    st.write(f"Le vainqueur sera probablement celui qui pourra imposer sa stratégie préférée: {fighter_a['name']} voudra maintenir le combat {a_style}, tandis que {fighter_b['name']} cherchera à l'amener vers une dynamique {b_style}.")
+                else:
+                    st.write("Les deux combattants auront des approches similaires, donc la technique et les adaptations en cours de combat seront déterminantes.")
+        else:
+            # Message d'accueil
+            st.info("Bienvenue sur le Prédicteur de Combats UFC! Sélectionnez deux combattants et cliquez sur 'Prédire le combat' pour obtenir une analyse complète.")
+            
+            # Message d'information
+            st.warning("⚠️ L'ordre des combattants est important! La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions. Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge.")
+
+
+
+def show_prediction_page():
+    """Interface de prédiction améliorée avec une meilleure organisation"""
+    # Section titre 
+    st.title("🎯 Prédicteur de Combat")
+    st.write("Sélectionnez deux combattants et obtenez des prédictions précises")
+    
+    # Layout à deux colonnes
+    main_cols = st.columns([1, 3])
+    
+    with main_cols[0]:
+        # Sélection des combattants
+        st.subheader("Sélection des combattants")
+        
+        # Message d'avertissement sur l'importance de l'ordre des combattants
+        st.warning("⚠️ Important : L'ordre des combattants (Rouge/Bleu) influence les prédictions. Traditionnellement, le combattant mieux classé ou favori est placé dans le coin rouge.")
+        
+        # Sélection du combattant rouge
+        st.subheader("🔴 Combattant Rouge")
+        fighter_a_name = st.selectbox(
+            "Sélectionner combattant rouge",
+            options=app_data["fighter_names"],
+            key="fighter_a_selectbox"
+        )
+        
+        # Sélection du combattant bleu (en excluant le combattant rouge)
+        st.subheader("🔵 Combattant Bleu")
+        fighter_b_options = [name for name in app_data["fighter_names"] if name != fighter_a_name]
+        fighter_b_name = st.selectbox(
+            "Sélectionner combattant bleu",
+            options=fighter_b_options,
+            key="fighter_b_selectbox"
+        )
+        
+        # Options de paris
+        st.subheader("Options de paris")
+
+        # Mode de saisie des cotes (manuel ou slider)
+        cote_input_mode = st.radio(
+            "Mode de saisie des cotes",
+            options=["Manuel", "Slider"],
+            index=0,  # Manuel par défaut
+            key="cote_input_mode"
+        )
+        
+        if cote_input_mode == "Manuel":
+            odds_a = st.number_input("Cote Rouge", min_value=1.01, value=2.0, step=0.01, format="%.2f", key="odds_a_input_manual")
+            odds_b = st.number_input("Cote Bleu", min_value=1.01, value=1.8, step=0.01, format="%.2f", key="odds_b_input_manual")
+        else:
+            odds_a = st.slider("Cote Rouge", min_value=1.01, max_value=10.0, value=2.0, step=0.05, format="%.2f", key="odds_a_input_slider")
+            odds_b = st.slider("Cote Bleu", min_value=1.01, max_value=10.0, value=1.8, step=0.05, format="%.2f", key="odds_b_input_slider")
+        
+        # Stratégie Kelly
+        st.subheader("📈 Critères Kelly")
+        kelly_strategy = st.selectbox(
+            "Stratégie Kelly",
+            options=["Kelly pur", "Kelly/2", "Kelly/3", "Kelly/4", "Kelly/5", "Kelly/10"],
+            index=3,  # Kelly/4 par défaut
+            key="kelly_strategy_select"
+        )
+        st.session_state.kelly_strategy = kelly_strategy
+        
+        # Bankroll actuelle
+        st.subheader("💼 Bankroll actuelle")
+        st.metric(
+            "",
+            f"{app_data['current_bankroll']:.2f} €", 
+            delta=None
+        )
+        
+        # Bouton de prédiction
+        predict_btn = st.button(
+            "🔮 Prédire le combat", 
+            type="primary", 
+            key="predict_btn", 
+            use_container_width=True
+        )
+    
+    with main_cols[1]:
+        # Récupérer les statistiques des combattants sélectionnés
+        fighter_a = app_data["fighters_dict"].get(fighter_a_name)
+        fighter_b = app_data["fighters_dict"].get(fighter_b_name)
+        
+        # Vérifier si on peut faire une prédiction
+        if predict_btn and fighter_a and fighter_b:
+            if fighter_a_name == fighter_b_name:
+                st.error("Veuillez sélectionner deux combattants différents.")
+            else:
+                # Afficher un spinner pendant le calcul
+                with st.spinner("Analyse en cours..."):
+                    # Faire les prédictions avec les deux méthodes
+                    classic_prediction, ml_prediction = predict_both_methods(
+                        fighter_a, 
+                        fighter_b,
+                        odds_a=odds_a,
+                        odds_b=odds_b,
+                        model=app_data["ml_model"],
+                        scaler=app_data["scaler"],
+                        feature_names=app_data["feature_names"]
+                    )
+                    
+                    # Stocker les résultats dans la session
+                    st.session_state.prediction_result = {
+                        'fighter_a': fighter_a,
+                        'fighter_b': fighter_b,
+                        'classic_prediction': classic_prediction,
+                        'ml_prediction': ml_prediction,
+                        'odds_a': odds_a,
+                        'odds_b': odds_b
+                    }
+        
+        # Afficher les résultats de prédiction
+        if st.session_state.prediction_result:
+            result = st.session_state.prediction_result
+            fighter_a = result['fighter_a']
+            fighter_b = result['fighter_b']
+            classic_prediction = result['classic_prediction']
+            ml_prediction = result['ml_prediction']
+            odds_a = result['odds_a']
+            odds_b = result['odds_b']
+            
+            # Afficher une vue en tête-à-tête des combattants
+            st.subheader("Combat")
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col1:
+                st.write(f"### 🔴 {fighter_a['name']}")
+                st.write(f"Record: {fighter_a['wins']}-{fighter_a['losses']}")
+            with col2:
+                st.write("## VS")
+            with col3:
+                st.write(f"### 🔵 {fighter_b['name']}")
+                st.write(f"Record: {fighter_b['wins']}-{fighter_b['losses']}")
+            
+            # Afficher les résultats des deux prédictions
+            st.subheader("🔮 Prédictions du combat")
+            
+            # Créer le graphique comparatif des probabilités pour les deux méthodes en un seul
+            if ml_prediction:
+                # Créer un DataFrame pour le graphique comparatif
+                proba_data = pd.DataFrame({
+                    'Combattant': [fighter_a['name'], fighter_b['name']],
+                    'Statistique': [classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    'Machine Learning': [ml_prediction['red_probability'], ml_prediction['blue_probability']]
+                })
+                
+                # Graphique modernisé
+                fig = go.Figure()
+                
+                # Ajouter les barres pour chaque méthode avec un style amélioré
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Statistique'],
+                    name='Prédiction Statistique',
+                    marker_color='#2196F3',
+                    text=[f"{proba:.0%}" for proba in proba_data['Statistique']],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                fig.add_trace(go.Bar(
+                    x=proba_data['Combattant'],
+                    y=proba_data['Machine Learning'],
+                    name='Prédiction ML',
+                    marker_color='#4CAF50',
+                    text=[f"{proba:.0%}" for proba in proba_data['Machine Learning']],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                # Configurer la mise en page
+                fig.update_layout(
+                    title=None,
+                    xaxis_title=None,
+                    yaxis_title="Probabilité de victoire",
+                    yaxis=dict(
+                        range=[0, 1],
+                        tickformat='.0%',
+                        gridcolor='rgba(255,255,255,0.1)',
+                        showgrid=True
+                    ),
+                    xaxis=dict(
+                        gridcolor='rgba(255,255,255,0.1)',
+                    ),
+                    legend_title=None,
+                    height=400,
+                    barmode='group',
+                    bargap=0.30,
+                    bargroupgap=0.1,
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="center",
+                        x=0.5
+                    ),
+                    margin=dict(t=50, b=50)
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                # Si seulement la méthode statistique est disponible
+                # Graphique modernisé pour la méthode unique
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    x=[fighter_a['name'], fighter_b['name']],
+                    y=[classic_prediction['red_probability'], classic_prediction['blue_probability']],
+                    marker_color=['#E53935', '#1E88E5'],
+                    text=[f"{classic_prediction['red_probability']:.0%}", f"{classic_prediction['blue_probability']:.0%}"],
+                    textposition='auto',
+                    hovertemplate='<b>%{x}</b><br>Probabilité: %{y:.1%}<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    title=None,
+                    xaxis_title=None,
+                    yaxis_title="Probabilité de victoire",
+                    yaxis=dict(
+                        range=[0, 1],
+                        tickformat='.0%',
+                        gridcolor='rgba(255,255,255,0.1)',
+                        showgrid=True
+                    ),
+                    xaxis=dict(
+                        gridcolor='rgba(255,255,255,0.1)',
+                    ),
+                    height=400,
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
                     margin=dict(t=50, b=50)
                 )
                 
@@ -3132,6 +4130,8 @@ def show_prediction_page():
             # Message d'information
             st.warning("⚠️ L'ordre des combattants est important! La position des combattants (coin Rouge vs Bleu) peut influencer significativement les prédictions. Traditionnellement, le combattant favori ou mieux classé est placé dans le coin rouge.")
 
+
+
 def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probability, kelly_fraction):
     """Affiche un formulaire modernisé pour placer un pari"""
     # AMÉLIORATION UI: Box de placement de paris améliorée
@@ -3267,12 +4267,12 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
                                 {event_name} - {event_date}
                             </div>
                             <div style="font-weight: 600; font-size: 1.1rem;">{pick} @ {odds:.2f}</div>
-                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: var(--text-secondary);">
+                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: rgba(255,255,255,0.8);">
                                 <div>Mise: <b>{bet_amount:.2f}€</b></div>
                                 <div>Gain potentiel: <b>{pot_gain:.2f}€</b></div>
                                 <div>ROI: <b>{roi_pct:.1f}%</b></div>
                             </div>
-                            <div style="margin-top: 10px; font-size: 0.9rem; color: var(--text-muted);">
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
                                 Vous pouvez suivre ce pari dans l'onglet "Gestion de Bankroll"
                             </div>
                         </div>
@@ -3282,6 +4282,8 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
                     st.error("❌ Erreur lors de l'enregistrement du pari.")
 
 # PARTIE 9 
+
+# ICI
 
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
@@ -3303,7 +4305,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     <div class="divider"></div>
     <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
         <h2>💰 Stratégie de paris optimisée</h2>
-        <p style="color: var(--text-muted);">Utilisez l'intelligence artificielle pour maximiser vos gains</p>
+        <p style="color: #aaa;">Utilisez l'intelligence artificielle pour maximiser vos gains</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -3375,7 +4377,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     st.markdown("""
     <div class="card" style="margin-top: 15px;">
         <h3 style="margin-top: 0;">Entrez les cotes proposées par les bookmakers</h3>
-        <p style="color: var(--text-muted); margin-bottom: 15px;">Ces cotes seront utilisées pour calculer la valeur de chaque pari</p>
+        <p style="color: #aaa; margin-bottom: 15px;">Ces cotes seront utilisées pour calculer la valeur de chaque pari</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -3527,7 +4529,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         <div class="divider"></div>
         <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
             <h2>💰 Recommandations de paris</h2>
-            <p style="color: var(--text-muted);">Combats identifiés comme offrant une valeur positive</p>
+            <p style="color: #aaa;">Combats identifiés comme offrant une valeur positive</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3649,12 +4651,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                     <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px;">
                                         {successful_bets} paris ajoutés pour {event_name}
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin: 15px 0; color: var(--text-secondary);">
+                                    <div style="display: flex; justify-content: space-between; margin: 15px 0; color: rgba(255,255,255,0.8);">
                                         <div>Mise totale: <b>{total_stake:.2f}€</b></div>
                                         <div>Gain potentiel: <b>{total_potential_profit:.2f}€</b></div>
                                         <div>ROI: <b>{total_potential_profit/total_stake*100:.1f}%</b></div>
                                     </div>
-                                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--text-muted);">
+                                    <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
                                         Vous pouvez suivre ces paris dans l'onglet "Gestion de Bankroll"
                                     </div>
                                 </div>
@@ -3745,7 +4747,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             <div class="divider"></div>
             <div class="section-fade-in" style="text-align:center; margin: 25px 0;">
                 <h2>💰 Recommandations de paris</h2>
-                <p style="color: var(--text-muted);">Combats identifiés comme offrant une valeur positive</p>
+                <p style="color: #aaa;">Combats identifiés comme offrant une valeur positive</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -3780,11 +4782,11 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             reason = "Erreur dans les données de cote"
                         
                         st.markdown(f"""
-                        <div style="margin-bottom: 10px; padding: 10px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                             <div><b>{fight['red_fighter']} vs {fight['blue_fighter']}</b></div>
                             <div>Vainqueur prédit: <b>{fight['winner_name']}</b> ({fight['probability']:.0%})</div>
                             <div>Cote: <b>{odds_value}</b> (Probabilité implicite: {implicit_prob if isinstance(implicit_prob, float) else implicit_prob})</div>
-                            <div>Edge: <b>{edge*100:.1f}%</b> if isinstance(edge, float) else edge</div>
+                            <div>Edge: <b>{edge*100:.1f}% </b> si edge est un nombre à virgule flottante else edge</div>
                             <div>Raison: {reason}</div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -3864,11 +4866,15 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         """, unsafe_allow_html=True)
                         
                         for fight in capped_fights:
+                            original_stake = current_bankroll * fight['original_kelly_pct']
                             st.markdown(f"""
                                 <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.1f}% (plafonné à 5%)</li>
                             """, unsafe_allow_html=True)
                         
-                        st.markdown("</ul></div>", unsafe_allow_html=True)
+                        st.markdown("""
+                            </ul>
+                        </div>
+                        """, unsafe_allow_html=True)
                     
                     # AMÉLIORATION UI: Résumé de la stratégie avec des métriques
                     total_stake = sum(fight['stake'] for fight in filtered_fights)
@@ -3938,12 +4944,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                             <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px;">
                                                 {successful_bets} paris ajoutés pour {event_name}
                                             </div>
-                                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: var(--text-secondary);">
+                                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: rgba(255,255,255,0.8);">
                                                 <div>Mise totale: <b>{total_stake:.2f}€</b></div>
                                                 <div>Gain potentiel: <b>{total_potential_profit:.2f}€</b></div>
                                                 <div>ROI: <b>{total_potential_profit/total_stake*100:.1f}%</b></div>
                                             </div>
-                                            <div style="margin-top: 10px; font-size: 0.9rem; color: var(--text-muted);">
+                                            <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
                                                 Vous pouvez suivre ces paris dans l'onglet "Gestion de Bankroll"
                                             </div>
                                         </div>
@@ -3954,6 +4960,34 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
+
+    
+    # Fonction de débogage
+    def debug_betting_strategy(event_url, bettable_fights, filtered_fights):
+        """Fonction de débogage pour la stratégie de paris"""
+        
+        debug_info = st.expander("📝 Informations de débogage (développeur)", expanded=False)
+        
+        with debug_info:
+            st.write("### État du dictionnaire des cotes")
+            st.write(st.session_state.get(f"odds_dict_{event_url}", {}))
+            
+            st.write("### Combats bettables")
+            for fight in bettable_fights:
+                fight_key = fight['fight_key']
+                odds_key = f"odds_{fight_key}"
+                odds_value = st.session_state.get(f"odds_dict_{event_url}", {}).get(odds_key, "Non définie")
+                
+                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={odds_value}")
+            
+            st.write("### Combats filtrés pour paris")
+            for fight in filtered_fights:
+                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={fight['odds']}, Kelly={fight.get('fractional_kelly', 0):.4f}, Mise={fight.get('stake', 0):.2f}€")
+    
+    # # Ajouter le débogage pour les développeurs
+    # if st.checkbox("Afficher le débogage (développeur)", value=False, key=f"debug_{event_url}"):
+    #     debug_betting_strategy(event_url, bettable_fights, filtered_fights)
+        
 
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
@@ -4276,21 +5310,22 @@ def show_upcoming_events_page():
 
 # PARTIE 10
 
+
 def show_bankroll_page():
     """Affiche la page de gestion de bankroll avec une interface améliorée"""
     # AMÉLIORATION UI: Titre de page avec animation
     st.markdown("""
     <div class="section-fade-in" style="text-align:center; margin-bottom: 25px;">
         <h2>💰 Gestion de bankroll et paris</h2>
-        <p style="color: var(--text-muted);">Suivez vos performances et gérez vos paris</p>
+        <p style="color: #aaa;">Suivez vos performances et gérez vos paris</p>
     </div>
     """, unsafe_allow_html=True)
     
     # AMÉLIORATION UI: Affichage de la bankroll actuelle dans une card moderne
     st.markdown(f"""
     <div class="card" style="text-align: center; margin-bottom: 30px;">
-        <div style="color: var(--text-muted); margin-bottom: 5px;">Bankroll actuelle</div>
-        <div style="font-size: 2.5rem; font-weight: 700; color: var(--text-primary);">{app_data['current_bankroll']:.2f} €</div>
+        <div style="color: #aaa; margin-bottom: 5px;">Bankroll actuelle</div>
+        <div style="font-size: 2.5rem; font-weight: 700;">{app_data['current_bankroll']:.2f} €</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -4357,15 +5392,15 @@ def show_bankroll_page():
             }, 0.1) 100%); margin: 15px 0;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div>
-                        <div style="font-weight: 500; color: var(--text-primary);">Opération</div>
+                        <div style="font-weight: 500;">Opération</div>
                         <div style="font-size: 1.2rem; font-weight: 600; color: {color};">
                             {adjustment_type}
                             {f" ({operation} {adjustment_amount:.2f} €)" if operation != "=" else f" → {adjustment_amount:.2f} €"}
                         </div>
                     </div>
                     <div>
-                        <div style="font-weight: 500; color: var(--text-primary);">Nouvelle bankroll</div>
-                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">{new_amount:.2f} €</div>
+                        <div style="font-weight: 500;">Nouvelle bankroll</div>
+                        <div style="font-size: 1.2rem; font-weight: 600;">{new_amount:.2f} €</div>
                     </div>
                 </div>
                 {f'<div style="margin-top: 10px; color: #F44336; font-weight: 500;">⚠️ Montant de retrait supérieur à la bankroll!</div>' if operation == '!' else ''}
@@ -4432,8 +5467,8 @@ def show_bankroll_page():
                                                                          border: 1px solid rgba(76, 175, 80, 0.3);">
                     <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
                     <h3 style="margin-bottom: 15px; color: #4CAF50;">Bankroll mise à jour</h3>
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">{new_bankroll:.2f} €</div>
-                    <div style="margin-top: 10px; color: var(--text-muted);">
+                    <div style="font-size: 2rem; font-weight: 700;">{new_bankroll:.2f} €</div>
+                    <div style="margin-top: 10px; color: rgba(255,255,255,0.6);">
                         {adjustment_note}
                     </div>
                 </div>
@@ -4523,7 +5558,7 @@ def show_bankroll_page():
         
         # AMÉLIORATION UI: Information sur la bankroll
         st.markdown(f"""
-        <div style="margin: 10px 0; font-size: 0.9rem; color: var(--text-muted); text-align: right;">
+        <div style="margin: 10px 0; font-size: 0.9rem; color: #aaa; text-align: right;">
             <i>% de bankroll: {manual_stake/app_data['current_bankroll']*100:.1f}%</i>
         </div>
         """, unsafe_allow_html=True)
@@ -4556,11 +5591,11 @@ def show_bankroll_page():
                                                                  border: 1px solid rgba(76, 175, 80, 0.3); text-align: center;">
                             <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
                             <h3 style="margin-bottom: 15px; color: #4CAF50;">Pari enregistré avec succès</h3>
-                            <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px; color: var(--text-primary);">
+                            <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px;">
                                 {manual_event_name} - {manual_event_date}
                             </div>
-                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">{manual_pick} @ {manual_odds:.2f}</div>
-                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: var(--text-secondary);">
+                            <div style="font-weight: 600; font-size: 1.1rem;">{manual_pick} @ {manual_odds:.2f}</div>
+                            <div style="display: flex; justify-content: space-between; margin: 15px 0; color: rgba(255,255,255,0.8);">
                                 <div>Mise: <b>{manual_stake:.2f}€</b></div>
                                 <div>Gain potentiel: <b>{potential_profit:.2f}€</b></div>
                                 <div>ROI: <b>{roi_pct:.1f}%</b></div>
@@ -4640,7 +5675,7 @@ def show_history_page():
     st.markdown("""
     <div class="section-fade-in" style="text-align:center; margin-bottom: 25px;">
         <h2>📊 Historique des paris et performances</h2>
-        <p style="color: var(--text-muted);">Analysez vos résultats et optimisez votre stratégie</p>
+        <p style="color: #aaa;">Analysez vos résultats et optimisez votre stratégie</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -4660,9 +5695,8 @@ def show_history_page():
         if not bankroll_df.empty:
             st.subheader("Évolution de la bankroll")
             
-            # AMÉLIORATION UI: Graphique modernisé avec thème adaptatif
+            # AMÉLIORATION UI: Graphique modernisé
             bankroll_df['date'] = pd.to_datetime(bankroll_df['date'])
-            plotly_theme = get_plotly_theme()
             
             fig = px.line(
                 bankroll_df, 
@@ -4672,7 +5706,7 @@ def show_history_page():
                 labels={"amount": "Bankroll (€)", "date": "Date"}
             )
             
-            # Amélioration du style du graphique avec thème adaptatif
+            # Amélioration du style du graphique
             fig.update_traces(
                 line=dict(width=3, color='#4CAF50'),
                 mode='lines+markers',
@@ -4680,19 +5714,19 @@ def show_history_page():
             )
             
             fig.update_layout(
-                paper_bgcolor=plotly_theme['paper_bgcolor'],
-                plot_bgcolor=plotly_theme['plot_bgcolor'],
-                font=dict(color=plotly_theme['font_color']),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white'),
                 xaxis=dict(
                     title="Date",
                     showgrid=True,
-                    gridcolor=plotly_theme['grid_color'],
+                    gridcolor='rgba(255,255,255,0.1)',
                     tickformat='%d %b %Y'
                 ),
                 yaxis=dict(
                     title="Bankroll (€)",
                     showgrid=True,
-                    gridcolor=plotly_theme['grid_color'],
+                    gridcolor='rgba(255,255,255,0.1)',
                 ),
                 margin=dict(l=40, r=40, t=40, b=40),
                 hovermode='x unified'
@@ -4709,7 +5743,7 @@ def show_history_page():
                     arrowhead=1,
                     ax=0,
                     ay=-40,
-                    font=dict(color=plotly_theme['font_color'])
+                    font=dict(color="#90EE90", size=16, family="Arial Black") 
                 )
                 
                 # Point final
@@ -4721,7 +5755,8 @@ def show_history_page():
                     arrowhead=1,
                     ax=0,
                     ay=-40,
-                    font=dict(color=plotly_theme['font_color'])
+                    font=dict(color="#90EE90", size=16, family="Arial Black") 
+
                 )
                 
                 # Point haut
@@ -4735,7 +5770,8 @@ def show_history_page():
                         arrowhead=1,
                         ax=0,
                         ay=-40,
-                        font=dict(color=plotly_theme['font_color'])
+                        font=dict(color="#90EE90", size=16, family="Arial Black") 
+
                     )
                 
                 # Point bas (après le début)
@@ -4751,7 +5787,7 @@ def show_history_page():
                             arrowhead=1,
                             ax=0,
                             ay=40,
-                            font=dict(color=plotly_theme['font_color'])
+                            font=dict(color="#90EE90", size=16, family="Arial Black") 
                         )
             
             st.plotly_chart(fig, use_container_width=True)
@@ -4818,15 +5854,15 @@ def show_history_page():
                     }, 0.1) 0%, rgba({
                         '56, 142, 60' if streak_type == 'win' else '211, 47, 47'
                     }, 0.1) 100%); text-align: center;">
-                        <div style="color: var(--text-muted); margin-bottom: 5px;">Série actuelle</div>
+                        <div style="color: #aaa; margin-bottom: 5px;">Série actuelle</div>
                         <div style="font-size: 2rem; font-weight: 700; color: {streak_color};">{streak_count} {streak_text}</div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown("""
                     <div class="card" style="text-align: center;">
-                        <div style="color: var(--text-muted); margin-bottom: 5px;">Série actuelle</div>
-                        <div style="font-size: 1.2rem; font-weight: 500; color: var(--text-primary);">Aucune série en cours</div>
+                        <div style="color: #aaa; margin-bottom: 5px;">Série actuelle</div>
+                        <div style="font-size: 1.2rem; font-weight: 500;">Aucune série en cours</div>
                     </div>
                     """, unsafe_allow_html=True)
             
@@ -4837,15 +5873,15 @@ def show_history_page():
                 if best_streak > 0:
                     st.markdown(f"""
                     <div class="card" style="background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%); text-align: center;">
-                        <div style="color: var(--text-muted); margin-bottom: 5px;">Meilleure série</div>
+                        <div style="color: #aaa; margin-bottom: 5px;">Meilleure série</div>
                         <div style="font-size: 2rem; font-weight: 700; color: #4CAF50;">{best_streak} victoires</div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown("""
                     <div class="card" style="text-align: center;">
-                        <div style="color: var(--text-muted); margin-bottom: 5px;">Meilleure série</div>
-                        <div style="font-size: 1.2rem; font-weight: 500; color: var(--text-primary);">Aucune série enregistrée</div>
+                        <div style="color: #aaa; margin-bottom: 5px;">Meilleure série</div>
+                        <div style="font-size: 1.2rem; font-weight: 500;">Aucune série enregistrée</div>
                     </div>
                     """, unsafe_allow_html=True)
             
@@ -4894,16 +5930,16 @@ def show_history_page():
                         <h4 style="margin-top: 0; color: #1E88E5;">Résumé des paris en cours</h4>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.9rem;">Total misé</div>
-                                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">{total_stake:.2f} €</div>
+                                <div style="color: #aaa; font-size: 0.9rem;">Total misé</div>
+                                <div style="font-size: 1.1rem; font-weight: 600;">{total_stake:.2f} €</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.9rem;">Gain potentiel</div>
-                                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">{total_potential:.2f} €</div>
+                                <div style="color: #aaa; font-size: 0.9rem;">Gain potentiel</div>
+                                <div style="font-size: 1.1rem; font-weight: 600;">{total_potential:.2f} €</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.9rem;">Cote moyenne</div>
-                                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">{avg_odds:.2f}</div>
+                                <div style="color: #aaa; font-size: 0.9rem;">Cote moyenne</div>
+                                <div style="font-size: 1.1rem; font-weight: 600;">{avg_odds:.2f}</div>
                             </div>
                         </div>
                     </div>
@@ -4913,8 +5949,8 @@ def show_history_page():
                     st.markdown("""
                     <div class="card" style="text-align: center; padding: 30px 20px;">
                         <div style="font-size: 3rem; margin-bottom: 15px;">🎲</div>
-                        <h3 style="margin-bottom: 15px; color: var(--text-primary);">Aucun pari en cours</h3>
-                        <p style="color: var(--text-secondary);">Utilisez l'onglet "Prédiction" ou "Événements à venir" pour placer de nouveaux paris.</p>
+                        <h3 style="margin-bottom: 15px;">Aucun pari en cours</h3>
+                        <p>Utilisez l'onglet "Prédiction" ou "Événements à venir" pour placer de nouveaux paris.</p>
                     </div>
                     """, unsafe_allow_html=True)
             
@@ -4939,7 +5975,7 @@ def show_history_page():
                     
                     display_closed_bets['formatted_result'] = display_closed_bets['result'].apply(format_result)
                     
-                    # Sélectionner et renommer les colonnes
+# Sélectionner et renommer les colonnes
                     display_closed_bets = display_closed_bets[["bet_id", "event_name", "event_date", "fighter_red", "fighter_blue", "pick", "odds", "stake", "formatted_result", "profit", "roi"]]
                     display_closed_bets.columns = ["ID", "Événement", "Date", "Rouge", "Bleu", "Pari sur", "Cote", "Mise (€)", "Résultat", "Profit (€)", "ROI (%)"]
                     
@@ -5001,9 +6037,6 @@ def show_history_page():
                     
                     analysis_tabs = st.tabs(["📊 Répartition", "📈 Performance", "🔍 Détails"])
                     
-                    # Obtenir le thème pour les graphiques
-                    plotly_theme = get_plotly_theme()
-                    
                     # Onglet Répartition
                     with analysis_tabs[0]:
                         chart_cols = st.columns(2)
@@ -5034,9 +6067,9 @@ def show_history_page():
                             )
                             
                             fig_results.update_layout(
-                                paper_bgcolor=plotly_theme['paper_bgcolor'],
-                                plot_bgcolor=plotly_theme['plot_bgcolor'],
-                                font=dict(color=plotly_theme['font_color']),
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                font=dict(color='white'),
                                 margin=dict(l=20, r=20, t=30, b=20),
                                 legend=dict(orientation="h", y=-0.1)
                             )
@@ -5069,9 +6102,9 @@ def show_history_page():
                             )
                             
                             fig_finances.update_layout(
-                                paper_bgcolor=plotly_theme['paper_bgcolor'],
-                                plot_bgcolor=plotly_theme['plot_bgcolor'],
-                                font=dict(color=plotly_theme['font_color']),
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                font=dict(color='white'),
                                 margin=dict(l=20, r=20, t=30, b=20),
                                 showlegend=False,
                                 xaxis=dict(
@@ -5081,7 +6114,7 @@ def show_history_page():
                                 yaxis=dict(
                                     title="Montant (€)",
                                     showgrid=True,
-                                    gridcolor=plotly_theme['grid_color']
+                                    gridcolor='rgba(255,255,255,0.1)'
                                 )
                             )
                             
@@ -5112,19 +6145,19 @@ def show_history_page():
                         )
                         
                         fig_profit.update_layout(
-                            paper_bgcolor=plotly_theme['paper_bgcolor'],
-                            plot_bgcolor=plotly_theme['plot_bgcolor'],
-                            font=dict(color=plotly_theme['font_color']),
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            font=dict(color='white'),
                             margin=dict(l=20, r=20, t=30, b=20),
                             xaxis=dict(
                                 title="Date",
                                 showgrid=True,
-                                gridcolor=plotly_theme['grid_color']
+                                gridcolor='rgba(255,255,255,0.1)'
                             ),
                             yaxis=dict(
                                 title="Profit cumulé (€)",
                                 showgrid=True,
-                                gridcolor=plotly_theme['grid_color']
+                                gridcolor='rgba(255,255,255,0.1)'
                             )
                         )
                         
@@ -5135,7 +6168,7 @@ def show_history_page():
                             x1=perf_df["Date"].max(),
                             y0=0,
                             y1=0,
-                            line=dict(color=plotly_theme['grid_color'], width=1, dash="dash")
+                            line=dict(color="rgba(255,255,255,0.3)", width=1, dash="dash")
                         )
                         
                         st.plotly_chart(fig_profit, use_container_width=True)
@@ -5156,19 +6189,19 @@ def show_history_page():
                         )
                         
                         roi_by_odds.update_layout(
-                            paper_bgcolor=plotly_theme['paper_bgcolor'],
-                            plot_bgcolor=plotly_theme['plot_bgcolor'],
-                            font=dict(color=plotly_theme['font_color']),
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            font=dict(color='white'),
                             margin=dict(l=20, r=20, t=30, b=20),
                             xaxis=dict(
                                 title="Cote",
                                 showgrid=True,
-                                gridcolor=plotly_theme['grid_color']
+                                gridcolor='rgba(255,255,255,0.1)'
                             ),
                             yaxis=dict(
                                 title="ROI (%)",
                                 showgrid=True,
-                                gridcolor=plotly_theme['grid_color']
+                                gridcolor='rgba(255,255,255,0.1)'
                             )
                         )
                         
@@ -5179,7 +6212,7 @@ def show_history_page():
                             x1=display_closed_bets["Cote"].max(),
                             y0=0,
                             y1=0,
-                            line=dict(color=plotly_theme['grid_color'], width=1, dash="dash")
+                            line=dict(color="rgba(255,255,255,0.3)", width=1, dash="dash")
                         )
                         
                         st.plotly_chart(roi_by_odds, use_container_width=True)
@@ -5217,7 +6250,7 @@ def show_history_page():
                                 hide_index=True
                             )
                             
-                            # Graphique d'évolution mensuelle avec thème adaptatif
+                            # Graphique d'évolution mensuelle
                             fig_monthly = px.bar(
                                 monthly_stats,
                                 x="Mois",
@@ -5229,9 +6262,9 @@ def show_history_page():
                             )
                             
                             fig_monthly.update_layout(
-                                paper_bgcolor=plotly_theme['paper_bgcolor'],
-                                plot_bgcolor=plotly_theme['plot_bgcolor'],
-                                font=dict(color=plotly_theme['font_color']),
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                font=dict(color='white'),
                                 margin=dict(l=20, r=20, t=30, b=20),
                                 xaxis=dict(
                                     title=None,
@@ -5240,7 +6273,7 @@ def show_history_page():
                                 yaxis=dict(
                                     title="Profit (€)",
                                     showgrid=True,
-                                    gridcolor=plotly_theme['grid_color']
+                                    gridcolor='rgba(255,255,255,0.1)'
                                 )
                             )
                             
@@ -5255,8 +6288,8 @@ def show_history_page():
                     st.markdown("""
                     <div class="card" style="text-align: center; padding: 30px 20px;">
                         <div style="font-size: 3rem; margin-bottom: 15px;">📜</div>
-                        <h3 style="margin-bottom: 15px; color: var(--text-primary);">Aucun pari dans l'historique</h3>
-                        <p style="color: var(--text-secondary);">Commencez à parier pour voir apparaître votre historique ici.</p>
+                        <h3 style="margin-bottom: 15px;">Aucun pari dans l'historique</h3>
+                        <p>Commencez à parier pour voir apparaître votre historique ici.</p>
                     </div>
                     """, unsafe_allow_html=True)
             
@@ -5291,24 +6324,24 @@ def show_history_page():
                         # Récupérer les informations du pari
                         selected_bet = open_bets[open_bets["bet_id"] == update_bet_id].iloc[0]
                         
-                        # AMÉLIORATION UI: Affichage amélioré des détails du pari avec thème adaptatif
+                        # AMÉLIORATION UI: Affichage amélioré des détails du pari
                         st.markdown(f"""
                         <div class="card" style="background: linear-gradient(145deg, rgba(30, 136, 229, 0.1) 0%, rgba(21, 101, 192, 0.1) 100%);">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="font-weight: 500; color: var(--text-primary);">Pari #{update_bet_id}</div>
-                                <div style="font-weight: 500; color: var(--text-primary);">{selected_bet['event_name']}</div>
+                                <div style="font-weight: 500;">Pari #{update_bet_id}</div>
+                                <div style="font-weight: 500;">{selected_bet['event_name']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="color: var(--text-secondary);">Pick</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['pick']}</div>
+                                <div>Pick</div>
+                                <div style="font-weight: 600;">{selected_bet['pick']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="color: var(--text-secondary);">Cote</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['odds']}</div>
+                                <div>Cote</div>
+                                <div style="font-weight: 600;">{selected_bet['odds']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <div style="color: var(--text-secondary);">Mise</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['stake']}€</div>
+                                <div>Mise</div>
+                                <div style="font-weight: 600;">{selected_bet['stake']}€</div>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -5351,7 +6384,7 @@ def show_history_page():
                                 # Mettre à jour la bankroll dans app_data
                                 app_data['current_bankroll'] = new_bankroll
                                 
-                                # AMÉLIORATION UI: Message de confirmation dynamique avec thème adaptatif
+                                # AMÉLIORATION UI: Message de confirmation dynamique
                                 result_icon = "✅" if result == "win" else "❌" if result == "loss" else "⚪"
                                 result_text = "Victoire" if result == "win" else "Défaite" if result == "loss" else "Annulé"
                                 result_color = "#4CAF50" if result == "win" else "#F44336" if result == "loss" else "#9E9E9E"
@@ -5367,7 +6400,7 @@ def show_history_page():
                                     profit = 0
                                     msg = "Mise remboursée"
                                 
-                                # AMÉLIORATION UI: Carte de confirmation avec thème adaptatif
+                                # AMÉLIORATION UI: Carte de confirmation
                                 st.markdown(f"""
                                 <div class="card section-fade-in" style="background: linear-gradient(145deg, rgba({
                                     '76, 175, 80' if result == 'win' else
@@ -5380,13 +6413,13 @@ def show_history_page():
                                 }, 0.1) 100%); text-align: center;">
                                     <div style="font-size: 3rem; margin-bottom: 10px;">{result_icon}</div>
                                     <h3 style="margin-bottom: 15px; color: {result_color};">{result_text}</h3>
-                                    <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px; color: var(--text-primary);">
+                                    <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 15px;">
                                         {selected_bet['pick']} @ {selected_bet['odds']}
                                     </div>
-                                    <div style="font-weight: 500; font-size: 1.1rem; color: var(--text-primary);">
+                                    <div style="font-weight: 500; font-size: 1.1rem;">
                                         {msg}
                                     </div>
-                                    <div style="margin-top: 15px; font-size: 1rem; color: var(--text-primary);">
+                                    <div style="margin-top: 15px; font-size: 1rem;">
                                         Nouvelle bankroll: <b>{new_bankroll:.2f}€</b>
                                     </div>
                                 </div>
@@ -5418,24 +6451,24 @@ def show_history_page():
                         # Récupérer les informations du pari
                         selected_bet = open_bets[open_bets["bet_id"] == delete_bet_id].iloc[0]
                         
-                        # AMÉLIORATION UI: Affichage amélioré des détails du pari avec thème adaptatif
+                        # AMÉLIORATION UI: Affichage amélioré des détails du pari
                         st.markdown(f"""
                         <div class="card" style="background: linear-gradient(145deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="font-weight: 500; color: var(--text-primary);">Pari #{delete_bet_id}</div>
-                                <div style="font-weight: 500; color: var(--text-primary);">{selected_bet['event_name']}</div>
+                                <div style="font-weight: 500;">Pari #{delete_bet_id}</div>
+                                <div style="font-weight: 500;">{selected_bet['event_name']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="color: var(--text-secondary);">Pick</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['pick']}</div>
+                                <div>Pick</div>
+                                <div style="font-weight: 600;">{selected_bet['pick']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="color: var(--text-secondary);">Cote</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['odds']}</div>
+                                <div>Cote</div>
+                                <div style="font-weight: 600;">{selected_bet['odds']}</div>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <div style="color: var(--text-secondary);">Mise</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">{selected_bet['stake']}€</div>
+                                <div>Mise</div>
+                                <div style="font-weight: 600;">{selected_bet['stake']}€</div>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -5460,12 +6493,12 @@ def show_history_page():
                                         # AMÉLIORATION UI: Message de confirmation
                                         st.success(f"✅ Pari #{delete_bet_id} supprimé avec succès!")
                                         
-                                        # AMÉLIORATION UI: Carte de confirmation avec thème adaptatif
+                                        # AMÉLIORATION UI: Carte de confirmation
                                         st.markdown(f"""
                                         <div class="card section-fade-in" style="text-align: center; margin: 15px 0;">
                                             <div style="font-size: 3rem; margin-bottom: 10px;">🗑️</div>
-                                            <h3 style="margin-bottom: 15px; color: var(--text-primary);">Pari supprimé</h3>
-                                            <div style="color: var(--text-muted);">
+                                            <h3 style="margin-bottom: 15px;">Pari supprimé</h3>
+                                            <div style="color: #aaa;">
                                                 Le pari a été définitivement retiré de votre historique.
                                             </div>
                                         </div>
@@ -5473,27 +6506,27 @@ def show_history_page():
                                     else:
                                         st.error("❌ Erreur lors de la suppression du pari.")
                         else:
-                            # Bouton désactivé avec thème adaptatif
+                            # Bouton désactivé
                             st.markdown("""
                             <div style="opacity: 0.5; pointer-events: none; margin-top: 15px;">
                                 <button style="width: 100%; padding: 8px 0; background-color: #F44336; color: white; border: none; border-radius: 4px; cursor: not-allowed;">
                                     🗑️ Supprimer le pari
                                 </button>
                             </div>
-                            <div style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                            <div style="text-align: center; font-size: 0.9rem; color: #aaa; margin-top: 5px;">
                                 Cochez la case de confirmation pour activer le bouton
                             </div>
                             """, unsafe_allow_html=True)
                     else:
                         st.info("Aucun pari à supprimer.")
         else:
-            # AMÉLIORATION UI: Message d'information pour état vide avec thème adaptatif
+            # AMÉLIORATION UI: Message d'information pour état vide
             st.markdown("""
             <div class="card" style="text-align: center; padding: 40px 20px;">
                 <div style="font-size: 6rem; margin-bottom: 20px;">📊</div>
-                <h2 style="margin-bottom: 15px; color: var(--text-primary);">Aucune donnée d'historique</h2>
-                <p style="margin-bottom: 30px; color: var(--text-secondary);">Placez votre premier pari pour commencer à suivre vos performances.</p>
-                <div style="opacity: 0.6; font-style: italic; color: var(--text-muted);">
+                <h2 style="margin-bottom: 15px;">Aucune donnée d'historique</h2>
+                <p style="margin-bottom: 30px;">Placez votre premier pari pour commencer à suivre vos performances.</p>
+                <div style="opacity: 0.6; font-style: italic;">
                     Utilisez les onglets <b>Prédiction</b> ou <b>Événements à venir</b> pour placer vos paris.
                 </div>
             </div>
@@ -5529,7 +6562,7 @@ def show_history_page():
                         key="download_bankroll_btn",
                         use_container_width=True
                     )
-
 # Lancer l'application
 if __name__ == "__main__":
     main()
+    

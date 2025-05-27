@@ -71,7 +71,7 @@ st.markdown("""
         text-align: center;
         font-size: 1.3rem;
         margin-bottom: 30px;
-        color: rgba(255, 255, 255, 0.8);
+        color: #C0C0C0;
     }
     
     /* AMÉLIORATION UI: Design système de cartes */
@@ -143,7 +143,7 @@ st.markdown("""
         justify-content: center;
         font-weight: 500;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.7);
+        color: gray !important;
     }
     
     [data-testid="stMetricValue"] {
@@ -415,7 +415,7 @@ st.markdown("""
     
     /* AMÉLIORATION UI: Combat cards modernisées */
     .fight-card-improved {
-        background: linear-gradient(145deg, rgba(48, 51, 66, 0.5) 0%, rgba(33, 36, 46, 0.5) 100%);
+        background-color: rgba(200, 200, 200, 0.15);
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 15px;
@@ -741,13 +741,14 @@ st.markdown("""
     }
     
     /* NOUVELLE SECTION UI: Améliorations des formulaires */
-    input[type="number"], input[type="text"], input[type="date"], select {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
-        color: white !important;
-        transition: all 0.2s !important;
-    }
+input[type="number"], input[type="text"], input[type="date"], select {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;https://www.perplexity.ai/
+    color: gray !important;
+    transition: all 0.2s !important;
+}
+
     
     input[type="number"]:focus, input[type="text"]:focus, 
     input[type="date"]:focus, select:focus {
@@ -1665,7 +1666,7 @@ def create_radar_chart(fighter_a, fighter_b):
         margin=dict(l=80, r=80, t=100, b=80),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white'),
+        font=dict(color='gray'),
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -1787,24 +1788,24 @@ def create_style_analysis_chart(fighter_a, fighter_b):
     # AMÉLIORATION UI: Graphique modernisé
     fig = go.Figure()
     
-    # Ajouter un arrière-plan de quadrant
+    # Ajouter un arrière-plan de quadrant avec contour gris
     fig.add_shape(
         type="rect", xref="paper", yref="paper",
         x0=0, y0=0, x1=1, y1=1,
-        line=dict(color="rgba(255, 255, 255, 0.1)", width=1)
+        line=dict(color="rgba(128, 128, 128, 0.3)", width=1)
     )
     
-    # Ajouter des lignes de quadrant avec style amélioré
+    # Ajouter des lignes de quadrant avec style amélioré en gris
     fig.add_shape(
         type="line", xref="paper", yref="paper",
         x0=0.5, y0=0, x1=0.5, y1=1,
-        line=dict(color="rgba(255, 255, 255, 0.2)", width=1, dash="dot")
+        line=dict(color="rgba(128, 128, 128, 0.4)", width=1, dash="dot")
     )
     
     fig.add_shape(
         type="line", xref="paper", yref="paper",
         x0=0, y0=0.5, x1=1, y1=0.5,
-        line=dict(color="rgba(255, 255, 255, 0.2)", width=1, dash="dot")
+        line=dict(color="rgba(128, 128, 128, 0.4)", width=1, dash="dot")
     )
     
     # Ajouter les points pour chaque combattant avec style amélioré
@@ -1843,26 +1844,27 @@ def create_style_analysis_chart(fighter_a, fighter_b):
         x=0.25, y=0.75, 
         text="Grappler Agressif",
         showarrow=False,
-        font=dict(color="rgba(255, 255, 255, 0.7)", size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.75, y=0.75, 
         text="Striker Agressif",
         showarrow=False,
-        font=dict(color="rgba(255, 255, 255, 0.7)", size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.25, y=0.25, 
         text="Grappler Défensif",
         showarrow=False,
-        font=dict(color="rgba(255, 255, 255, 0.7)", size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
     fig.add_annotation(
         x=0.75, y=0.25, 
         text="Striker Défensif",
         showarrow=False,
-        font=dict(color="rgba(255, 255, 255, 0.7)", size=12)
+        font=dict(color="rgba(128, 128, 128, 0.7)", size=12)
     )
+
     
     # Configurer la mise en page moderne
     fig.update_layout(
@@ -1903,6 +1905,7 @@ def create_style_analysis_chart(fighter_a, fighter_b):
     )
     
     return fig
+
 
 # Fonction pour créer un DataFrame des statistiques comparatives
 def create_stats_comparison_df(fighter_a, fighter_b):
@@ -5739,7 +5742,8 @@ def show_history_page():
                     showarrow=True,
                     arrowhead=1,
                     ax=0,
-                    ay=-40
+                    ay=-40,
+                    font=dict(color="#90EE90", size=16, family="Arial Black") 
                 )
                 
                 # Point final
@@ -5750,7 +5754,9 @@ def show_history_page():
                     showarrow=True,
                     arrowhead=1,
                     ax=0,
-                    ay=-40
+                    ay=-40,
+                    font=dict(color="#90EE90", size=16, family="Arial Black") 
+
                 )
                 
                 # Point haut
@@ -5763,7 +5769,9 @@ def show_history_page():
                         showarrow=True,
                         arrowhead=1,
                         ax=0,
-                        ay=-40
+                        ay=-40,
+                        font=dict(color="#90EE90", size=16, family="Arial Black") 
+
                     )
                 
                 # Point bas (après le début)
@@ -5778,7 +5786,8 @@ def show_history_page():
                             showarrow=True,
                             arrowhead=1,
                             ax=0,
-                            ay=40
+                            ay=40,
+                            font=dict(color="#90EE90", size=16, family="Arial Black") 
                         )
             
             st.plotly_chart(fig, use_container_width=True)
