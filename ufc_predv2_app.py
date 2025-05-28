@@ -5305,7 +5305,9 @@ def show_upcoming_events_page():
                                     
                                     # Afficher le vainqueur prédit
                                     st.write("**Vainqueur prédit:**")
-                                    st.markdown(f"### {winner_name}")
+                                    winner_emoji = "🔴" if winner_ml == "Red" else "🔵"
+                                    winner_hex_color = "#E53935" if winner_ml == "Red" else "#1E88E5"
+                                    st.markdown(f"<h3 style='color: {winner_hex_color};'>{winner_emoji} {winner_name}</h3>", unsafe_allow_html=True)
                                     
                                     # Afficher la méthode et la confiance
                                     st.write(f"**Méthode:** {method}")
@@ -5327,7 +5329,9 @@ def show_upcoming_events_page():
                                         with detail_cols[0]:
                                             st.write("### Prédiction Statistique")
                                             winner_name_classic = classic_result['winner_name']
-                                            st.write(f"**Vainqueur prédit:** {winner_name_classic}")
+                                            winner_classic_emoji = "🔴" if winner_classic == "Red" else "🔵"
+                                            winner_classic_color = "#E53935" if winner_classic == "Red" else "#1E88E5"
+                                            st.markdown(f"**Vainqueur prédit:** <span style='color: {winner_classic_color};'>{winner_classic_emoji} {winner_name_classic}</span>", unsafe_allow_html=True)
                                             st.write(f"**Probabilités:** {classic_result['red_probability']:.0%} (Rouge) vs {classic_result['blue_probability']:.0%} (Bleu)")
                                             st.write(f"**Confiance:** {classic_result['confidence']}")
                                         
@@ -5336,7 +5340,9 @@ def show_upcoming_events_page():
                                             with detail_cols[1]:
                                                 st.write("### Prédiction Machine Learning")
                                                 winner_name_ml = ml_result['winner_name']
-                                                st.write(f"**Vainqueur prédit:** {winner_name_ml}")
+                                                winner_ml_emoji = "🔴" if winner_ml == "Red" else "🔵"
+                                                winner_ml_color = "#E53935" if winner_ml == "Red" else "#1E88E5"
+                                                st.markdown(f"**Vainqueur prédit:** <span style='color: {winner_ml_color};'>{winner_ml_emoji} {winner_name_ml}</span>", unsafe_allow_html=True)
                                                 st.write(f"**Probabilités:** {ml_result['red_probability']:.0%} (Rouge) vs {ml_result['blue_probability']:.0%} (Bleu)")
                                                 st.write(f"**Confiance:** {ml_result['confidence']}")
                                         
