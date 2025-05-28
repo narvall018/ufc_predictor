@@ -18,6 +18,50 @@ import time
 import random
 warnings.filterwarnings('ignore')
 
+def create_probability_bar(red_prob, blue_prob, red_name, blue_name):
+    """
+    Crée une barre de progression HTML bicolore pour afficher les probabilités
+    
+    Args:
+        red_prob: Probabilité du combattant rouge (0-1)
+        blue_prob: Probabilité du combattant bleu (0-1)
+        red_name: Nom du combattant rouge
+        blue_name: Nom du combattant bleu
+    
+    Returns:
+        HTML string de la barre de progression
+    """
+    # S'assurer que les probabilités sont entre 0 et 100
+    red_pct = max(0, min(100, red_prob * 100))
+    blue_pct = max(0, min(100, blue_prob * 100))
+    
+    # Normaliser pour que le total soit 100%
+    total = red_pct + blue_pct
+    if total > 0:
+        red_pct = (red_pct / total) * 100
+        blue_pct = (blue_pct / total) * 100
+    else:
+        red_pct = 50
+        blue_pct = 50
+    
+    html = f"""
+    <div class="probability-container">
+        <div class="probability-bar">
+            <div class="probability-bar-red" style="width: {red_pct}%;">
+                {red_pct:.0f}%
+            </div>
+            <div class="probability-bar-blue" style="width: {blue_pct}%;">
+                {blue_pct:.0f}%
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.9rem;">
+            <span style="color: #E53935;">🔴 {red_name}</span>
+            <span style="color: #1E88E5;">🔵 {blue_name}</span>
+        </div>
+    </div>
+    """
+    return html
+
 # Configuration de la page avec un thème plus moderne
 st.set_page_config(
     page_title="UFC Fight Predictor",
@@ -3661,7 +3705,14 @@ def show_prediction_page():
                     progress_value = red_prob
                 
                 # Toujours afficher la barre de progression
-                st.progress(progress_value)
+                # Toujours afficher la barre de progression bicolore
+                progress_html = create_probability_bar(
+                    red_prob, 
+                    blue_prob, 
+                    fighter_a['name'], 
+                    fighter_b['name']
+                )
+                st.markdown(progress_html, unsafe_allow_html=True)
                 
                 # Afficher la confiance
                 confidence = classic_prediction['confidence']
@@ -3711,7 +3762,15 @@ def show_prediction_page():
                         progress_value_ml = red_prob_ml
                     
                     # Toujours afficher la barre de progression
-                    st.progress(progress_value_ml)
+                    # Toujours afficher la barre de progression bicolore
+                    progress_html_ml = create_probability_bar(
+                        red_prob_ml, 
+                        blue_prob_ml, 
+                        fighter_a['name'], 
+                        fighter_b['name']
+                    )
+                    st.markdown(progress_html_ml, unsafe_allow_html=True)
+
                     
                     # Afficher la confiance
                     confidence_ml = ml_prediction['confidence']
@@ -5235,7 +5294,14 @@ def show_upcoming_events_page():
                                         st.write(f"🔵 {blue_match}: {blue_prob:.0%}")
                                     
                                     # Utiliser la barre de progression pour montrer les probabilités
-                                    st.progress(red_prob)
+                                    # Utiliser la barre de progression bicolore pour montrer les probabilités
+                                    progress_html = create_probability_bar(
+                                        red_prob, 
+                                        blue_prob, 
+                                        red_match, 
+                                        blue_match
+                                    )
+                                    st.markdown(progress_html, unsafe_allow_html=True)
                                     
                                     # Afficher le vainqueur prédit
                                     st.write("**Vainqueur prédit:**")
