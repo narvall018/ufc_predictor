@@ -4342,7 +4342,7 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
 
 # PARTIE 9 
 
-# ICI
+
 
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
@@ -4402,35 +4402,194 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         )
     
     with col2:
-        # MODIFICATION: Ajout de Kelly/12, Kelly/14, Kelly/16 et définir Kelly/14 par défaut
+        # MODIFICATION: Ajout des nouvelles stratégies
+        strategy_options = [
+            "ULTRA-SECURE", 
+            "OPTIMAL STRATEGY", 
+            "AGGRESSIVE", 
+            "Kelly complet", 
+            "Demi-Kelly", 
+            "Quart-Kelly", 
+            "Kelly/5", 
+            "Kelly/6", 
+            "Kelly/8", 
+            "Kelly/10", 
+            "Kelly/12", 
+            "Kelly/14", 
+            "Kelly/16"
+        ]
+        
         kelly_strategy = st.selectbox(
-            "Stratégie Kelly",
-            options=["Kelly complet", "Demi-Kelly", "Quart-Kelly", "Kelly/5", "Kelly/6", "Kelly/8", "Kelly/10", "Kelly/12", "Kelly/14", "Kelly/16"],
-            index=8,  # Kelly/14 par défaut (index 8 dans la nouvelle liste)
+            "Stratégie de paris",
+            options=strategy_options,
+            index=1,  # OPTIMAL STRATEGY par défaut
             key=f"kelly_strategy_{event_url}"
         )
         
-        # MODIFICATION: Déterminer le diviseur Kelly en fonction de la stratégie
-        if kelly_strategy == "Kelly complet":
-            kelly_divisor = 1
-        elif kelly_strategy == "Demi-Kelly":
-            kelly_divisor = 2
-        elif kelly_strategy == "Quart-Kelly":
-            kelly_divisor = 4
-        elif kelly_strategy == "Kelly/5":
-            kelly_divisor = 5
-        elif kelly_strategy == "Kelly/6":
-            kelly_divisor = 6
-        elif kelly_strategy == "Kelly/8":
-            kelly_divisor = 8
-        elif kelly_strategy == "Kelly/10":
-            kelly_divisor = 10
-        elif kelly_strategy == "Kelly/12":
-            kelly_divisor = 12
-        elif kelly_strategy == "Kelly/14":
-            kelly_divisor = 14
-        else:  # "Kelly/16"
-            kelly_divisor = 16
+        # NOUVEAU: Définition des paramètres pour chaque stratégie
+        strategy_params = {
+            "ULTRA-SECURE": {
+                "kelly_fraction": 17.3,
+                "min_confidence": 0.671,
+                "min_value": 1.139,
+                "max_bet_fraction": 0.0057,
+                "min_edge": 0.045,
+                "min_bet_pct": 0.001,
+                "description": "Stratégie ultra-conservatrice avec mise maximale de 0.57% par pari"
+            },
+            "OPTIMAL STRATEGY": {
+                "kelly_fraction": 10.84413949349914,
+                "min_confidence": 0.6868474607949324,
+                "min_value": 1.1443872756387072,
+                "max_bet_fraction": 0.04157348795229382,
+                "min_edge": 0.0579010170275563,
+                "min_bet_pct": 0.0156550016861687,
+                "description": "Stratégie optimisée mathématiquement pour un équilibre rendement/risque"
+            },
+            "AGGRESSIVE": {
+                "kelly_fraction": 54.57895572533219,
+                "min_confidence": 0.8804031702586482,
+                "min_value": 1.0127078432620351,
+                "max_bet_fraction": 0.16561756998989577,
+                "min_edge": 0.003714553031616009,
+                "min_bet_pct": 0.03731285201070915,
+                "description": "Stratégie agressive avec critères stricts et mises importantes"
+            },
+            "Kelly complet": {
+                "kelly_fraction": 1,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly pur avec plafond de sécurité à 5%"
+            },
+            "Demi-Kelly": {
+                "kelly_fraction": 2,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 2 pour réduire la variance"
+            },
+            "Quart-Kelly": {
+                "kelly_fraction": 4,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 4 - approche conservatrice"
+            },
+            "Kelly/5": {
+                "kelly_fraction": 5,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 5 - très conservateur"
+            },
+            "Kelly/6": {
+                "kelly_fraction": 6,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 6 - ultra conservateur"
+            },
+            "Kelly/8": {
+                "kelly_fraction": 8,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 8 - très prudent"
+            },
+            "Kelly/10": {
+                "kelly_fraction": 10,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 10 - extrêmement prudent"
+            },
+            "Kelly/12": {
+                "kelly_fraction": 12,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 12 - très minimal"
+            },
+            "Kelly/14": {
+                "kelly_fraction": 14,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 14 - minimal"
+            },
+            "Kelly/16": {
+                "kelly_fraction": 16,
+                "min_confidence": 0.65,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.05,
+                "min_edge": 0.05,
+                "min_bet_pct": 0.01,
+                "description": "Kelly divisé par 16 - ultra minimal"
+            }
+        }
+        
+        # Récupérer les paramètres de la stratégie sélectionnée
+        current_strategy = strategy_params[kelly_strategy]
+        kelly_divisor = current_strategy["kelly_fraction"]
+        min_confidence = current_strategy["min_confidence"]
+        min_value = current_strategy["min_value"]
+        max_kelly_pct = current_strategy["max_bet_fraction"]
+        edge_minimum_fraction = current_strategy["min_edge"]
+        min_bet_pct = current_strategy["min_bet_pct"]
+        
+    # NOUVEAU: Affichage des informations de la stratégie sélectionnée
+    st.markdown(f"""
+    <div class="card" style="background: linear-gradient(145deg, rgba(30, 136, 229, 0.1) 0%, rgba(21, 101, 192, 0.1) 100%);
+                         border-left: 3px solid #1E88E5; margin: 15px 0;">
+        <h4 style="color: #1E88E5; margin-top: 0;">📋 Informations sur la stratégie "{kelly_strategy}"</h4>
+        <p style="margin-bottom: 15px; font-style: italic;">{current_strategy["description"]}</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem;">
+            <div>
+                <div style="color: #aaa;">Diviseur Kelly:</div>
+                <div style="font-weight: 600;">{kelly_divisor:.2f}</div>
+            </div>
+            <div>
+                <div style="color: #aaa;">Confiance minimum:</div>
+                <div style="font-weight: 600;">{min_confidence*100:.1f}%</div>
+            </div>
+            <div>
+                <div style="color: #aaa;">Value minimum:</div>
+                <div style="font-weight: 600;">{min_value:.3f}</div>
+            </div>
+            <div>
+                <div style="color: #aaa;">Mise max par pari:</div>
+                <div style="font-weight: 600;">{max_kelly_pct*100:.2f}%</div>
+            </div>
+            <div>
+                <div style="color: #aaa;">Edge minimum:</div>
+                <div style="font-weight: 600;">{edge_minimum_fraction*100:.1f}%</div>
+            </div>
+            <div>
+                <div style="color: #aaa;">Mise minimum:</div>
+                <div style="font-weight: 600;">{min_bet_pct*100:.2f}%</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # AMÉLIORATION UI: Section pour les cotes améliorée
     st.markdown("""
@@ -4440,13 +4599,13 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     </div>
     """, unsafe_allow_html=True)
     
-    # NOUVEAU: Edge minimum réglable entre 3% et 10%
+    # Option pour ajuster l'edge minimum (avec valeur par défaut de la stratégie)
     edge_minimum = st.slider(
         "Edge minimum (%) - Différence minimum entre probabilité modèle et probabilité implicite",
-        min_value=3.0,
+        min_value=0.1,
         max_value=10.0,
-        value=5.0,
-        step=0.5,
+        value=edge_minimum_fraction * 100,
+        step=0.1,
         key=f"min_edge_{event_url}"
     )
     
@@ -4605,7 +4764,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     # Identifier quelle valeur afficher dans la colonne Kelly
                     display_kelly = f"{kelly_pct:.1f}%"
                     if is_capped:
-                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                        display_kelly += f" → {fight.get('capped_kelly_pct', 0.0057)*100:.2f}%"  # Ajouter l'information de plafonnement
                 else:
                     # Compatibilité avec l'ancien format
                     kelly_pct = fight.get('fractional_kelly', 0) * 100
@@ -4655,12 +4814,16 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                 st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
             
             # Résumé détaillé
+            strategy_name = f"{kelly_strategy} avec plafond à {max_kelly_pct*100:.2f}%"
+            
             st.markdown(f"""
             <div class="strategy-summary">
                 <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                 <ul>
-                    <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
-                    <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
+                    <li>Stratégie: <b>{strategy_name}</b></li>
+                    <li>Diviseur Kelly: <b>{kelly_divisor:.2f}</b></li>
+                    <li>Confiance minimum: <b>{min_confidence*100:.1f}%</b></li>
+                    <li>Value minimum: <b>{min_value:.3f}</b></li>
                     <li>Edge minimum: <b>{edge_minimum:.1f}%</b></li>
                     <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
                     <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
@@ -4728,12 +4891,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
         else:
             # AMÉLIORATION UI: Message d'avertissement plus visuel
-            st.markdown("""
+            st.markdown(f"""
             <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
                                      border: 1px solid rgba(255, 193, 7, 0.3); text-align: center; padding: 20px;">
                 <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
                 <h3 style="color: #FFC107; margin-bottom: 10px;">Aucun combat intéressant</h3>
-                <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ 65% et value positive).</p>
+                <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ {min_confidence*100:.1f}%, edge ≥ {edge_minimum:.1f}%, value ≥ {min_value:.3f}).</p>
             </div>
             """, unsafe_allow_html=True)
     else:
@@ -4763,8 +4926,8 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         fight['odds'] = 2.0
                         st.session_state[f"odds_dict_{event_url}"][odds_key] = 2.0
                         
-                    # Vérifier la confiance du modèle
-                    if fight['probability'] < 0.65:
+                    # Vérifier la confiance du modèle selon la stratégie
+                    if fight['probability'] < min_confidence:
                         continue
                         
                     # Vérifier le value betting
@@ -4775,8 +4938,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     if edge < edge_minimum_fraction:  # Edge minimum (exprimé en fraction décimale)
                         continue
                     
+                    # Vérifier la value selon la stratégie
                     value = fight['probability'] * fight['odds']
-                    if value < 1.15:
+                    if value < min_value:
                         continue
                         
                     # Calculer la fraction Kelly pure
@@ -4787,6 +4951,10 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     
                     # Appliquer le diviseur Kelly
                     fractional_kelly = kelly / kelly_divisor
+                    
+                    # Vérifier que la mise est au-dessus du minimum
+                    if fractional_kelly < min_bet_pct:
+                        continue
                     
                     # Ajouter aux paris recommandés
                     if fractional_kelly > 0:
@@ -4818,7 +4986,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                          border: 1px solid rgba(255, 193, 7, 0.3); text-align: center; padding: 20px;">
                     <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
                     <h3 style="color: #FFC107; margin-bottom: 10px;">Aucun combat intéressant</h3>
-                    <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ 65%, edge ≥ {edge_minimum:.1f}% et value positive).</p>
+                    <p style="margin-bottom: 0;">Aucun combat ne correspond aux critères de value betting (confiance ≥ {min_confidence*100:.1f}%, edge ≥ {edge_minimum:.1f}%, value ≥ {min_value:.3f}).</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -4831,11 +4999,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         implicit_prob = 1 / float(odds_value) if isinstance(odds_value, (int, float)) and odds_value > 0 else "N/A"
                         edge = fight['probability'] - implicit_prob if isinstance(implicit_prob, float) else "N/A"
                         
-                        # MODIFICATION: Affichage des raisons adaptées à la nouvelle stratégie
+                        # Affichage des raisons adaptées à la nouvelle stratégie
                         if isinstance(edge, float):
-                            reason = "Confiance < 65%" if fight['probability'] < 0.65 else \
+                            value = fight['probability'] * float(odds_value)
+                            reason = f"Confiance < {min_confidence*100:.1f}%" if fight['probability'] < min_confidence else \
                                     f"Edge insuffisant ({edge*100:.1f}% < {edge_minimum:.1f}%)" if edge < edge_minimum_fraction else \
-                                    "Value insuffisante" if fight['probability'] * float(odds_value) < 1.15 else \
+                                    f"Value insuffisante ({value:.3f} < {min_value:.3f})" if value < min_value else \
                                     "Raison inconnue"
                         else:
                             reason = "Erreur dans les données de cote"
@@ -4845,20 +5014,18 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             <div><b>{fight['red_fighter']} vs {fight['blue_fighter']}</b></div>
                             <div>Vainqueur prédit: <b>{fight['winner_name']}</b> ({fight['probability']:.0%})</div>
                             <div>Cote: <b>{odds_value}</b> (Probabilité implicite: {implicit_prob if isinstance(implicit_prob, float) else implicit_prob})</div>
-                            <div>Edge: <b>{edge*100:.1f}% </b> si edge est un nombre à virgule flottante else edge</div>
+                            <div>Edge: <b>{edge*100:.1f}%</b> si edge est un nombre à virgule flottante else edge</div>
                             <div>Raison: {reason}</div>
                         </div>
                         """, unsafe_allow_html=True)
             else:
-                # MODIFICATION ICI: Application de la méthode Kelly fixe avec plafond absolu
-                max_kelly_pct = 0.05  # Plafond de 5% de la bankroll par pari
-                
+                # Application de la méthode Kelly avec plafond adapté selon la stratégie
                 # Appliquer le Kelly fixe avec plafond absolu pour chaque combat
                 for fight in filtered_fights:
                     # Utiliser directement le pourcentage Kelly calculé (déjà divisé par kelly_divisor)
                     kelly_pct = fight['fractional_kelly']
                     
-                    # Plafonner à 5% maximum de la bankroll
+                    # Plafonner selon la stratégie
                     capped_kelly = min(kelly_pct, max_kelly_pct)
                     
                     # Calculer la mise finale en euros
@@ -4880,7 +5047,8 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     # Identifier quelle valeur afficher dans la colonne Kelly
                     display_kelly = f"{kelly_pct:.1f}%"
                     if fight['is_capped']:
-                        display_kelly += f" → 5.0%"  # Ajouter l'information de plafonnement
+                        cap_pct = max_kelly_pct * 100
+                        display_kelly += f" → {cap_pct:.2f}%"  # Ajouter l'information de plafonnement
                     
                     recommendation_data.append({
                         "Combat": f"{fight['red_fighter']} vs {fight['blue_fighter']}",
@@ -4913,21 +5081,22 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         hide_index=True
                     )
                     
-                    # MODIFICATION ICI: Message pour les paris plafonnés
+                    # Message pour les paris plafonnés adapté à la stratégie
                     capped_fights = [f for f in filtered_fights if f.get('is_capped', False)]
                     if capped_fights:
-                        st.markdown("""
+                        cap_pct = max_kelly_pct * 100
+                        st.markdown(f"""
                         <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
                                      border-left: 3px solid #FFC107; margin-top: 15px;">
                             <h4 style="color: #FFC107; margin-top: 0;">⚠️ Information importante</h4>
-                            <p>Certaines mises ont été plafonnées à 5% de votre bankroll (règle de gestion du risque):</p>
+                            <p>Certaines mises ont été plafonnées à {cap_pct:.2f}% de votre bankroll (règle de gestion du risque {kelly_strategy}):</p>
                             <ul>
                         """, unsafe_allow_html=True)
                         
                         for fight in capped_fights:
                             original_stake = current_bankroll * fight['original_kelly_pct']
                             st.markdown(f"""
-                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.1f}% (plafonné à 5%)</li>
+                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.2f}% (plafonné à {cap_pct:.2f}%)</li>
                             """, unsafe_allow_html=True)
                         
                         st.markdown("""
@@ -4948,14 +5117,19 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     with summary_cols[2]:
                         st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
                     
-                    # Résumé détaillé avec edge minimum inclus
+                    # Résumé détaillé avec paramètres spécifiques à la stratégie
+                    strategy_name = f"{kelly_strategy} avec plafond à {max_kelly_pct*100:.2f}%"
+                    
                     st.markdown(f"""
                     <div class="strategy-summary">
                         <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                         <ul>
-                            <li>Stratégie: <b>Kelly fixe avec plafond à 5%</b></li>
-                            <li>Diviseur Kelly: <b>{kelly_divisor}</b> ({kelly_strategy})</li>
+                            <li>Stratégie: <b>{strategy_name}</b></li>
+                            <li>Diviseur Kelly: <b>{kelly_divisor:.2f}</b></li>
+                            <li>Confiance minimum: <b>{min_confidence*100:.1f}%</b></li>
+                            <li>Value minimum: <b>{min_value:.3f}</b></li>
                             <li>Edge minimum: <b>{edge_minimum:.1f}%</b></li>
+                            <li>Mise minimum: <b>{min_bet_pct*100:.2f}%</b></li>
                             <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
                             <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                             <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
@@ -5019,35 +5193,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
-
-    
-    # Fonction de débogage
-    def debug_betting_strategy(event_url, bettable_fights, filtered_fights):
-        """Fonction de débogage pour la stratégie de paris"""
         
-        debug_info = st.expander("📝 Informations de débogage (développeur)", expanded=False)
-        
-        with debug_info:
-            st.write("### État du dictionnaire des cotes")
-            st.write(st.session_state.get(f"odds_dict_{event_url}", {}))
-            
-            st.write("### Combats bettables")
-            for fight in bettable_fights:
-                fight_key = fight['fight_key']
-                odds_key = f"odds_{fight_key}"
-                odds_value = st.session_state.get(f"odds_dict_{event_url}", {}).get(odds_key, "Non définie")
-                
-                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={odds_value}")
-            
-            st.write("### Combats filtrés pour paris")
-            for fight in filtered_fights:
-                st.write(f"- {fight['red_fighter']} vs {fight['blue_fighter']}: Prob={fight['probability']:.2f}, Cote={fight['odds']}, Kelly={fight.get('fractional_kelly', 0):.4f}, Mise={fight.get('stake', 0):.2f}€")
-    
-    # # Ajouter le débogage pour les développeurs
-    # if st.checkbox("Afficher le débogage (développeur)", value=False, key=f"debug_{event_url}"):
-    #     debug_betting_strategy(event_url, bettable_fights, filtered_fights)
-        
-
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
     # AMÉLIORATION UI: Titre de page simple
