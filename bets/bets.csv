@@ -9,5 +9,5 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 8,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Jared Gordon,Thiago Moises,Jared Gordon,1.94,53.32759171118624,1.0,0.7860524309717569,closed,win,50.12793620851506,94.0
 9,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,Luana Santos,Tainara Lisboa,Luana Santos,1.71,52.39161518009807,1.0,0.8125961440453948,closed,win,37.19804677786963,71.0
 10,2025-05-12,UFC Fight Night: Burns vs. Morales,2025-05-12,HyunSung Park,Carlos Hernandez,HyunSung Park,1.66,65.77017372782178,1.0,0.876249141812631,closed,win,43.40831466036237,65.99999999999999
-11,2025-05-25,UFC Fight Night: Blanchfield vs. Barber,2025-05-25,Dustin Jacoby,Bruno Lopes,Bruno Lopes,2.47,75.58,14.0,0.8119755539216853,open,,0.0,0.0
-12,2025-05-25,UFC Fight Night: Blanchfield vs. Barber,2025-05-25,Jafel Filho,Allan Nascimento,Jafel Filho,2.39,71.37,14.0,0.7940746863778831,open,,0.0,0.0
+11,2025-05-25,UFC Fight Night: Blanchfield vs. Barber,2025-05-25,Dustin Jacoby,Bruno Lopes,Bruno Lopes,2.47,75.58,14.0,0.8119755539216853,closed,loss,-75.58,-100.0
+12,2025-05-25,UFC Fight Night: Blanchfield vs. Barber,2025-05-25,Jafel Filho,Allan Nascimento,Jafel Filho,2.39,71.37,14.0,0.7940746863778831,closed,loss,-71.37,-100.0
