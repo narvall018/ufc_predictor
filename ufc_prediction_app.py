@@ -4699,9 +4699,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     # Champ pour entrer la cote du bookmaker
                     odds_key = f"odds_{fight_key}"
                     
-                    # Initialiser la valeur si première utilisation
+                    # Initialiser la valeur si première utilisation - MODIFICATION: cote par défaut à 1.01
                     if odds_key not in st.session_state[f"odds_dict_{event_url}"]:
-                        st.session_state[f"odds_dict_{event_url}"][odds_key] = 2.0
+                        st.session_state[f"odds_dict_{event_url}"][odds_key] = 1.01
                     
                     # Selon le mode de saisie choisi
                     if odds_input_mode == "Manuel":
@@ -4931,9 +4931,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                     if odds_key in st.session_state[f"odds_dict_{event_url}"]:
                         fight['odds'] = st.session_state[f"odds_dict_{event_url}"][odds_key]
                     else:
-                        # Valeur par défaut si non définie (ne devrait pas arriver)
-                        fight['odds'] = 2.0
-                        st.session_state[f"odds_dict_{event_url}"][odds_key] = 2.0
+                        # Valeur par défaut si non définie - MODIFICATION: cote par défaut à 1.01
+                        fight['odds'] = 1.01
+                        st.session_state[f"odds_dict_{event_url}"][odds_key] = 1.01
                         
                     # Vérifier la confiance du modèle selon la stratégie
                     if fight['probability'] < min_confidence:
@@ -5003,6 +5003,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                 debug_info = st.expander("🔍 Détails des combats évalués", expanded=False)
                 with debug_info:
                     for fight in bettable_fights:
+                        fight_key = fight['fight_key']
                         odds_key = f"odds_{fight_key}"
                         odds_value = st.session_state[f"odds_dict_{event_url}"].get(odds_key, "Non définie")
                         implicit_prob = 1 / float(odds_value) if isinstance(odds_value, (int, float)) and odds_value > 0 else "N/A"
@@ -5202,7 +5203,6 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
-
         
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
