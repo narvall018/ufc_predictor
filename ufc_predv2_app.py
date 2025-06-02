@@ -4343,7 +4343,6 @@ def show_bet_form(fighter_red, fighter_blue, pick, odds, kelly_amount, probabili
 # PARTIE 9 
 
 
-
 def show_betting_strategy_section(event_url, event_name, fights, predictions_data, current_bankroll=300):
     """Affiche la section de stratégie de paris basée sur les prédictions existantes avec UI améliorée"""
     
@@ -4402,8 +4401,9 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         )
     
     with col2:
-        # MODIFICATION: Ajout des nouvelles stratégies
+        # MODIFICATION: Ajout de la stratégie REALISTIC
         strategy_options = [
+            "REALISTIC",
             "ULTRA-SECURE", 
             "OPTIMAL STRATEGY", 
             "AGGRESSIVE", 
@@ -4422,12 +4422,21 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
         kelly_strategy = st.selectbox(
             "Stratégie de paris",
             options=strategy_options,
-            index=1,  # OPTIMAL STRATEGY par défaut
+            index=0,  # REALISTIC par défaut
             key=f"kelly_strategy_{event_url}"
         )
         
         # NOUVEAU: Définition des paramètres pour chaque stratégie
         strategy_params = {
+            "REALISTIC": {
+                "kelly_fraction": 4.9,
+                "min_confidence": 0.578,
+                "min_value": 1.15,
+                "max_bet_fraction": 0.017,
+                "min_edge": 0.094,
+                "min_bet_pct": 0.01,
+                "description": "Stratégie réaliste équilibrée avec des critères modérés et mise plafonnée à 1.7%"
+            },
             "ULTRA-SECURE": {
                 "kelly_fraction": 17.3,
                 "min_confidence": 0.671,
@@ -4603,7 +4612,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
     edge_minimum = st.slider(
         "Edge minimum (%) - Différence minimum entre probabilité modèle et probabilité implicite",
         min_value=0.1,
-        max_value=10.0,
+        max_value=15.0,
         value=edge_minimum_fraction * 100,
         step=0.1,
         key=f"min_edge_{event_url}"
@@ -5089,14 +5098,14 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         <div class="card" style="background: linear-gradient(145deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.1) 100%);
                                      border-left: 3px solid #FFC107; margin-top: 15px;">
                             <h4 style="color: #FFC107; margin-top: 0;">⚠️ Information importante</h4>
-                            <p>Certaines mises ont été plafonnées à {cap_pct:.2f}% de votre bankroll (règle de gestion du risque {kelly_strategy}):</p>
+                            <p>Certaines mises ont été plafonnées à {cap_pct:.1f}% de votre bankroll (règle de gestion du risque {kelly_strategy}):</p>
                             <ul>
                         """, unsafe_allow_html=True)
                         
                         for fight in capped_fights:
                             original_stake = current_bankroll * fight['original_kelly_pct']
                             st.markdown(f"""
-                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.2f}% (plafonné à {cap_pct:.2f}%)</li>
+                                <li>{fight['winner_name']} : Kelly={fight['original_kelly_pct']*100:.1f}% → {fight['capped_kelly_pct']*100:.1f}% (plafonné à {cap_pct:.1f}%)</li>
                             """, unsafe_allow_html=True)
                         
                         st.markdown("""
@@ -5118,18 +5127,18 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                         st.metric("Gain potentiel", f"{total_potential_profit:.2f}€", f"{total_potential_profit/total_stake*100:.1f}%")
                     
                     # Résumé détaillé avec paramètres spécifiques à la stratégie
-                    strategy_name = f"{kelly_strategy} avec plafond à {max_kelly_pct*100:.2f}%"
+                    strategy_name = f"{kelly_strategy} avec plafond à {max_kelly_pct*100:.1f}%"
                     
                     st.markdown(f"""
                     <div class="strategy-summary">
                         <h4 style="margin-top: 0;">Résumé de la stratégie</h4>
                         <ul>
                             <li>Stratégie: <b>{strategy_name}</b></li>
-                            <li>Diviseur Kelly: <b>{kelly_divisor:.2f}</b></li>
+                            <li>Diviseur Kelly: <b>{kelly_divisor:.1f}</b></li>
                             <li>Confiance minimum: <b>{min_confidence*100:.1f}%</b></li>
                             <li>Value minimum: <b>{min_value:.3f}</b></li>
                             <li>Edge minimum: <b>{edge_minimum:.1f}%</b></li>
-                            <li>Mise minimum: <b>{min_bet_pct*100:.2f}%</b></li>
+                            <li>Mise minimum: <b>{min_bet_pct*100:.1f}%</b></li>
                             <li>Nombre de paris recommandés: <b>{len(filtered_fights)}</b></li>
                             <li>Exposition totale: <b>{total_stake/current_bankroll*100:.1f}%</b> de la bankroll</li>
                             <li>ROI potentiel: <b>{total_potential_profit/total_stake*100:.1f}%</b></li>
@@ -5193,6 +5202,7 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                                         st.error("❌ Aucun pari n'a pu être enregistré.")
                                 except Exception as e:
                                     st.error(f"❌ Erreur lors de l'enregistrement des paris: {e}")
+
         
 def show_upcoming_events_page():
     """Affiche la page des événements à venir avec UI améliorée"""
