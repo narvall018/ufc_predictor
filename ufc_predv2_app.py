@@ -4679,7 +4679,12 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
             for j, fight in enumerate(row_fights):
                 with cols[j]:
                     fight_key = fight['fight_key']
-                    # AMÉLIORATION UI: Card de combat modernisée
+                    
+                    # NOUVEAU: Déterminer la couleur du pourcentage selon la confiance minimum
+                    probability_color = "#4CAF50" if fight['probability'] >= min_confidence else "#F44336"
+                    probability_bg = "rgba(76, 175, 80, 0.1)" if fight['probability'] >= min_confidence else "rgba(244, 67, 54, 0.1)"
+                    
+                    # AMÉLIORATION UI: Card de combat modernisée avec pourcentage coloré
                     st.markdown(f"""
                     <div class="fight-card-improved">
                         <div class="fighters-banner">
@@ -4692,7 +4697,13 @@ def show_betting_strategy_section(event_url, event_name, fights, predictions_dat
                             <span style="font-weight: 600; color: {('#E53935' if fight['winner'] == 'Red' else '#1E88E5')};">
                                 {fight['winner_name']}
                             </span>
-                            <span> ({fight['probability']:.0%})</span>
+                            <span style="background: {probability_bg}; color: {probability_color}; padding: 2px 6px; border-radius: 12px; font-weight: 600; margin-left: 5px;">
+                                ({fight['probability']:.0%})
+                            </span>
+                        </div>
+                        <div style="text-align: center; font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
+                            Confiance min: {min_confidence*100:.1f}% 
+                            {'✅' if fight['probability'] >= min_confidence else '❌'}
                         </div>
                     """, unsafe_allow_html=True)
                     
