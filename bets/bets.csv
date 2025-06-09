@@ -17,3 +17,8 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 17,2025-06-05,UFC 316: Dvalishvili vs. O'Malley 2,2025-06-05,Vicente Luque,Kevin Holland,Vicente Luque,3.2,23.8,4.9,0.5961061442616807,closed,loss,-23.8,-100.0
 18,2025-06-05,UFC 316: Dvalishvili vs. O'Malley 2,2025-06-05,Serghei Spivac,Waldo Cortes-Acosta,Waldo Cortes-Acosta,2.17,23.8,4.9,0.8075898431296605,closed,win,27.846,117.0
 19,2025-06-05,UFC 316: Dvalishvili vs. O'Malley 2,2025-06-05,Khaos Williams,Andreas Gustafsson,Khaos Williams,1.53,23.8,4.9,0.7674577482559611,closed,loss,-23.8,-100.0
+20,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Kamaru Usman,Joaquin Buckley,Kamaru Usman,3.15,23.1,4.9,0.6367334508839881,open,,0.0,0.0
+21,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Rose Namajunas,Miranda Maverick,Miranda Maverick,3.1,23.1,4.9,0.8009860342617601,open,,0.0,0.0
+22,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Cody Garbrandt,Raoni Barcelos,Raoni Barcelos,1.61,23.1,4.9,0.8740439992754022,open,,0.0,0.0
+23,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Paul Craig,Rodolfo Bellato,Rodolfo Bellato,1.28,23.1,4.9,0.9118409490408568,open,,0.0,0.0
+24,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Ricky Simon,Charles Jourdain,Ricky Simon,1.59,23.1,4.9,0.805016136779833,open,,0.0,0.0
