@@ -23,3 +23,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 23,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Paul Craig,Rodolfo Bellato,Rodolfo Bellato,1.28,23.1,4.9,0.9118409490408568,closed,void,0.0,0.0
 24,2025-06-09,UFC Fight Night: Usman vs. Buckley,2025-06-09,Ricky Simon,Charles Jourdain,Ricky Simon,1.59,23.1,4.9,0.805016136779833,closed,win,13.629000000000003,59.00000000000001
 25,2025-06-10,UFC Fight Night: Usman vs. Buckley,2025-06-10,Phil Rowe,Ange Loosa,Ange Loosa,1.71,23.1,4.9,0.7509322481099743,closed,loss,-23.1,-100.0
+26,2025-06-15,COMPENSATION RICKY SIMON CAR PAS VICTOIRE MAIS ANNULE,2025-06-15,AJ Cunningham,AJ Dobson,AJ Dobson,1.8,23.1,4.0,0.5332296677488716,closed,loss,-23.1,-100.0
