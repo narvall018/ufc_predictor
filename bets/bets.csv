@@ -25,8 +25,8 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 25,2025-06-10,UFC Fight Night: Usman vs. Buckley,2025-06-10,Phil Rowe,Ange Loosa,Ange Loosa,1.71,23.1,4.9,0.7509322481099743,closed,loss,-23.1,-100.0
 26,2025-06-15,COMPENSATION RICKY SIMON CAR PAS VICTOIRE MAIS ANNULE,2025-06-15,AJ Cunningham,AJ Dobson,AJ Dobson,1.8,23.1,4.0,0.5332296677488716,closed,loss,-23.1,-100.0
 27,2025-06-15,RICKY SIMON MODIF ,2025-06-15,AJ Cunningham,AJ Dobson,AJ Dobson,1.95,10.0,4.0,0.5332296677488716,closed,win,9.5,95.0
-28,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Jamahal Hill,Khalil Rountree Jr.,Jamahal Hill,2.12,23.4,4.9,0.8112188511113362,open,,0.0,0.0
-29,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Rafael Fiziev,Ignacio Bahamondes,Ignacio Bahamondes,1.77,23.4,4.9,0.8567195821888776,open,,0.0,0.0
-30,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Muhammad Naimov,Bogdan Grad,Bogdan Grad,2.75,23.4,4.9,0.8264559749287914,open,,0.0,0.0
-31,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Ismail Naurdiev,JunYong Park,Ismail Naurdiev,2.5,23.4,4.9,0.6476170616984935,open,,0.0,0.0
-32,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Hamdy Abdelwahab,Mohammed Usman,Hamdy Abdelwahab,1.54,23.4,4.9,0.8000512258190483,open,,0.0,0.0
+28,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Jamahal Hill,Khalil Rountree Jr.,Jamahal Hill,2.12,23.4,4.9,0.8112188511113362,closed,loss,-23.4,-100.0
+29,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Rafael Fiziev,Ignacio Bahamondes,Ignacio Bahamondes,1.77,23.4,4.9,0.8567195821888776,closed,loss,-23.4,-100.0
+30,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Muhammad Naimov,Bogdan Grad,Bogdan Grad,2.75,23.4,4.9,0.8264559749287914,closed,loss,-23.4,-100.0
+31,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Ismail Naurdiev,JunYong Park,Ismail Naurdiev,2.5,23.4,4.9,0.6476170616984935,closed,loss,-23.4,-100.0
+32,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Hamdy Abdelwahab,Mohammed Usman,Hamdy Abdelwahab,1.54,23.4,4.9,0.8000512258190483,closed,loss,-23.4,-100.0
