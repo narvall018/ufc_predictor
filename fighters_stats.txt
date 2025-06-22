@@ -1757,8 +1757,9 @@ td_def: 0.68
 sub_avg: 0.0
 
 name: Rafael Fiziev
-wins: 12
+wins: 13
 losses: 4
+draws: 0
 height: 172.72
 weight: 70.31
 reach: 180.34
@@ -1792,7 +1793,8 @@ sub_avg: 1.1
 
 name: Ignacio Bahamondes
 wins: 17
-losses: 5
+losses: 6
+draws: 0
 height: 190.5
 weight: 70.31
 reach: 190.5
@@ -2903,13 +2905,14 @@ td_def: 0.76
 sub_avg: 0.0
 
 name: Nazim Sadykhov
-wins: 10
+wins: 11
 losses: 1
+draws: 1
 height: 177.8
 weight: 70.31
 reach: 175.26
 stance: Southpaw
-age: 30
+age: 31
 SLpM: 4.7
 sig_str_acc: 0.46
 SApM: 5.66
@@ -3723,8 +3726,9 @@ td_def: 0.57
 sub_avg: 0.5
 
 name: Muhammad Naimov
-wins: 12
+wins: 13
 losses: 3
+draws: 0
 height: 175.26
 weight: 65.77
 reach: 177.8
@@ -3860,7 +3864,8 @@ sub_avg: 1.5
 
 name: Bogdan Grad
 wins: 15
-losses: 2
+losses: 3
+draws: 0
 height: 172.72
 weight: 65.77
 reach: 177.8
@@ -3894,7 +3899,8 @@ sub_avg: 0.0
 
 name: Hamdy Abdelwahab
 wins: 6
-losses: 0
+losses: 1
+draws: 0
 height: 187.96
 weight: 119.75
 reach: 182.88
@@ -4014,12 +4020,13 @@ sub_avg: 0.2
 
 name: Jamahal Hill
 wins: 12
-losses: 3
+losses: 4
+draws: 0
 height: 193.04
 weight: 92.99
 reach: 200.66
 stance: Southpaw
-age: 33
+age: 34
 SLpM: 7.05
 sig_str_acc: 0.53
 SApM: 4.02
@@ -4322,8 +4329,9 @@ td_def: 0.76
 sub_avg: 0.0
 
 name: Tagir Ulanbekov
-wins: 16
+wins: 17
 losses: 2
+draws: 0
 height: 170.18
 weight: 56.7
 reach: 177.8
@@ -6059,7 +6067,8 @@ sub_avg: 0.0
 
 name: Nikolas Motta
 wins: 15
-losses: 5
+losses: 6
+draws: 0
 height: 175.26
 weight: 70.31
 reach: 177.8
@@ -6404,7 +6413,8 @@ sub_avg: 0.0
 
 name: Oban Elliott
 wins: 12
-losses: 2
+losses: 3
+draws: 0
 height: 182.88
 weight: 77.11
 reach: 182.88
@@ -6696,7 +6706,8 @@ sub_avg: 0.8
 
 name: Melissa Mullins
 wins: 7
-losses: 1
+losses: 2
+draws: 0
 height: 170.18
 weight: 61.23
 reach: 172.72
@@ -6712,8 +6723,9 @@ td_def: 0.85
 sub_avg: 0.0
 
 name: Klaudia Sygula
-wins: 6
+wins: 7
 losses: 2
+draws: 0
 height: 172.72
 weight: 61.23
 reach: 175.26
@@ -7208,8 +7220,9 @@ td_def: 0.45
 sub_avg: 0.8
 
 name: Myktybek Orolbai
-wins: 13
+wins: 14
 losses: 2
+draws: 1
 height: 177.8
 weight: 70.31
 reach: 187.96
@@ -7295,7 +7308,8 @@ sub_avg: 1.2
 
 name: Ismail Naurdiev
 wins: 24
-losses: 7
+losses: 8
+draws: 0
 height: 177.8
 weight: 83.91
 reach: 187.96
@@ -7640,8 +7654,9 @@ td_def: 0.45
 sub_avg: 1.6
 
 name: JunYong Park
-wins: 18
+wins: 19
 losses: 6
+draws: 0
 height: 177.8
 weight: 83.91
 reach: 185.42
@@ -7827,8 +7842,9 @@ td_def: 0.61
 sub_avg: 0.0
 
 name: Khalil Rountree Jr.
-wins: 14
+wins: 15
 losses: 6
+draws: 0
 height: 185.42
 weight: 92.99
 reach: 193.04
@@ -8208,8 +8224,9 @@ td_def: 0.77
 sub_avg: 0.3
 
 name: Daria Zhelezniakova
-wins: 9
+wins: 10
 losses: 2
+draws: 0
 height: 175.26
 weight: 61.23
 reach: 172.72
@@ -9309,8 +9326,9 @@ td_def: 1.0
 sub_avg: 1.6
 
 name: Curtis Blaydes
-wins: 18
+wins: 19
 losses: 5
+draws: 0
 height: 193.04
 weight: 120.2
 reach: 203.2
@@ -9567,8 +9585,9 @@ td_def: 0.67
 sub_avg: 0.6
 
 name: Mohammed Usman
-wins: 11
+wins: 12
 losses: 4
+draws: 0
 height: 187.96
 weight: 108.41
 reach: 200.66
@@ -11493,8 +11512,9 @@ td_def: 0.0
 sub_avg: 0.8
 
 name: Azat Maksum
-wins: 17
-losses: 1
+wins: 15
+losses: 2
+draws: 0
 height: 170.18
 weight: 56.7
 reach: 177.8
@@ -12025,7 +12045,8 @@ sub_avg: 0.0
 
 name: Irina Alekseeva
 wins: 5
-losses: 2
+losses: 3
+draws: 0
 height: 172.72
 weight: 61.23
 reach: 170.18
@@ -44043,6 +44064,60 @@ SApM: 7.33
 str_def: 0.33
 td_avg: 2.0
 td_acc: 0.18
+td_def: 0.0
+sub_avg: 0.0
+
+name: Rizvan Kuniev
+wins: 12
+losses: 3
+draws: 1
+height: 193.04
+weight: 108.86
+reach: 193.04
+stance: Orthodox
+age: 33
+SLpM: 5.82
+sig_str_acc: 0.72
+SApM: 1.25
+str_def: 0.55
+td_avg: 2.82
+td_acc: 0.75
+td_def: 1.0
+sub_avg: 0.0
+
+name: Seokhyeon Ko
+wins: 12
+losses: 2
+draws: 0
+height: 177.8
+weight: 77.11
+reach: 180.34
+stance: Southpaw
+age: 31
+SLpM: 3.6
+sig_str_acc: 0.51
+SApM: 3.33
+str_def: 0.57
+td_avg: 2.0
+td_acc: 0.33
+td_def: 0.5
+sub_avg: 0.0
+
+name: Tofiq Musayev
+wins: 22
+losses: 6
+draws: 0
+height: 175.26
+weight: 70.31
+reach: 175.26
+stance: Orthodox
+age: 35
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
 td_def: 0.0
 sub_avg: 0.0
 
