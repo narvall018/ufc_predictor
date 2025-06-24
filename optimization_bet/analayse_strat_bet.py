@@ -827,7 +827,7 @@ class UFCBettingOptimizerAggressiveFrequentDD30:
         drawdown_periods = []
         in_drawdown = False
         start = 0
-        
+
         for i in range(len(drawdown)):
             if drawdown.iloc[i] < 0 and not in_drawdown:
                 in_drawdown = True
@@ -835,7 +835,11 @@ class UFCBettingOptimizerAggressiveFrequentDD30:
             elif drawdown.iloc[i] >= 0 and in_drawdown:
                 in_drawdown = False
                 drawdown_periods.append(i - start)
-        
+
+        # If we end in drawdown, account for the ongoing period
+        if in_drawdown:
+            drawdown_periods.append(len(drawdown) - start)
+
         max_drawdown_duration = max(drawdown_periods) if drawdown_periods else 0
         
         # Pertes consécutives maximales
