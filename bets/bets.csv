@@ -33,6 +33,6 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 33,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Brandon Royval,Joshua Van,Joshua Van,1.84,21.41,4.9,0.7972921632862374,closed,win,17.9844,84.00000000000001
 34,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Beneil Dariush,Renato Moicano,Beneil Dariush,2.01,21.41,4.9,0.6457149004750464,closed,win,21.624099999999995,100.99999999999996
 35,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Jack Hermansson,Gregory Rodrigues,Jack Hermansson,2.6,21.41,4.9,0.6934719520329028,closed,loss,-21.41,-100.0
-36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,open,,0.0,0.0
+36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,closed,loss,-21.41,-100.0
 37,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Viviane Araujo,Tracy Cortez,Tracy Cortez,1.42,21.41,4.9,0.8417296044998334,open,,0.0,0.0
 38,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Terrance McKinney,Viacheslav Borshchev,Terrance McKinney,1.54,21.41,4.9,0.8544897505685886,open,,0.0,0.0
