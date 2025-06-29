@@ -30,7 +30,7 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 30,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Muhammad Naimov,Bogdan Grad,Bogdan Grad,2.75,23.4,4.9,0.8264559749287914,closed,loss,-23.4,-100.0
 31,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Ismail Naurdiev,JunYong Park,Ismail Naurdiev,2.5,23.4,4.9,0.6476170616984935,closed,loss,-23.4,-100.0
 32,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Hamdy Abdelwahab,Mohammed Usman,Hamdy Abdelwahab,1.54,23.4,4.9,0.8000512258190483,closed,loss,-23.4,-100.0
-33,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Brandon Royval,Joshua Van,Joshua Van,1.84,21.41,4.9,0.7972921632862374,open,,0.0,0.0
+33,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Brandon Royval,Joshua Van,Joshua Van,1.84,21.41,4.9,0.7972921632862374,closed,win,17.9844,84.00000000000001
 34,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Beneil Dariush,Renato Moicano,Beneil Dariush,2.01,21.41,4.9,0.6457149004750464,open,,0.0,0.0
 35,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Jack Hermansson,Gregory Rodrigues,Jack Hermansson,2.6,21.41,4.9,0.6934719520329028,open,,0.0,0.0
 36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,open,,0.0,0.0
