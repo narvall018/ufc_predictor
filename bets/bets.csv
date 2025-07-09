@@ -30,12 +30,13 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 30,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Muhammad Naimov,Bogdan Grad,Bogdan Grad,2.75,23.4,4.9,0.8264559749287914,closed,loss,-23.4,-100.0
 31,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Ismail Naurdiev,JunYong Park,Ismail Naurdiev,2.5,23.4,4.9,0.6476170616984935,closed,loss,-23.4,-100.0
 32,2025-06-17,UFC Fight Night: Hill vs. Rountree Jr.,2025-06-17,Hamdy Abdelwahab,Mohammed Usman,Hamdy Abdelwahab,1.54,23.4,4.9,0.8000512258190483,closed,loss,-23.4,-100.0
-33,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Brandon Royval,Joshua Van,Joshua Van,1.84,21.41,4.9,0.7972921632862374,open,,0.0,0.0
-34,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Beneil Dariush,Renato Moicano,Beneil Dariush,2.01,21.41,4.9,0.6457149004750464,open,,0.0,0.0
-35,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Jack Hermansson,Gregory Rodrigues,Jack Hermansson,2.6,21.41,4.9,0.6934719520329028,open,,0.0,0.0
-36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,open,,0.0,0.0
-37,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Viviane Araujo,Tracy Cortez,Tracy Cortez,1.42,21.41,4.9,0.8417296044998334,open,,0.0,0.0
-38,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Terrance McKinney,Viacheslav Borshchev,Terrance McKinney,1.54,21.41,4.9,0.8544897505685886,open,,0.0,0.0
-39,2025-06-26,UFC Fight Night,2025-06-26,AJ Cunningham,AJ Dobson,AJ Dobson,1.8,5.0,4.0,0.5332296677488716,open,,0.0,0.0
-40,2025-06-26,UFC Fight Night,2025-06-26,AJ Cunningham,AJ Dobson,AJ Dobson,1.8,5.0,4.0,0.5332296677488716,open,,0.0,0.0
-41,2025-06-26,UFC Fight Night,2025-06-26,AJ Cunningham,AJ Dobson,AJ Dobson,1.8,100.0,4.0,0.5332296677488716,open,,0.0,0.0
+33,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Brandon Royval,Joshua Van,Joshua Van,1.84,21.41,4.9,0.7972921632862374,closed,win,17.9844,84.00000000000001
+34,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Beneil Dariush,Renato Moicano,Beneil Dariush,2.01,21.41,4.9,0.6457149004750464,closed,win,21.624099999999995,100.99999999999996
+35,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Jack Hermansson,Gregory Rodrigues,Jack Hermansson,2.6,21.41,4.9,0.6934719520329028,closed,loss,-21.41,-100.0
+36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,closed,loss,-21.41,-100.0
+37,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Viviane Araujo,Tracy Cortez,Tracy Cortez,1.42,21.41,4.9,0.8417296044998334,closed,win,8.992199999999999,41.99999999999999
+38,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Terrance McKinney,Viacheslav Borshchev,Terrance McKinney,1.54,21.41,4.9,0.8544897505685886,closed,win,11.5614,54.0
+39,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Derrick Lewis,Tallison Teixeira,Derrick Lewis,2.65,21.71,4.9,0.6892693250716279,open,,0.0,0.0
+40,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Calvin Kattar,Steve Garcia,Steve Garcia,1.7,21.71,4.9,0.8307860660376243,open,,0.0,0.0
+41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,open,,0.0,0.0
+42,2025-06-29,UFC Fight Night,2025-06-29,Nate Landwehr,Morgan Charriere,Nate Landwehr,2.95,21.71,4.0,0.7510366283129891,open,,0.0,0.0
