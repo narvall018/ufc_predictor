@@ -38,5 +38,5 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 38,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Terrance McKinney,Viacheslav Borshchev,Terrance McKinney,1.54,21.41,4.9,0.8544897505685886,closed,win,11.5614,54.0
 39,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Derrick Lewis,Tallison Teixeira,Derrick Lewis,2.65,21.71,4.9,0.6892693250716279,open,,0.0,0.0
 40,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Calvin Kattar,Steve Garcia,Steve Garcia,1.7,21.71,4.9,0.8307860660376243,open,,0.0,0.0
-41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,open,,0.0,0.0
+41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,closed,win,23.446800000000003,108.0
 42,2025-06-29,UFC Fight Night,2025-06-29,Nate Landwehr,Morgan Charriere,Nate Landwehr,2.95,21.71,4.0,0.7510366283129891,closed,loss,-21.71,-100.0
