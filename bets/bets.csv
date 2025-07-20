@@ -41,4 +41,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,closed,win,23.446800000000003,108.0
 42,2025-06-29,UFC Fight Night,2025-06-29,Nate Landwehr,Morgan Charriere,Nate Landwehr,2.95,21.71,4.0,0.7510366283129891,closed,loss,-21.71,-100.0
 43,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Kyler Phillips,Vinicius Oliveira,Vinicius Oliveira,1.62,22.6,4.9,0.7342150984703344,closed,win,14.012000000000004,62.000000000000014
-44,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Francisco Prado,Nikolay Veretennikov,Francisco Prado,1.68,22.6,4.9,0.801372671200948,open,,0.0,0.0
+44,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Francisco Prado,Nikolay Veretennikov,Francisco Prado,1.68,22.6,4.9,0.801372671200948,closed,void,0.0,0.0
