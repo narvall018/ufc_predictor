@@ -44,3 +44,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 44,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Francisco Prado,Nikolay Veretennikov,Francisco Prado,1.68,22.6,4.9,0.801372671200948,closed,void,0.0,0.0
 45,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Robert Whittaker,Reinier de Ridder,Reinier de Ridder,2.21,22.84,4.9,0.7260554118623459,open,,0.0,0.0
 46,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Petr Yan,Marcus McGhee,Marcus McGhee,4.1,22.84,4.9,0.7603214841071104,open,,0.0,0.0
+47,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Amanda Ribas,Tabatha Ricci,Tabatha Ricci,2.55,22.84,4.9,0.6136286007249807,open,,0.0,0.0
