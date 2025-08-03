@@ -36,7 +36,16 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 36,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Hyder Amil,Jose Delgado,Hyder Amil,2.5,21.41,4.9,0.7115306060934812,closed,loss,-21.41,-100.0
 37,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Viviane Araujo,Tracy Cortez,Tracy Cortez,1.42,21.41,4.9,0.8417296044998334,closed,win,8.992199999999999,41.99999999999999
 38,2025-06-24,UFC 317: Topuria vs. Oliveira,2025-06-24,Terrance McKinney,Viacheslav Borshchev,Terrance McKinney,1.54,21.41,4.9,0.8544897505685886,closed,win,11.5614,54.0
-39,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Derrick Lewis,Tallison Teixeira,Derrick Lewis,2.65,21.71,4.9,0.6892693250716279,open,,0.0,0.0
-40,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Calvin Kattar,Steve Garcia,Steve Garcia,1.7,21.71,4.9,0.8307860660376243,open,,0.0,0.0
-41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,open,,0.0,0.0
-42,2025-06-29,UFC Fight Night,2025-06-29,Nate Landwehr,Morgan Charriere,Nate Landwehr,2.95,21.71,4.0,0.7510366283129891,open,,0.0,0.0
+39,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Derrick Lewis,Tallison Teixeira,Derrick Lewis,2.65,21.71,4.9,0.6892693250716279,closed,win,35.8215,165.0
+40,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Calvin Kattar,Steve Garcia,Steve Garcia,1.7,21.71,4.9,0.8307860660376243,closed,win,15.197,70.0
+41,2025-06-29,UFC Fight Night: Lewis vs. Teixeira,2025-06-29,Jake Matthews,Chidi Njokuani,Jake Matthews,2.08,21.71,4.9,0.6307147251622955,closed,win,23.446800000000003,108.0
+42,2025-06-29,UFC Fight Night,2025-06-29,Nate Landwehr,Morgan Charriere,Nate Landwehr,2.95,21.71,4.0,0.7510366283129891,closed,loss,-21.71,-100.0
+43,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Kyler Phillips,Vinicius Oliveira,Vinicius Oliveira,1.62,22.6,4.9,0.7342150984703344,closed,win,14.012000000000004,62.000000000000014
+44,2025-07-15,UFC 318: Holloway vs. Poirier 3,2025-07-15,Francisco Prado,Nikolay Veretennikov,Francisco Prado,1.68,22.6,4.9,0.801372671200948,closed,void,0.0,0.0
+45,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Robert Whittaker,Reinier de Ridder,Reinier de Ridder,2.21,22.84,4.9,0.7260554118623459,closed,win,27.6364,121.0
+46,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Petr Yan,Marcus McGhee,Marcus McGhee,4.1,22.84,4.9,0.7603214841071104,closed,loss,-22.84,-100.0
+47,2025-07-22,UFC Fight Night: Whittaker vs. De Ridder,2025-07-22,Amanda Ribas,Tabatha Ricci,Tabatha Ricci,2.55,22.84,4.9,0.6136286007249807,closed,win,35.401999999999994,154.99999999999997
+48,2025-07-26,UFC Fight Night: Albazi vs. Taira,2025-07-26,Mateusz Rebecki,Chris Duncan,Mateusz Rebecki,1.47,23.53,4.9,0.8175301889130293,open,,0.0,0.0
+49,2025-07-26,UFC Fight Night: Albazi vs. Taira,2025-07-26,Elves Brener,Esteban Ribovics,Esteban Ribovics,1.37,23.53,4.9,0.8438923609748943,open,,0.0,0.0
+50,2025-07-26,UFC Fight Night: Albazi vs. Taira,2025-07-26,Piera Rodriguez,Ketlen Souza,Piera Rodriguez,1.59,23.53,4.9,0.7661876259411414,open,,0.0,0.0
+51,2025-07-31,UFC Fight Night: Taira vs. Park,2025-07-31,Tatsuro Taira,HyunSung Park,HyunSung Park,3.7,23.53,4.9,0.7639021985315967,open,,0.0,0.0
