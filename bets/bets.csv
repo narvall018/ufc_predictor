@@ -50,3 +50,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 50,2025-07-26,UFC Fight Night: Albazi vs. Taira,2025-07-26,Piera Rodriguez,Ketlen Souza,Piera Rodriguez,1.59,23.53,4.9,0.7661876259411414,closed,win,13.882700000000003,59.00000000000001
 51,2025-07-31,UFC Fight Night: Taira vs. Park,2025-07-31,Tatsuro Taira,HyunSung Park,HyunSung Park,3.7,23.53,4.9,0.7639021985315967,closed,loss,-23.53,-100.0
 52,2025-08-07,UFC Fight Night: Dolidze vs. Hernandez,2025-08-07,Iasmin Lucindo,Angela Hill,Iasmin Lucindo,1.55,23.11,4.9,0.7863992274607433,open,,0.0,0.0
+53,2025-08-07,UFC Fight Night: Dolidze vs. Hernandez,2025-08-07,Cody Brundage,Eric McConico,Cody Brundage,1.57,23.11,4.9,0.8506172994149442,open,,0.0,0.0
