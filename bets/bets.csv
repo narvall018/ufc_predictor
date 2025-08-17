@@ -57,4 +57,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 57,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Jessica Andrade,Loopy Godinez,Jessica Andrade,2.33,23.33,4.9,0.6837676706431137,open,,0.0,0.0
 58,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Bryan Battle,Nursulton Ruziboev,Bryan Battle,1.57,23.33,4.9,0.7673900683253356,closed,void,0.0,0.0
 59,2025-08-13,UFC Fight Night,2025-08-13,Tim Elliott,Kai Asakura,Tim Elliott,3.4,23.33,4.0,0.6313600059218756,open,,0.0,0.0
-60,2025-08-13,UFC Fight Night,2025-08-13,Edson Barboza,Drakkar Klose,Drakkar Klose,2.38,23.33,4.0,0.7849687508712195,open,,0.0,0.0
+60,2025-08-13,UFC Fight Night,2025-08-13,Edson Barboza,Drakkar Klose,Drakkar Klose,2.38,23.33,4.0,0.7849687508712195,closed,win,32.19539999999999,137.99999999999997
