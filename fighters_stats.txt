@@ -16,13 +16,14 @@ td_def: 0.46
 sub_avg: 0.1
 
 name: Lerone Murphy
-wins: 16
+wins: 17
 losses: 0
+draws: 1
 height: 175.26
 weight: 65.77
 reach: 185.42
 stance: Orthodox
-age: 33
+age: 34
 SLpM: 4.53
 sig_str_acc: 0.54
 SApM: 2.48
@@ -119,7 +120,8 @@ sub_avg: 0.0
 
 name: Gerald Meerschaert
 wins: 37
-losses: 19
+losses: 20
+draws: 0
 height: 185.42
 weight: 83.91
 reach: 195.58
@@ -223,12 +225,13 @@ sub_avg: 0.0
 
 name: Dione Barbosa
 wins: 8
-losses: 3
+losses: 4
+draws: 0
 height: 167.64
 weight: 56.7
 reach: 167.64
 stance: Orthodox
-age: 32
+age: 33
 SLpM: 2.35
 sig_str_acc: 0.5
 SApM: 2.73
@@ -685,8 +688,9 @@ td_def: 0.54
 sub_avg: 1.2
 
 name: Loopy Godinez
-wins: 13
+wins: 14
 losses: 5
+draws: 0
 height: 157.48
 weight: 52.16
 reach: 154.94
@@ -1341,8 +1345,9 @@ td_def: 0.68
 sub_avg: 0.5
 
 name: Alexander Hernandez
-wins: 16
+wins: 17
 losses: 8
+draws: 0
 height: 175.26
 weight: 70.31
 reach: 182.88
@@ -2815,7 +2820,8 @@ sub_avg: 0.0
 
 name: Jared Cannonier
 wins: 18
-losses: 8
+losses: 9
+draws: 0
 height: 180.34
 weight: 83.91
 reach: 195.58
@@ -3217,7 +3223,8 @@ sub_avg: 0.0
 
 name: Dricus Du Plessis
 wins: 23
-losses: 2
+losses: 3
+draws: 0
 height: 185.42
 weight: 83.91
 reach: 193.04
@@ -3646,10 +3653,11 @@ td_def: 0.71
 sub_avg: 0.0
 
 name: Michael Page
-wins: 23
+wins: 24
 losses: 3
+draws: 0
 height: 190.5
-weight: 77.11
+weight: 83.91
 reach: 200.66
 stance: Switch
 age: 38
@@ -5120,8 +5128,9 @@ td_def: 0.4
 sub_avg: 1.2
 
 name: Drakkar Klose
-wins: 15
+wins: 16
 losses: 3
+draws: 1
 height: 175.26
 weight: 70.31
 reach: 177.8
@@ -5331,7 +5340,8 @@ sub_avg: 1.0
 
 name: Kai Asakura
 wins: 21
-losses: 5
+losses: 6
+draws: 0
 height: 172.72
 weight: 56.7
 reach: 175.26
@@ -5730,7 +5740,7 @@ sub_avg: 0.6
 
 name: Chase Hooper
 wins: 16
-losses: 3
+losses: 4
 draws: 1
 height: 185.42
 weight: 70.31
@@ -6270,8 +6280,9 @@ td_def: 0.75
 sub_avg: 0.6
 
 name: Karine Silva
-wins: 18
+wins: 19
 losses: 5
+draws: 0
 height: 165.1
 weight: 56.7
 reach: 170.18
@@ -6550,14 +6561,14 @@ td_def: 0.53
 sub_avg: 0.2
 
 name: Carlos Prates
-wins: 21
+wins: 22
 losses: 7
 draws: 0
 height: 185.42
 weight: 77.11
 reach: 198.12
 stance: Switch
-age: 31
+age: 32
 SLpM: 3.6
 sig_str_acc: 0.54
 SApM: 4.79
@@ -7187,13 +7198,14 @@ td_def: 0.82
 sub_avg: 0.0
 
 name: Khamzat Chimaev
-wins: 14
+wins: 15
 losses: 0
+draws: 0
 height: 187.96
 weight: 83.91
 reach: 190.5
 stance: Orthodox
-age: 30
+age: 31
 SLpM: 5.36
 sig_str_acc: 0.58
 SApM: 3.25
@@ -7240,7 +7252,8 @@ sub_avg: 0.2
 
 name: Geoff Neal
 wins: 16
-losses: 6
+losses: 7
+draws: 0
 height: 180.34
 weight: 77.11
 reach: 190.5
@@ -8554,19 +8567,20 @@ sub_avg: 0.5
 
 name: Jessica Andrade
 wins: 26
-losses: 13
+losses: 15
+draws: 0
 height: 154.94
-weight: 56.7
+weight: 52.16
 reach: 157.48
 stance: Orthodox
 age: 33
-SLpM: 6.44
+SLpM: 6.39
 sig_str_acc: 0.5
-SApM: 5.51
+SApM: 5.49
 str_def: 0.54
-td_avg: 2.23
+td_avg: 2.21
 td_acc: 0.54
-td_def: 0.72
+td_def: 0.71
 sub_avg: 0.3
 
 name: Natalia Silva
@@ -9206,7 +9220,7 @@ td_def: 0.63
 sub_avg: 0.3
 
 name: Michal Oleksiejczuk
-wins: 20
+wins: 21
 losses: 9
 draws: 0
 height: 182.88
@@ -10351,9 +10365,10 @@ sub_avg: 0.0
 
 name: Edson Barboza
 wins: 24
-losses: 12
+losses: 13
+draws: 0
 height: 180.34
-weight: 65.77
+weight: 70.31
 reach: 190.5
 stance: Orthodox
 age: 39
@@ -11739,8 +11754,9 @@ td_def: 0.9
 sub_avg: 0.2
 
 name: Tim Elliott
-wins: 21
+wins: 22
 losses: 13
+draws: 1
 height: 170.18
 weight: 56.7
 reach: 167.64
@@ -21318,8 +21334,9 @@ td_def: 0.0
 sub_avg: 0.0
 
 name: Joseph Morales
-wins: 9
+wins: 14
 losses: 2
+draws: 0
 height: 167.64
 weight: 56.7
 reach: 175.26
@@ -44191,5 +44208,77 @@ str_def: 0.5
 td_avg: 2.2
 td_acc: 1.0
 td_def: 1.0
+sub_avg: 0.0
+
+name: Eric Nolan
+wins: 8
+losses: 4
+draws: 0
+height: 187.96
+weight: 83.91
+reach: 187.96
+stance: Orthodox
+age: 27
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Aaron Pico
+wins: 13
+losses: 5
+draws: 0
+height: 172.72
+weight: 65.77
+reach: 177.8
+stance: Orthodox
+age: 28
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Baisangur Susurkaev
+wins: 10
+losses: 0
+draws: 0
+height: 187.96
+weight: 83.91
+reach: 200.66
+stance: Orthodox
+age: 24
+SLpM: 3.26
+sig_str_acc: 0.58
+SApM: 2.28
+str_def: 0.46
+td_avg: 0.0
+td_acc: 0.0
+td_def: 1.0
+sub_avg: 0.0
+
+name: Alibi Idiris
+wins: 11
+losses: 1
+draws: 0
+height: 167.64
+weight: 56.7
+reach: 172.72
+stance: Orthodox
+age: 30
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
 sub_avg: 0.0
 
