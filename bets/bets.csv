@@ -60,3 +60,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 60,2025-08-13,UFC Fight Night,2025-08-13,Edson Barboza,Drakkar Klose,Drakkar Klose,2.38,23.33,4.0,0.7849687508712195,closed,win,32.19539999999999,137.99999999999997
 61,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sergei Pavlovich,Waldo Cortes-Acosta,Waldo Cortes-Acosta,3.15,24.56,4.9,0.683346004774642,open,,0.0,0.0
 62,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sumudaerji,Kevin Borjas,Sumudaerji,1.66,24.56,4.9,0.7429131108805759,open,,0.0,0.0
+63,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Lone'er Kavanagh,Charles Johnson,Lone'er Kavanagh,1.45,24.56,4.9,0.8445277319810519,open,,0.0,0.0
