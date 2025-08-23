@@ -51,10 +51,16 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 51,2025-07-31,UFC Fight Night: Taira vs. Park,2025-07-31,Tatsuro Taira,HyunSung Park,HyunSung Park,3.7,23.53,4.9,0.7639021985315967,closed,loss,-23.53,-100.0
 52,2025-08-07,UFC Fight Night: Dolidze vs. Hernandez,2025-08-07,Iasmin Lucindo,Angela Hill,Iasmin Lucindo,1.55,23.11,4.9,0.7863992274607433,closed,win,12.7105,55.00000000000001
 53,2025-08-07,UFC Fight Night: Dolidze vs. Hernandez,2025-08-07,Cody Brundage,Eric McConico,Cody Brundage,1.57,23.11,4.9,0.8506172994149442,closed,void,0.0,0.0
-54,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Lerone Murphy,Aaron Pico,Lerone Murphy,2.34,23.33,4.9,0.8215810831690046,closed,win,31.262199999999993,134.0
+54,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Lerone Murphy,Aaron Pico,Lerone Murphy,2.34,23.33,4.9,0.8215810831690046,closed,win,31.2622,134.0
 55,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Geoff Neal,Carlos Prates,Geoff Neal,3.1,23.33,4.9,0.6210904864069867,closed,loss,-23.33,-100.0
 56,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,King Green,Diego Ferreira,King Green,2.37,23.33,4.9,0.5990906021427,closed,void,0.0,0.0
 57,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Jessica Andrade,Loopy Godinez,Jessica Andrade,2.33,23.33,4.9,0.6837676706431137,closed,loss,-23.33,-100.0
 58,2025-08-11,UFC 319: Du Plessis vs. Chimaev,2025-08-11,Bryan Battle,Nursulton Ruziboev,Bryan Battle,1.57,23.33,4.9,0.7673900683253356,closed,void,0.0,0.0
 59,2025-08-13,UFC Fight Night,2025-08-13,Tim Elliott,Kai Asakura,Tim Elliott,3.4,23.33,4.0,0.6313600059218756,closed,win,55.992,240.0
 60,2025-08-13,UFC Fight Night,2025-08-13,Edson Barboza,Drakkar Klose,Drakkar Klose,2.38,23.33,4.0,0.7849687508712195,closed,win,32.19539999999999,137.99999999999997
+61,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sergei Pavlovich,Waldo Cortes-Acosta,Waldo Cortes-Acosta,3.15,24.56,4.9,0.683346004774642,closed,loss,-24.56,-100.0
+62,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sumudaerji,Kevin Borjas,Sumudaerji,1.66,24.56,4.9,0.7429131108805759,closed,win,16.2096,65.99999999999999
+63,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Lone'er Kavanagh,Charles Johnson,Lone'er Kavanagh,1.45,24.56,4.9,0.8445277319810519,closed,loss,-24.56,-100.0
+64,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Nassourdine Imavov,Caio Borralho,Caio Borralho,1.95,24.0,4.9,0.8832389032691426,open,,0.0,0.0
+65,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Andreas Gustafsson,Rinat Fakhretdinov,Rinat Fakhretdinov,1.73,24.0,4.9,0.91353443189889,open,,0.0,0.0
+66,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Shauna Bannon,Sam Hughes,Shauna Bannon,3.0,24.0,4.9,0.8659925758524915,open,,0.0,0.0
