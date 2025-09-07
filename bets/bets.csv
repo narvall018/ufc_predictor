@@ -61,6 +61,13 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 61,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sergei Pavlovich,Waldo Cortes-Acosta,Waldo Cortes-Acosta,3.15,24.56,4.9,0.683346004774642,closed,loss,-24.56,-100.0
 62,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Sumudaerji,Kevin Borjas,Sumudaerji,1.66,24.56,4.9,0.7429131108805759,closed,win,16.2096,65.99999999999999
 63,2025-08-17,UFC Fight Night: Walker vs. Zhang,2025-08-17,Lone'er Kavanagh,Charles Johnson,Lone'er Kavanagh,1.45,24.56,4.9,0.8445277319810519,closed,loss,-24.56,-100.0
-64,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Nassourdine Imavov,Caio Borralho,Caio Borralho,1.95,24.0,4.9,0.8832389032691426,open,,0.0,0.0
-65,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Andreas Gustafsson,Rinat Fakhretdinov,Rinat Fakhretdinov,1.73,24.0,4.9,0.91353443189889,open,,0.0,0.0
-66,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Shauna Bannon,Sam Hughes,Shauna Bannon,3.0,24.0,4.9,0.8659925758524915,open,,0.0,0.0
+64,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Nassourdine Imavov,Caio Borralho,Caio Borralho,1.95,24.0,4.9,0.8832389032691426,closed,win,22.8,95.0
+65,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Andreas Gustafsson,Rinat Fakhretdinov,Rinat Fakhretdinov,1.73,24.0,4.9,0.91353443189889,closed,win,17.52,73.0
+66,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,Shauna Bannon,Sam Hughes,Shauna Bannon,3.0,24.0,4.9,0.8659925758524915,closed,loss,-24.0,-100.0
+67,2025-08-23,UFC Fight Night: Imavov vs. Borralho,2025-08-23,William Gomis,Robert Ruchala,William Gomis,1.51,24.0,4.9,0.836052037630834,closed,win,12.24,51.0
+68,2025-09-07,UFC Fight Night,2025-09-07,Nassourdine Imavov,Caio Borralho,Caio Borralho,1.8,46.8,4.0,0.8832389032691426,closed,loss,-46.8,-100.0
+69,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Diego Lopes,Jean Silva,Jean Silva,1.33,23.69,4.9,0.8840650501473819,open,,0.0,0.0
+70,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Rob Font,David Martinez,David Martinez,2.7,23.69,4.9,0.837183295350276,open,,0.0,0.0
+71,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Jose Medina,Dusko Todorovic,Dusko Todorovic,1.32,23.69,4.9,0.9010879284173204,open,,0.0,0.0
+72,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Claudio Puelles,Joaquim Silva,Claudio Puelles,2.13,23.69,4.9,0.649013847365639,open,,0.0,0.0
+73,2025-09-07,UFC Fight Night,2025-09-07,Rafa Garcia,Jared Gordon,Rafa Garcia,3.25,23.69,4.0,0.6344684176182785,open,,0.0,0.0
