@@ -103,7 +103,8 @@ sub_avg: 0.4
 
 name: Brad Tavares
 wins: 21
-losses: 11
+losses: 12
+draws: 0
 height: 185.42
 weight: 83.91
 reach: 187.96
@@ -243,7 +244,8 @@ sub_avg: 2.3
 
 name: Rhys McKee
 wins: 14
-losses: 6
+losses: 7
+draws: 1
 height: 187.96
 weight: 77.11
 reach: 198.12
@@ -1104,9 +1106,10 @@ sub_avg: 0.5
 
 name: Marcin Tybura
 wins: 27
-losses: 9
+losses: 10
+draws: 0
 height: 190.5
-weight: 112.94
+weight: 111.58
 reach: 198.12
 stance: Orthodox
 age: 39
@@ -1174,7 +1177,8 @@ sub_avg: 0.0
 
 name: Shauna Bannon
 wins: 7
-losses: 1
+losses: 2
+draws: 0
 height: 165.1
 weight: 52.16
 reach: 165.1
@@ -1259,8 +1263,9 @@ td_def: 0.75
 sub_avg: 0.0
 
 name: Kaue Fernandes
-wins: 10
+wins: 11
 losses: 2
+draws: 0
 height: 175.26
 weight: 70.31
 reach: 185.42
@@ -1437,17 +1442,18 @@ sub_avg: 0.0
 
 name: Brendson Ribeiro
 wins: 17
-losses: 7
+losses: 9
+draws: 0
 height: 190.5
 weight: 92.99
 reach: 205.74
 stance: Orthodox
 age: 28
-SLpM: 3.34
-sig_str_acc: 0.43
-SApM: 3.72
-str_def: 0.55
-td_avg: 1.07
+SLpM: 3.26
+sig_str_acc: 0.42
+SApM: 4.04
+str_def: 0.52
+td_avg: 0.99
 td_acc: 0.42
 td_def: 0.0
 sub_avg: 0.7
@@ -1610,13 +1616,14 @@ td_def: 0.8
 sub_avg: 0.0
 
 name: Sam Hughes
-wins: 10
+wins: 11
 losses: 6
+draws: 0
 height: 165.1
 weight: 52.16
 reach: 162.56
 stance: Orthodox
-age: 32
+age: 33
 SLpM: 4.41
 sig_str_acc: 0.46
 SApM: 4.57
@@ -1888,12 +1895,13 @@ sub_avg: 0.3
 
 name: Mauricio Ruffy
 wins: 12
-losses: 1
+losses: 2
+draws: 0
 height: 180.34
 weight: 70.31
 reach: 190.5
 stance: Orthodox
-age: 28
+age: 29
 SLpM: 4.54
 sig_str_acc: 0.58
 SApM: 4.59
@@ -2200,13 +2208,14 @@ td_def: 0.81
 sub_avg: 1.2
 
 name: William Gomis
-wins: 14
+wins: 15
 losses: 3
+draws: 0
 height: 182.88
 weight: 65.77
 reach: 185.42
 stance: Southpaw
-age: 27
+age: 28
 SLpM: 3.53
 sig_str_acc: 0.51
 SApM: 2.86
@@ -2234,13 +2243,14 @@ td_def: 1.0
 sub_avg: 0.0
 
 name: Sam Patterson
-wins: 13
+wins: 14
 losses: 2
+draws: 1
 height: 190.5
 weight: 77.11
 reach: 198.12
 stance: Orthodox
-age: 28
+age: 29
 SLpM: 3.17
 sig_str_acc: 0.41
 SApM: 3.6
@@ -2791,20 +2801,21 @@ td_def: 0.57
 sub_avg: 0.0
 
 name: Modestas Bukauskas
-wins: 17
+wins: 19
 losses: 6
+draws: 0
 height: 190.5
 weight: 92.99
-reach: 198.12
+reach: 193.04
 stance: Switch
 age: 31
-SLpM: 3.32
+SLpM: 3.26
 sig_str_acc: 0.42
-SApM: 4.11
-str_def: 0.5
-td_avg: 0.37
+SApM: 4.07
+str_def: 0.51
+td_avg: 0.31
 td_acc: 0.66
-td_def: 0.71
+td_def: 0.77
 sub_avg: 0.2
 
 name: Rafael Cerqueira
@@ -3626,13 +3637,14 @@ td_def: 0.76
 sub_avg: 0.1
 
 name: Nassourdine Imavov
-wins: 16
+wins: 17
 losses: 4
+draws: 0
 height: 190.5
 weight: 83.91
 reach: 190.5
 stance: Orthodox
-age: 30
+age: 29
 SLpM: 4.45
 sig_str_acc: 0.55
 SApM: 3.26
@@ -6258,19 +6270,20 @@ sub_avg: 3.6
 
 name: Paul Craig
 wins: 17
-losses: 9
+losses: 10
+draws: 1
 height: 190.5
 weight: 92.99
 reach: 193.04
 stance: Orthodox
 age: 37
-SLpM: 2.52
-sig_str_acc: 0.44
-SApM: 3.03
+SLpM: 2.54
+sig_str_acc: 0.45
+SApM: 3.0
 str_def: 0.43
-td_avg: 1.52
-td_acc: 0.2
-td_def: 0.37
+td_avg: 1.47
+td_acc: 0.19
+td_def: 0.35
 sub_avg: 1.4
 
 name: Viviane Araujo
@@ -7421,8 +7434,9 @@ td_def: 0.73
 sub_avg: 0.2
 
 name: Rinat Fakhretdinov
-wins: 23
+wins: 24
 losses: 1
+draws: 1
 height: 182.88
 weight: 77.11
 reach: 187.96
@@ -8183,21 +8197,22 @@ td_def: 0.64
 sub_avg: 0.2
 
 name: Benoit Saint Denis
-wins: 13
+wins: 15
 losses: 3
+draws: 0
 height: 180.34
 weight: 70.31
 reach: 185.42
 stance: Southpaw
 age: 29
-SLpM: 5.17
-sig_str_acc: 0.53
-SApM: 4.98
+SLpM: 5.39
+sig_str_acc: 0.55
+SApM: 4.61
 str_def: 0.41
-td_avg: 3.97
-td_acc: 0.37
-td_def: 0.68
-sub_avg: 1.2
+td_avg: 4.19
+td_acc: 0.39
+td_def: 0.7
+sub_avg: 1.5
 
 name: Matt Frevola
 wins: 11
@@ -8234,21 +8249,22 @@ td_def: 0.75
 sub_avg: 0.0
 
 name: Oumar Sy
-wins: 11
-losses: 0
+wins: 12
+losses: 1
+draws: 0
 height: 193.04
 weight: 92.99
 reach: 210.82
 stance: Orthodox
 age: 29
-SLpM: 4.81
-sig_str_acc: 0.59
-SApM: 1.71
-str_def: 0.73
-td_avg: 3.21
-td_acc: 0.4
+SLpM: 3.68
+sig_str_acc: 0.5
+SApM: 1.81
+str_def: 0.7
+td_avg: 2.22
+td_acc: 0.33
 td_def: 1.0
-sub_avg: 0.8
+sub_avg: 0.4
 
 name: Da Woon Jung
 wins: 15
@@ -8372,18 +8388,19 @@ td_def: 0.5
 sub_avg: 0.3
 
 name: Bolaji Oki
-wins: 9
-losses: 2
+wins: 10
+losses: 3
+draws: 0
 height: 177.8
 weight: 70.31
 reach: 185.42
 stance: Orthodox
 age: 29
-SLpM: 5.63
+SLpM: 7.05
 sig_str_acc: 0.45
-SApM: 2.58
-str_def: 0.63
-td_avg: 2.11
+SApM: 4.76
+str_def: 0.62
+td_avg: 1.24
 td_acc: 0.75
 td_def: 0.85
 sub_avg: 0.0
@@ -8789,7 +8806,8 @@ sub_avg: 2.4
 
 name: Caio Borralho
 wins: 17
-losses: 1
+losses: 2
+draws: 0
 height: 185.42
 weight: 83.91
 reach: 190.5
@@ -10589,7 +10607,8 @@ sub_avg: 0.0
 
 name: Trey Waters
 wins: 9
-losses: 1
+losses: 2
+draws: 0
 height: 195.58
 weight: 77.11
 reach: 195.58
@@ -11512,13 +11531,14 @@ td_def: 0.8
 sub_avg: 0.4
 
 name: Robert Bryczek
-wins: 17
+wins: 18
 losses: 6
+draws: 0
 height: 182.88
 weight: 83.91
 reach: 190.5
 stance: Orthodox
-age: 34
+age: 35
 SLpM: 2.13
 sig_str_acc: 0.24
 SApM: 4.47
@@ -14858,19 +14878,20 @@ td_def: 0.83
 sub_avg: 0.4
 
 name: Mason Jones
-wins: 11
+wins: 17
 losses: 2
+draws: 0
 height: 177.8
 weight: 70.31
 reach: 187.96
 stance: Orthodox
-age: 29
-SLpM: 5.61
-sig_str_acc: 0.44
-SApM: 4.94
-str_def: 0.46
-td_avg: 3.16
-td_acc: 0.45
+age: 30
+SLpM: 5.56
+sig_str_acc: 0.41
+SApM: 4.46
+str_def: 0.48
+td_avg: 4.24
+td_acc: 0.52
 td_def: 0.8
 sub_avg: 0.0
 
@@ -44313,6 +44334,96 @@ SLpM: 11.01
 sig_str_acc: 0.48
 SApM: 7.39
 str_def: 0.58
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Harry Hardwick
+wins: 13
+losses: 4
+draws: 1
+height: 172.72
+weight: 70.31
+reach: 180.34
+stance: Switch
+age: 30
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Axel Sola
+wins: 11
+losses: 0
+draws: 1
+height: 187.96
+weight: 77.11
+reach: 187.96
+stance: Southpaw
+age: 27
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Ante Delija
+wins: 26
+losses: 6
+draws: 0
+height: 190.5
+weight: 108.41
+reach: 198.12
+stance: Orthodox
+age: 35
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
+td_avg: 0.0
+td_acc: 0.0
+td_def: 0.0
+sub_avg: 0.0
+
+name: Andreas Gustafsson
+wins: 12
+losses: 3
+draws: 0
+height: 185.42
+weight: 77.11
+reach: 185.42
+stance: Orthodox
+age: 34
+SLpM: 5.83
+sig_str_acc: 0.76
+SApM: 2.79
+str_def: 0.45
+td_avg: 6.43
+td_acc: 0.58
+td_def: 1.0
+sub_avg: 0.0
+
+name: Robert Ruchala
+wins: 11
+losses: 2
+draws: 0
+height: 172.72
+weight: 65.77
+reach: 182.88
+stance: Switch
+age: 27
+SLpM: 0.0
+sig_str_acc: 0.0
+SApM: 0.0
+str_def: 0.0
 td_avg: 0.0
 td_acc: 0.0
 td_def: 0.0
