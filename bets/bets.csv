@@ -68,6 +68,6 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 68,2025-09-07,UFC Fight Night,2025-09-07,Nassourdine Imavov,Caio Borralho,Caio Borralho,1.8,46.8,4.0,0.8832389032691426,closed,loss,-46.8,-100.0
 69,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Diego Lopes,Jean Silva,Jean Silva,1.33,23.69,4.9,0.8840650501473819,closed,loss,-23.69,-100.0
 70,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Rob Font,David Martinez,David Martinez,2.7,23.69,4.9,0.837183295350276,closed,win,40.273,170.0
-71,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Jose Medina,Dusko Todorovic,Dusko Todorovic,1.32,23.69,4.9,0.9010879284173204,open,,0.0,0.0
+71,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Jose Medina,Dusko Todorovic,Dusko Todorovic,1.32,23.69,4.9,0.9010879284173204,closed,win,7.580800000000002,32.00000000000001
 72,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Claudio Puelles,Joaquim Silva,Claudio Puelles,2.13,23.69,4.9,0.649013847365639,open,,0.0,0.0
 73,2025-09-07,UFC Fight Night,2025-09-07,Rafa Garcia,Jared Gordon,Rafa Garcia,3.25,23.69,4.0,0.6344684176182785,open,,0.0,0.0
