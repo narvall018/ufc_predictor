@@ -72,3 +72,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 72,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Claudio Puelles,Joaquim Silva,Claudio Puelles,2.13,23.69,4.9,0.649013847365639,closed,void,0.0,0.0
 73,2025-09-07,UFC Fight Night,2025-09-07,Rafa Garcia,Jared Gordon,Rafa Garcia,3.25,23.69,4.0,0.6344684176182785,closed,win,53.3025,225.0
 74,2025-09-22,UFC Fight Night: Ulberg vs. Reyes,2025-09-22,Jimmy Crute,Ivan Erslan,Jimmy Crute,1.56,25.01,4.9,0.763779220704123,open,,0.0,0.0
+75,2025-09-22,UFC Fight Night: Ulberg vs. Reyes,2025-09-22,Jonathan Micallef,Oban Elliott,Jonathan Micallef,1.99,25.01,4.9,0.6787339929859469,open,,0.0,0.0
