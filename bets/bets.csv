@@ -71,3 +71,11 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 71,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Jose Medina,Dusko Todorovic,Dusko Todorovic,1.32,23.69,4.9,0.9010879284173204,closed,win,7.580800000000002,32.00000000000001
 72,2025-09-07,UFC Fight Night: Lopes vs. Silva,2025-09-07,Claudio Puelles,Joaquim Silva,Claudio Puelles,2.13,23.69,4.9,0.649013847365639,closed,void,0.0,0.0
 73,2025-09-07,UFC Fight Night,2025-09-07,Rafa Garcia,Jared Gordon,Rafa Garcia,3.25,23.69,4.0,0.6344684176182785,closed,win,53.3025,225.0
+74,2025-09-22,UFC Fight Night: Ulberg vs. Reyes,2025-09-22,Jimmy Crute,Ivan Erslan,Jimmy Crute,1.56,25.01,4.9,0.763779220704123,closed,win,14.005600000000005,56.00000000000001
+75,2025-09-22,UFC Fight Night: Ulberg vs. Reyes,2025-09-22,Jonathan Micallef,Oban Elliott,Jonathan Micallef,1.99,25.01,4.9,0.6787339929859469,closed,void,0.0,0.0
+76,2025-09-22,UFC Fight Night: Ulberg vs. Reyes,2025-09-22,Michelle Montague,Luana Carolina,Luana Carolina,2.75,25.01,4.9,0.930750393836898,closed,void,0.0,0.0
+77,2025-09-28,UFC 320: Ankalaev vs. Pereira 2,2025-09-28,Magomed Ankalaev,Alex Pereira,Magomed Ankalaev,1.39,25.25,4.9,0.8659018710195083,open,,0.0,0.0
+78,2025-09-28,UFC 320: Ankalaev vs. Pereira 2,2025-09-28,Jiri Prochazka,Khalil Rountree Jr.,Jiri Prochazka,1.57,25.25,4.9,0.8917300390859234,open,,0.0,0.0
+79,2025-09-28,UFC 320: Ankalaev vs. Pereira 2,2025-09-28,Ramiz Brahimaj,Austin Vanderford,Austin Vanderford,1.35,25.25,4.9,0.9382150278575564,open,,0.0,0.0
+80,2025-09-28,UFC Fight Night,2025-09-28,Macy Chiasson,Yana Santos,Macy Chiasson,1.48,25.25,4.0,0.8435653330992873,open,,0.0,0.0
+81,2025-09-28,UFC Fight Night,2025-09-28,Abus Magomedov,Joe Pyfer,Abus Magomedov,2.8,25.25,4.0,0.7455723472954436,open,,0.0,0.0
