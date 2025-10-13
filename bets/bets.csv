@@ -82,3 +82,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 82,2025-10-06,UFC Fight Night: Oliveira vs. Gamrot,2025-10-06,Ricardo Ramos,Kaan Ofli,Ricardo Ramos,1.53,23.78,4.9,0.7957821721213427,closed,loss,-23.78,-100.0
 83,2025-10-13,UFC Fight Night: De Ridder vs. Allen,2025-10-13,Reinier de Ridder,Brendan Allen,Reinier de Ridder,1.51,23.37,4.9,0.7742222821540824,open,,0.0,0.0
 84,2025-10-13,UFC Fight Night: De Ridder vs. Allen,2025-10-13,Kyle Nelson,Matt Frevola,Kyle Nelson,1.96,23.37,4.9,0.6911565581207813,open,,0.0,0.0
+85,2025-10-13,UFC Fight Night: De Ridder vs. Allen,2025-10-13,Bruno Silva,HyunSung Park,HyunSung Park,1.39,23.37,4.9,0.8581925987302554,open,,0.0,0.0
