@@ -79,4 +79,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 79,2025-09-28,UFC 320: Ankalaev vs. Pereira 2,2025-09-28,Ramiz Brahimaj,Austin Vanderford,Austin Vanderford,1.35,25.25,4.9,0.9382150278575564,closed,loss,-25.25,-100.0
 80,2025-09-28,UFC Fight Night,2025-09-28,Macy Chiasson,Yana Santos,Macy Chiasson,1.48,25.25,4.0,0.8435653330992873,closed,loss,-25.25,-100.0
 81,2025-09-28,UFC Fight Night,2025-09-28,Abus Magomedov,Joe Pyfer,Abus Magomedov,2.8,25.25,4.0,0.7455723472954436,closed,loss,-25.25,-100.0
-82,2025-10-06,UFC Fight Night: Oliveira vs. Gamrot,2025-10-06,Ricardo Ramos,Kaan Ofli,Ricardo Ramos,1.53,23.78,4.9,0.7957821721213427,open,,0.0,0.0
+82,2025-10-06,UFC Fight Night: Oliveira vs. Gamrot,2025-10-06,Ricardo Ramos,Kaan Ofli,Ricardo Ramos,1.53,23.78,4.9,0.7957821721213427,closed,loss,-23.78,-100.0
