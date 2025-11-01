@@ -86,3 +86,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 86,2025-10-13,UFC Fight Night,2025-10-13,Bruno Silva,HyunSung Park,HyunSung Park,1.39,23.37,4.0,0.8581925987302554,closed,loss,-23.37,-100.0
 87,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Waldo Cortes Acosta,Ante Delija,Waldo Cortes Acosta,2.06,23.37,4.9,0.7118022102294576,open,,0.0,0.0
 88,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Jeremiah Wells,Themba Gorimbo,Jeremiah Wells,2.2,23.37,4.9,0.6425423042447286,open,,0.0,0.0
+89,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Isaac Dulgarian,Yadier del Valle,Isaac Dulgarian,1.41,23.37,4.9,0.8419378626763782,open,,0.0,0.0
