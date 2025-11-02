@@ -87,6 +87,6 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 87,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Waldo Cortes Acosta,Ante Delija,Waldo Cortes Acosta,2.06,23.37,4.9,0.7118022102294576,closed,win,24.7722,106.0
 88,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Jeremiah Wells,Themba Gorimbo,Jeremiah Wells,2.2,23.37,4.9,0.6425423042447286,closed,win,28.044000000000004,120.0
 89,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Billy Elekana,Kevin Christian,Kevin Christian,3.1,23.37,4.9,0.6254717892910945,closed,void,0.0,0.0
-90,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Timmy Cuamba,ChangHo Lee,ChangHo Lee,1.93,23.37,4.9,0.9123289124739008,open,,0.0,0.0
+90,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Timmy Cuamba,ChangHo Lee,ChangHo Lee,1.93,23.37,4.9,0.9123289124739008,closed,loss,-23.37,-100.0
 91,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Phil Rowe,Seokhyeon Ko,Seokhyeon Ko,1.55,23.37,4.9,0.9421349160595468,open,,0.0,0.0
 92,2025-11-01,UFC Fight Night,2025-11-01,AJ Cunningham,Norma Dumont,Norma Dumont,1.61,23.37,4.0,0.9399851757132546,open,,0.0,0.0
