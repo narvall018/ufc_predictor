@@ -20,7 +20,7 @@ HEADERS = {
 }
 
 # Paramètres de configuration
-MAX_EVENTS_TO_CHECK = 2
+MAX_EVENTS_TO_CHECK = 5
 MAX_RETRIES = 3
 DELAY_RANGE = (0.5, 1.5)
 VERBOSE = True
