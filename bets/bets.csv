@@ -89,4 +89,13 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 89,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Billy Elekana,Kevin Christian,Kevin Christian,3.1,23.37,4.9,0.6254717892910945,closed,void,0.0,0.0
 90,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Timmy Cuamba,ChangHo Lee,ChangHo Lee,1.93,23.37,4.9,0.9123289124739008,closed,loss,-23.37,-100.0
 91,2025-11-01,UFC Fight Night: Garcia vs. Onama,2025-11-01,Phil Rowe,Seokhyeon Ko,Seokhyeon Ko,1.55,23.37,4.9,0.9421349160595468,closed,win,12.853500000000002,55.00000000000001
-92,2025-11-01,UFC Fight Night,2025-11-01,AJ Cunningham,Norma Dumont,Norma Dumont,1.61,23.37,4.0,0.9399851757132546,closed,win,14.255700000000003,61.00000000000001
+92,2025-11-01,UFC Fight Night,2025-11-01,AJ Cunningham,Norma Dumont,Norma Dumont,1.61,23.37,4.0,0.9399851757132546,closed,win,14.255700000000004,61.00000000000001
+93,2025-11-06,UFC Fight Night: Bonfim vs. Brown,2025-11-06,Gabriel Bonfim,Randy Brown,Gabriel Bonfim,1.53,24.33,4.9,0.8098249753358218,closed,win,12.8949,53.0
+94,2025-11-06,UFC Fight Night: Bonfim vs. Brown,2025-11-06,Muslim Salikhov,Uros Medic,Muslim Salikhov,2.35,24.33,4.9,0.6914093508183085,closed,win,32.8455,135.0
+95,2025-11-06,UFC Fight Night: Bonfim vs. Brown,2025-11-06,Hyder Amil,Jamall Emmers,Hyder Amil,1.66,24.33,4.9,0.8368612920640373,closed,loss,-24.33,-100.0
+96,2025-11-06,UFC Fight Night: Bonfim vs. Brown,2025-11-06,Miles Johns,Daniel Marcos,Daniel Marcos,1.52,24.33,4.9,0.9189228541841916,closed,win,12.6516,52.0
+97,2025-11-06,UFC Fight Night,2025-11-06,Jacqueline Cavalcanti,AJ Cunningham,Jacqueline Cavalcanti,1.53,24.33,4.0,0.8417269286909831,closed,win,12.8949,53.0
+98,2025-11-06,UFC Fight Night,2025-11-06,Ismael Bonfim,AJ Cunningham,Ismael Bonfim,1.48,24.33,4.0,0.8655748144006762,closed,loss,-24.33,-100.0
+99,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Serghei Spivac,Shamil Gaziev,Serghei Spivac,2.17,24.71,4.9,0.6760598142687774,open,,0.0,0.0
+100,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Bogdan Grad,Luke Riley,Bogdan Grad,3.05,24.71,4.9,0.7717700958112477,open,,0.0,0.0
+101,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Bekzat Almakhan,Aleksandre Topuria,Aleksandre Topuria,1.9,24.71,4.9,0.8280448813946253,open,,0.0,0.0
