@@ -98,4 +98,4 @@ bet_id,date_placed,event_name,event_date,fighter_red,fighter_blue,pick,odds,stak
 98,2025-11-06,UFC Fight Night,2025-11-06,Ismael Bonfim,AJ Cunningham,Ismael Bonfim,1.48,24.33,4.0,0.8655748144006762,closed,loss,-24.33,-100.0
 99,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Serghei Spivac,Shamil Gaziev,Serghei Spivac,2.17,24.71,4.9,0.6760598142687774,closed,void,0.0,0.0
 100,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Bogdan Grad,Luke Riley,Bogdan Grad,3.05,24.71,4.9,0.7717700958112477,closed,loss,-24.71,-100.0
-101,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Bekzat Almakhan,Aleksandre Topuria,Aleksandre Topuria,1.9,24.71,4.9,0.8280448813946253,open,,0.0,0.0
+101,2025-11-19,UFC Fight Night: Tsarukyan vs. Hooker,2025-11-19,Bekzat Almakhan,Aleksandre Topuria,Aleksandre Topuria,1.9,24.71,4.9,0.8280448813946253,closed,win,22.238999999999997,89.99999999999999
